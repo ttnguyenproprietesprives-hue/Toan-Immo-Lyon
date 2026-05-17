@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estimation immobilière gratuite – Toan Immo Lyon</title>
+  <meta name="description" content="Obtenez une estimation gratuite de votre bien immobilier sur Lyon et le Grand Lyon. Résultat instantané basé sur les données du marché réel." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy: #1A2E4A;
+      --navy-deep: #0F1E33;
+      --gold: #C9A84C;
+      --gold-light: #F5EDD6;
+      --gold-pale: #FBF8F0;
+      --white: #FFFFFF;
+      --gray-50: #F8F7F5;
+      --gray-100: #EEECE8;
+      --gray-300: #B8B4AC;
+      --gray-500: #7A7670;
+      --gray-700: #3D3B38;
+      --success: #1D9E75;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-700);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--navy-deep);
+      padding: 0 2rem;
+      position: sticky; top: 0; z-index: 100;
+      border-bottom: 1px solid rgba(201,168,76,0.2);
+    }
+    .header-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .logo-mark {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 15px; font-weight: 600; color: var(--navy-deep);
+    }
+    .logo-text { font-family: 'Playfair Display', serif; font-size: 17px; color: var(--white); font-weight: 500; letter-spacing: 0.01em; }
+    .logo-sub { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 1px; }
+    .header-badge {
+      font-size: 11px; padding: 5px 14px; border-radius: 99px;
+      border: 1px solid rgba(201,168,76,0.4);
+      color: var(--gold); letter-spacing: 0.04em;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--navy);
+      padding: 5rem 2rem 4rem;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 100%, rgba(201,168,76,0.08) 0%, transparent 70%);
+    }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1.25rem;
+      border: 1px solid rgba(201,168,76,0.3);
+      padding: 5px 14px; border-radius: 99px;
+    }
+    .hero-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 500; color: var(--white);
+      line-height: 1.2; margin-bottom: 1.25rem;
+    }
+    .hero h1 em { font-style: italic; color: var(--gold); }
+    .hero p {
+      font-size: 1.05rem; color: rgba(255,255,255,0.6);
+      max-width: 520px; margin: 0 auto 2.5rem;
+      font-weight: 300; line-height: 1.7;
+    }
+    .hero-stats {
+      display: flex; justify-content: center; gap: 3rem;
+      flex-wrap: wrap;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat .num { font-family: 'Playfair Display', serif; font-size: 1.75rem; color: var(--gold); }
+    .hero-stat .lbl { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+
+    /* ── MAIN CARD ── */
+    .main {
+      max-width: 780px; margin: -2rem auto 4rem;
+      padding: 0 1.5rem;
+      position: relative; z-index: 10;
+    }
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-100);
+      overflow: hidden;
+    }
+    .card-header {
+      background: var(--navy);
+      padding: 1.5rem 2rem;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .card-header-icon {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(201,168,76,0.15);
+      border: 1px solid rgba(201,168,76,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .card-header h2 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--white); font-weight: 500; }
+    .card-header p { font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+
+    /* Steps */
+    .steps {
+      display: flex; border-bottom: 1px solid var(--gray-100);
+    }
+    .step {
+      flex: 1; padding: 10px 8px; text-align: center;
+      font-size: 12px; color: var(--gray-300);
+      background: var(--gray-50); transition: all 0.2s;
+      border-right: 1px solid var(--gray-100);
+    }
+    .step:last-child { border-right: none; }
+    .step.active { background: var(--white); color: var(--navy); font-weight: 500; }
+    .step.done { background: var(--navy-deep); color: rgba(255,255,255,0.6); }
+
+    /* Form */
+    .form-body { padding: 2rem; }
+    .section-label {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--gray-300); font-weight: 500; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--gray-100); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .field label {
+      display: block; font-size: 11px; color: var(--gray-500);
+      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; font-weight: 500;
+    }
+    .field select, .field input {
+      width: 100%; padding: 10px 12px;
+      border: 1px solid var(--gray-100);
+      border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif; font-size: 14px;
+      color: var(--gray-700);
+      background: var(--white);
+      appearance: none; -webkit-appearance: none;
+      transition: border-color 0.15s;
+    }
+    .field select:focus, .field input:focus {
+      outline: none; border-color: var(--navy);
+    }
+    .field.full { grid-column: 1 / -1; }
+    .submit-btn {
+      width: 100%; padding: 15px;
+      background: var(--navy);
+      color: var(--white);
+      border: none; border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500;
+      cursor: pointer; margin-top: 1.5rem;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background 0.2s;
+    }
+    .submit-btn:hover { background: var(--navy-deep); }
+    .submit-btn .arrow { font-size: 18px; }
+
+    /* Loading */
+    .loading {
+      padding: 3rem 2rem; text-align: center;
+    }
+    .spinner-ring {
+      width: 48px; height: 48px; border-radius: 50%;
+      border: 3px solid var(--gray-100);
+      border-top-color: var(--gold);
+      animation: spin 0.9s linear infinite;
+      margin: 0 auto 1.5rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-msg { font-size: 14px; color: var(--gray-500); font-weight: 300; }
+    .loading-steps { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+    .ls { font-size: 12px; color: var(--gray-300); display: flex; align-items: center; gap: 6px; }
+    .ls.active { color: var(--navy); font-weight: 500; }
+    .ls.done { color: var(--success); }
+
+    /* Result */
+    .result-zone { }
+    .result-hero {
+      background: var(--navy);
+      padding: 2rem;
+    }
+    .result-meta { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.4); margin-bottom: 8px; }
+    .result-price { font-family: 'Playfair Display', serif; font-size: 3rem; color: var(--gold); font-weight: 500; margin-bottom: 4px; }
+    .result-range { font-size: 13px; color: rgba(255,255,255,0.45); }
+    .result-metrics {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid rgba(255,255,255,0.08); margin-top: 1.5rem;
+    }
+    .rm { padding: 14px; text-align: center; border-right: 1px solid rgba(255,255,255,0.08); }
+    .rm:last-child { border-right: none; }
+    .rm-val { font-size: 18px; font-weight: 500; color: var(--white); }
+    .rm-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(255,255,255,0.35); margin-top: 3px; }
+    .result-badges { display: flex; gap: 8px; margin-top: 1.25rem; flex-wrap: wrap; }
+    .rbadge {
+      font-size: 11px; padding: 4px 12px; border-radius: 99px;
+      border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.55);
+      display: flex; align-items: center; gap: 5px;
+    }
+    .rbadge .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
+
+    .result-body { padding: 2rem; }
+    .analysis-text { font-size: 14px; color: var(--gray-500); line-height: 1.75; margin-bottom: 1.5rem; font-weight: 300; }
+    .pts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 1.5rem; }
+    .pts-block .pts-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 500; margin-bottom: 8px; }
+    .pts-block.forts .pts-title { color: var(--success); }
+    .pts-block.vigil .pts-title { color: var(--gold); }
+    .pts-block ul { list-style: none; }
+    .pts-block li { font-size: 13px; color: var(--gray-500); padding: 3px 0; display: flex; align-items: flex-start; gap: 7px; line-height: 1.5; }
+    .pts-block.forts li::before { content: '✓'; color: var(--success); font-weight: 500; flex-shrink: 0; }
+    .pts-block.vigil li::before { content: '·'; color: var(--gold); font-size: 18px; line-height: 1; flex-shrink: 0; }
+    .conseil-box {
+      padding: 14px 16px;
+      border-left: 3px solid var(--gold);
+      background: var(--gold-pale);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin-bottom: 1.5rem;
+    }
+    .conseil-box .c-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold); font-weight: 500; margin-bottom: 4px; }
+    .conseil-box p { font-size: 13px; color: var(--gray-700); line-height: 1.6; }
+    .divider { border: none; border-top: 1px solid var(--gray-100); margin: 1.5rem 0; }
+
+    /* CTA Lead */
+    .cta-box {
+      border: 1px solid var(--gray-100);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .cta-header {
+      background: var(--navy-deep); padding: 1.25rem 1.5rem;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .cta-header-icon { font-size: 20px; }
+    .cta-header h3 { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--white); font-weight: 500; }
+    .cta-header p { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+    .cta-body { padding: 1.5rem; background: var(--gold-pale); }
+    .cta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    .cta-grid .full { grid-column: 1 / -1; }
+    .cta-grid label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray-500); display: block; margin-bottom: 4px; }
+    .cta-grid input {
+      width: 100%; padding: 10px 12px;
+      border: 1px solid rgba(201,168,76,0.25);
+      border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif; font-size: 14px;
+      background: var(--white); color: var(--gray-700);
+    }
+    .cta-grid input:focus { outline: none; border-color: var(--gold); }
+    .cta-submit {
+      width: 100%; padding: 13px;
+      background: var(--navy); color: var(--white);
+      border: none; border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .cta-submit:hover { background: var(--navy-deep); }
+    .cta-note { font-size: 11px; color: var(--gray-300); text-align: center; margin-top: 10px; }
+
+    /* Success */
+    .success-zone { padding: 3rem 2rem; text-align: center; }
+    .success-icon {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: var(--navy); margin: 0 auto 1.5rem;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+    }
+    .success-zone h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--navy); margin-bottom: 8px; }
+    .success-zone p { font-size: 14px; color: var(--gray-500); font-weight: 300; line-height: 1.7; }
+
+    /* Footer */
+    footer { text-align: center; padding: 2rem; font-size: 12px; color: var(--gray-300); }
+
+    @media (max-width: 600px) {
+      .grid-2, .grid-3, .pts-grid, .cta-grid { grid-template-columns: 1fr; }
+      .result-metrics { grid-template-columns: 1fr; }
+      .rm { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); }
+      .hero { padding: 3rem 1.5rem 2.5rem; }
+      .hero-stats { gap: 1.5rem; }
+      .form-body { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="logo" href="/">
+      <div class="logo-mark">TI</div>
+      <div>
+        <div class="logo-text">Toan Immo Lyon</div>
+        <div class="logo-sub">Conseiller immobilier · Grand Lyon</div>
+      </div>
+    </a>
+    <div class="header-badge">Estimation gratuite</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-tag">Données marché en temps réel</div>
+  <h1>Quelle est la valeur<br/>de votre bien <em>aujourd'hui</em> ?</h1>
+  <p>Estimation instantanée basée sur les transactions réelles DVF, LeBonCoin, PAP et SeLoger sur le Grand Lyon.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="num">30+</div><div class="lbl">Communes du Grand Lyon</div></div>
+    <div class="hero-stat"><div class="num">100%</div><div class="lbl">Gratuit et sans engagement</div></div>
+    <div class="hero-stat"><div class="num">2 min</div><div class="lbl">Pour obtenir votre résultat</div></div>
+  </div>
+</section>
+
+<main class="main">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-icon">🏠</div>
+      <div>
+        <h2>Estimez votre bien</h2>
+        <p>Remplissez le formulaire · Résultat immédiat</p>
+      </div>
+    </div>
+
+    <div class="steps" id="stepbar">
+      <div class="step active" id="s1">① Votre bien</div>
+      <div class="step" id="s2">② Estimation</div>
+      <div class="step" id="s3">③ Être recontacté</div>
+    </div>
+
+    <!-- FORMULAIRE -->
+    <div id="form-zone" class="form-body">
+      <div class="section-label">Localisation</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Commune</label>
+          <select id="commune">
+            <option value="Lyon 1er arrondissement">Lyon 1er arr.</option>
+            <option value="Lyon 2e arrondissement">Lyon 2e arr.</option>
+            <option value="Lyon 3e arrondissement">Lyon 3e arr.</option>
+            <option value="Lyon 4e arrondissement">Lyon 4e arr.</option>
+            <option value="Lyon 5e arrondissement">Lyon 5e arr.</option>
+            <option value="Lyon 6e arrondissement" selected>Lyon 6e arr.</option>
+            <option value="Lyon 7e arrondissement">Lyon 7e arr.</option>
+            <option value="Lyon 8e arrondissement">Lyon 8e arr.</option>
+            <option value="Lyon 9e arrondissement">Lyon 9e arr.</option>
+            <option value="Villeurbanne">Villeurbanne</option>
+            <option value="Caluire-et-Cuire">Caluire-et-Cuire</option>
+            <option value="Bron">Bron</option>
+            <option value="Vénissieux">Vénissieux</option>
+            <option value="Vaulx-en-Velin">Vaulx-en-Velin</option>
+            <option value="Décines-Charpieu">Décines-Charpieu</option>
+            <option value="Meyzieu">Meyzieu</option>
+            <option value="Saint-Priest">Saint-Priest</option>
+            <option value="Écully">Écully</option>
+            <option value="Tassin-la-Demi-Lune">Tassin-la-Demi-Lune</option>
+            <option value="Craponne">Craponne</option>
+            <option value="Francheville">Francheville</option>
+            <option value="Sainte-Foy-lès-Lyon">Sainte-Foy-lès-Lyon</option>
+            <option value="Oullins">Oullins</option>
+            <option value="Pierre-Bénite">Pierre-Bénite</option>
+            <option value="Saint-Fons">Saint-Fons</option>
+            <option value="Feyzin">Feyzin</option>
+            <option value="Mions">Mions</option>
+            <option value="Chassieu">Chassieu</option>
+            <option value="Corbas">Corbas</option>
+            <option value="Solaize">Solaize</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Type de transaction</label>
+          <select id="transaction">
+            <option value="vente">Vente</option>
+            <option value="location">Location</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section-label">Description du bien</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Type de bien</label>
+          <select id="type_bien">
+            <option value="appartement">Appartement</option>
+            <option value="maison">Maison</option>
+            <option value="studio">Studio</option>
+            <option value="loft">Loft</option>
+            <option value="duplex">Duplex</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Nombre de pièces</label>
+          <select id="pieces">
+            <option value="1">1 pièce (studio)</option>
+            <option value="2">2 pièces (T2)</option>
+            <option value="3" selected>3 pièces (T3)</option>
+            <option value="4">4 pièces (T4)</option>
+            <option value="5">5 pièces et +</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Surface (m²)</label>
+          <input type="number" id="surface" value="65" min="10" max="500" />
+        </div>
+        <div class="field">
+          <label>Année de construction</label>
+          <select id="annee">
+            <option value="haussmannien (avant 1914)">Avant 1914 – haussmannien</option>
+            <option value="ancien (1914-1970)">1914–1970</option>
+            <option value="moderne (1970-2000)" selected>1970–2000</option>
+            <option value="récent (2000-2015)">2000–2015</option>
+            <option value="neuf (après 2015)">Après 2015 / Neuf</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section-label">État et caractéristiques</div>
+      <div class="grid-3">
+        <div class="field">
+          <label>État général</label>
+          <select id="etat">
+            <option value="à rénover">À rénover</option>
+            <option value="bon état" selected>Bon état</option>
+            <option value="rénové récemment">Rénové</option>
+            <option value="neuf">Neuf</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>DPE</label>
+          <select id="dpe">
+            <option value="A ou B">A ou B</option>
+            <option value="C ou D" selected>C ou D</option>
+            <option value="E ou F">E ou F</option>
+            <option value="G (passoire thermique)">G – passoire</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Étage</label>
+          <select id="etage">
+            <option value="rez-de-chaussée">RDC</option>
+            <option value="étage bas (1-3)">Étage bas</option>
+            <option value="étage moyen" selected>Étage moyen</option>
+            <option value="étage élevé">Étage élevé</option>
+            <option value="dernier étage">Dernier étage</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Exposition</label>
+          <select id="expo">
+            <option value="nord">Nord</option>
+            <option value="est">Est</option>
+            <option value="ouest">Ouest</option>
+            <option value="sud" selected>Sud</option>
+            <option value="traversant">Traversant</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Parking</label>
+          <select id="parking">
+            <option value="sans parking">Non</option>
+            <option value="avec parking" selected>Oui</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Extérieur</label>
+          <select id="exterieur">
+            <option value="aucun extérieur">Aucun</option>
+            <option value="balcon" selected>Balcon</option>
+            <option value="terrasse">Terrasse</option>
+            <option value="jardin">Jardin</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="submit-btn" onclick="lancerEstimation()">
+        Obtenir mon estimation gratuite <span class="arrow">→</span>
+      </button>
+      <p style="font-size:12px;color:var(--gray-300);text-align:center;margin-top:10px;">Sans engagement · Résultat en moins de 30 secondes</p>
+    </div>
+
+    <!-- LOADING -->
+    <div id="loading-zone" style="display:none" class="loading">
+      <div class="spinner-ring"></div>
+      <div class="loading-msg" id="loading-msg">Analyse du marché en cours…</div>
+      <div class="loading-steps">
+        <div class="ls" id="ls1">📊 Consultation des données DVF (transactions réelles)</div>
+        <div class="ls" id="ls2">🔍 Analyse des annonces LeBonCoin, PAP, SeLoger</div>
+        <div class="ls" id="ls3">📍 Comparaison avec les biens similaires à proximité</div>
+        <div class="ls" id="ls4">✨ Génération de votre estimation personnalisée</div>
+      </div>
+    </div>
+
+    <!-- RÉSULTAT -->
+    <div id="result-zone" style="display:none"></div>
+
+    <!-- SUCCÈS -->
+    <div id="success-zone" style="display:none" class="success-zone">
+      <div class="success-icon">✓</div>
+      <h3>Demande bien reçue !</h3>
+      <p>Toan vous recontactera sous 24h pour un avis de valeur<br/>complet et personnalisé. Merci de votre confiance.</p>
+    </div>
+  </div>
+
+  <div id="error-msg" style="color:#c0392b;font-size:13px;text-align:center;margin-top:1rem;display:none;"></div>
+</main>
+
+<footer>
+  <strong style="color:var(--navy)">Toan Immo Lyon</strong> · Conseiller immobilier indépendant · Grand Lyon<br/>
+  <span>Estimation fournie à titre indicatif basée sur les données du marché immobilier local</span>
+</footer>
+
+<script>
+const loadingMsgs = [
+  "Consultation des transactions DVF…",
+  "Analyse des annonces récentes…",
+  "Comparaison avec les biens similaires…",
+  "Génération de votre estimation…"
+];
+
+function setStep(n) {
+  ['s1','s2','s3'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (i + 1 < n) el.className = 'step done';
+    else if (i + 1 === n) el.className = 'step active';
+    else el.className = 'step';
+  });
+}
+
+async function lancerEstimation() {
+  const data = {
+    commune: document.getElementById('commune').value,
+    transaction: document.getElementById('transaction').value,
+    type_bien: document.getElementById('type_bien').value,
+    pieces: document.getElementById('pieces').value,
+    surface: document.getElementById('surface').value,
+    annee: document.getElementById('annee').value,
+    etat: document.getElementById('etat').value,
+    dpe: document.getElementById('dpe').value,
+    etage: document.getElementById('etage').value,
+    expo: document.getElementById('expo').value,
+    parking: document.getElementById('parking').value,
+    exterieur: document.getElementById('exterieur').value,
+  };
+
+  document.getElementById('form-zone').style.display = 'none';
+  document.getElementById('loading-zone').style.display = 'block';
+  document.getElementById('error-msg').style.display = 'none';
+  setStep(2);
+
+  let mi = 0;
+  const lsIds = ['ls1','ls2','ls3','ls4'];
+  const iv = setInterval(() => {
+    if (mi < lsIds.length) {
+      lsIds.forEach((id, i) => {
+        document.getElementById(id).className = 'ls' + (i < mi ? ' done' : i === mi ? ' active' : '');
+      });
+      mi++;
+    }
+  }, 1600);
+
+  const unite = data.transaction === 'vente' ? '€' : '€/mois';
+  const prompt = `Tu es un expert immobilier du Grand Lyon. Estime ce bien en t'appuyant sur les données réelles du marché (DVF, LeBonCoin, PAP, SeLoger, MeilleursAgents) pour ${data.commune}.
+
+Bien : ${data.type_bien} de ${data.surface}m², ${data.pieces} pièce(s), transaction : ${data.transaction}.
+Construction : ${data.annee}. État : ${data.etat}. DPE : ${data.dpe}.
+Étage : ${data.etage}. Exposition : ${data.expo}. ${data.parking}. Extérieur : ${data.exterieur}.
+
+Réponds UNIQUEMENT en JSON valide, sans markdown ni texte autour :
+{"prix_estime":320000,"prix_min":295000,"prix_max":345000,"prix_m2":4267,"unite":"${unite}","confiance":"Élevée","tendance":"hausse modérée","analyse":"2 phrases max sur le marché local et les facteurs clés pour ce bien","points_forts":["atout 1","atout 2","atout 3"],"vigilances":["vigilance 1"],"conseil":"conseil court et actionnable","nb_similaires":12,"delai":"45 jours"}`;
+
+  try {
+    const res = await fetch('/api/estimate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    clearInterval(iv);
+    if (!res.ok) throw new Error('Erreur serveur ' + res.status);
+    const d = await res.json();
+
+    const fmt = n => Number(n).toLocaleString('fr-FR');
+    const forts = (d.points_forts || []).map(p => `<li>${p}</li>`).join('');
+    const vigils = (d.vigilances || []).map(p => `<li>${p}</li>`).join('');
+
+    document.getElementById('result-zone').innerHTML = `
+      <div class="result-zone">
+        <div class="result-hero">
+          <div class="result-meta">Estimation ${d.unite === '€/mois' ? 'locative' : 'vénale'} — ${data.commune}</div>
+          <div class="result-price">${fmt(d.prix_estime)} <span style="font-size:1.5rem">${d.unite}</span></div>
+          <div class="result-range">Fourchette réaliste : ${fmt(d.prix_min)} – ${fmt(d.prix_max)} ${d.unite}</div>
+          <div class="result-metrics">
+            <div class="rm"><div class="rm-val">${fmt(d.prix_m2)} €</div><div class="rm-lbl">Prix / m²</div></div>
+            <div class="rm"><div class="rm-val">${d.nb_similaires || '~10'}</div><div class="rm-lbl">Annonces similaires</div></div>
+            <div class="rm"><div class="rm-val">${d.delai || '–'}</div><div class="rm-lbl">Délai moyen</div></div>
+          </div>
+          <div class="result-badges">
+            <div class="rbadge"><div class="dot"></div>Confiance ${d.confiance}</div>
+            <div class="rbadge"><div class="dot"></div>Marché : ${d.tendance}</div>
+          </div>
+        </div>
+        <div class="result-body">
+          <p class="analysis-text">${d.analyse}</p>
+          <div class="pts-grid">
+            ${forts ? `<div class="pts-block forts"><div class="pts-title">Points forts</div><ul>${forts}</ul></div>` : ''}
+            ${vigils ? `<div class="pts-block vigil"><div class="pts-title">Points de vigilance</div><ul>${vigils}</ul></div>` : ''}
+          </div>
+          ${d.conseil ? `<div class="conseil-box"><div class="c-lbl">Conseil de Toan</div><p>${d.conseil}</p></div>` : ''}
+          <div class="divider"></div>
+          <div class="cta-box">
+            <div class="cta-header">
+              <div class="cta-header-icon">📞</div>
+              <div>
+                <h3>Obtenir un avis de valeur complet</h3>
+                <p>Visite gratuite · Rapport détaillé · Sous 24h</p>
+              </div>
+            </div>
+            <div class="cta-body">
+              <div class="cta-grid">
+                <div><label>Prénom *</label><input type="text" id="l-prenom" placeholder="Votre prénom" /></div>
+                <div><label>Téléphone *</label><input type="tel" id="l-tel" placeholder="06 00 00 00 00" /></div>
+                <div class="full"><label>Email</label><input type="email" id="l-email" placeholder="votre@email.fr" /></div>
+                <div class="full"><label>Message (optionnel)</label><input type="text" id="l-msg" placeholder="Ex : je souhaite vendre dans 3 mois…" /></div>
+              </div>
+              <button class="cta-submit" onclick="envoyerLead('${data.commune}', '${data.type_bien}', '${data.surface}m²', '${fmt(d.prix_estime)} ${d.unite}')">
+                Être recontacté par Toan →
+              </button>
+              <div class="cta-note">Aucun engagement · Vos données restent confidentielles</div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+    document.getElementById('loading-zone').style.display = 'none';
+    document.getElementById('result-zone').style.display = 'block';
+    setStep(2);
+  } catch(e) {
+    clearInterval(iv);
+    document.getElementById('loading-zone').style.display = 'none';
+    document.getElementById('form-zone').style.display = 'block';
+    document.getElementById('error-msg').style.display = 'block';
+    document.getElementById('error-msg').textContent = 'Une erreur est survenue. Vérifiez votre connexion et réessayez.';
+    setStep(1);
+  }
+}
+
+async function envoyerLead(commune, type, surface, estimation) {
+  const prenom = document.getElementById('l-prenom').value.trim();
+  const tel = document.getElementById('l-tel').value.trim();
+  const email = document.getElementById('l-email').value.trim();
+  const msg = document.getElementById('l-msg').value.trim();
+
+  if (!prenom || !tel) {
+    alert('Merci de renseigner votre prénom et votre téléphone.');
+    return;
+  }
+
+  try {
+    await fetch('/api/lead', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prenom, tel, email, msg, commune, type, surface, estimation })
+    });
+  } catch(e) {}
+
+  document.getElementById('result-zone').style.display = 'none';
+  document.getElementById('success-zone').style.display = 'block';
+  setStep(3);
+}
+</script>
+</body>
+</html>
