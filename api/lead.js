@@ -44,6 +44,7 @@ export default async function handler(req, res) {
       Fourchette: body['Fourchette'] || '',
       Prix_m2: body['Prix m²'] || '',
       Tendance: body['Tendance'] || '',
+      Consentement_RGPD: 'OUI – Case cochée le ' + new Date().toLocaleDateString('fr-FR') + ' à ' + new Date().toLocaleTimeString('fr-FR'),
       Source: 'Toan Immo Lyon – Outil estimation'
     };
 
