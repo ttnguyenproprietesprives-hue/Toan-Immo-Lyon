@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -645,6 +644,47 @@ Réponds UNIQUEMENT en JSON valide sans markdown :
     clearInterval(iv);
     if (!res.ok) throw new Error('Erreur ' + res.status);
     const est = await res.json();
+
+    // Envoi email au prospect si email renseigné
+    if (d.email) {
+      fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prospect: {
+            civilite: d.civilite,
+            prenom: d.prenom,
+            nom: d.nom,
+            email: d.email
+          },
+          estimation: {
+            prix_formate: fmt(est.prix_estime),
+            min_formate: fmt(est.prix_min),
+            max_formate: fmt(est.prix_max),
+            prix_m2_formate: fmt(est.prix_m2),
+            unite: est.unite,
+            confiance: est.confiance,
+            tendance: est.tendance,
+            analyse: est.analyse,
+            points_forts: est.points_forts,
+            vigilances: est.vigilances,
+            conseil: est.conseil,
+            nb_similaires: est.nb_similaires,
+            delai: est.delai
+          },
+          bien: {
+            projet: projetLabel,
+            type: d.type_bien,
+            pieces: d.pieces,
+            surface: d.surface,
+            commune: d.commune,
+            adresse: d.adresse,
+            etat: d.etat,
+            dpe: d.dpe
+          }
+        })
+      }).catch(() => {});
+    }
 
     // Envoi lead complet à Formspree
     fetch('/api/lead', {
