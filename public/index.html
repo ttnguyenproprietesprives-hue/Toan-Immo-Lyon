@@ -622,18 +622,28 @@ async function lancerEstimation() {
   const salutation = `${civilite} ${prenom} ${nom}`.trim();
   const projetLabel = d.projet === 'vente' ? 'vente' : d.projet === 'location' ? 'mise en location' : 'achat';
 
-  const prompt = `Tu es un expert immobilier du Grand Lyon. Estime ce bien pour ${salutation} dans le cadre d'un projet de ${projetLabel}, en t'appuyant sur les données réelles du marché (DVF, LeBonCoin, PAP, SeLoger) pour ${d.commune}.
+  const prompt = `Tu es un expert immobilier du Grand Lyon, spécialiste de l'estimation à la valeur réelle de marché.
 
-Bien : ${d.type_bien} de ${d.surface}m², ${d.pieces} pièce(s), ${d.sdb} SDB, ${d.nb_etages}.
+RÈGLES IMPORTANTES pour l'estimation :
+- Base-toi EXCLUSIVEMENT sur les prix de vente réels DVF (Demandes de Valeurs Foncières = transactions notariées réelles), PAS sur les prix affichés en annonce
+- Les prix d'annonces (LeBonCoin, PAP, SeLoger) sont en moyenne 8 à 12% au-dessus des prix de vente réels
+- Applique systématiquement une décote réaliste par rapport aux prix affichés
+- Tiens compte de la marge de négociation habituelle sur le marché lyonnais (5 à 10%)
+- L'estimation doit être RÉALISTE et VENDABLE, pas optimiste
+- Un bien surestimé ne se vend pas — mieux vaut un prix juste dès le départ
+
+Bien à estimer pour ${salutation} — projet : ${projetLabel} — commune : ${d.commune}.
+
+Caractéristiques : ${d.type_bien} de ${d.surface}m², ${d.pieces} pièce(s), ${d.sdb} SDB, ${d.nb_etages}.
 Adresse : ${d.adresse || 'non renseignée'}, ${d.commune}, environnement : ${d.environnement}.
 Construction : ${d.annee}. État : ${d.etat}. DPE : ${d.dpe}. Chauffage : ${d.chauffage}.
 Étage : ${d.etage}. Exposition : ${d.expo}. Luminosité : ${d.lumineux}. Vue : ${d.vue}.
 Équipements : ${d.parking}, ${d.exterieur}, ${d.ascenseur}, ${d.cave}, ${d.cuisine}, ${d.clim}, ${d.parquet}.
 ${d.projet === 'achat' ? 'Budget max : ' + d.budget + '€, apport : ' + d.apport + '€, financement : ' + d.financement + '.' : ''}
-Délai : ${d.delai}.
+Délai envisagé : ${d.delai}.
 
 Réponds UNIQUEMENT en JSON valide sans markdown :
-{"prix_estime":320000,"prix_min":295000,"prix_max":345000,"prix_m2":4267,"unite":"${unite}","confiance":"Élevée","tendance":"hausse modérée","analyse":"2 phrases personnalisées pour ${salutation} sur le marché local et les facteurs clés","points_forts":["atout 1","atout 2","atout 3"],"vigilances":["vigilance 1"],"conseil":"conseil personnalisé pour ${salutation} dans son projet de ${projetLabel}","nb_similaires":12,"delai":"45 jours"}`;
+{"prix_estime":320000,"prix_min":295000,"prix_max":345000,"prix_m2":4267,"unite":"${unite}","confiance":"Élevée","tendance":"hausse modérée","analyse":"2 phrases personnalisées pour ${salutation} basées sur les transactions DVF réelles du secteur","points_forts":["atout 1","atout 2","atout 3"],"vigilances":["vigilance 1"],"conseil":"conseil réaliste et actionnable pour ${salutation} dans son projet de ${projetLabel}","nb_similaires":12,"delai":"45 jours"}`;
 
   const fmt = n => Number(n).toLocaleString('fr-FR');
 
