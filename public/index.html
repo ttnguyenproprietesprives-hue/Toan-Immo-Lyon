@@ -643,7 +643,10 @@ Réponds UNIQUEMENT en JSON valide sans markdown :
     });
     clearInterval(iv);
     if (!res.ok) throw new Error('Erreur ' + res.status);
-    const est = await res.json();
+    const rawText = await res.text();
+    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Réponse invalide');
+    const est = JSON.parse(jsonMatch[0]);
 
     // Envoi email au prospect si email renseigné
     if (d.email) {
