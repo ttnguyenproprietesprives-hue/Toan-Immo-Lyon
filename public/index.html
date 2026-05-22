@@ -1,11 +1,45 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Estimation immobilière gratuite – Toan Immo Lyon</title>
-  <meta name="description" content="Estimation gratuite de votre bien immobilier sur Lyon et le Grand Lyon. Résultat instantané basé sur les données du marché réel." />
+
+  <title>Estimation immobilière gratuite – Lyon & Grand Lyon | Toan Immo Lyon</title>
+  <meta name="description" content="Estimez gratuitement votre bien immobilier sur Lyon, Bron, Villeurbanne et le Grand Lyon. Résultat instantané en 2 minutes. Toan Nguyen, mandataire immobilier Propriétés-Privées." />
+  <meta name="keywords" content="estimation immobilière Lyon, estimation immobilière Bron, mandataire immobilier Lyon, prix immobilier Grand Lyon, estimer appartement Lyon, estimer maison Lyon, estimation gratuite Lyon" />
+  <meta name="author" content="NGUYEN Trung Toan – Toan Immo Lyon" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://www.toanimmo-lyon.fr/" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.toanimmo-lyon.fr/" />
+  <meta property="og:title" content="Estimation immobilière gratuite – Lyon & Grand Lyon | Toan Immo Lyon" />
+  <meta property="og:description" content="Estimez gratuitement votre bien en 2 minutes. Résultat instantané basé sur les données DVF réelles. Toan Immo Lyon, mandataire Propriétés-Privées." />
+  <meta property="og:locale" content="fr_FR" />
+
+  <!-- Schema.org -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "RealEstateAgent",
+    "name": "Toan Immo Lyon",
+    "description": "Mandataire immobilier indépendant sur Lyon et le Grand Lyon. Estimation gratuite en ligne en 2 minutes.",
+    "url": "https://www.toanimmo-lyon.fr",
+    "telephone": "+33660022725",
+    "areaServed": ["Lyon", "Bron", "Villeurbanne", "Caluire-et-Cuire", "Saint-Priest", "Grand Lyon"],
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Lyon",
+      "addressRegion": "Auvergne-Rhône-Alpes",
+      "addressCountry": "FR"
+    },
+    "sameAs": [
+      "https://calendly.com/tt-nguyen-proprietesprivees/rendez-vous-estimation-vente-achat"
+    ]
+  }
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
@@ -663,48 +697,28 @@ Format attendu (remplace toutes les valeurs par les vraies) :
     if (!jsonMatch) throw new Error('Réponse invalide');
     const est = JSON.parse(jsonMatch[0]);
 
-    // Envoi email au prospect si email renseigné
     if (d.email) {
       fetch('/api/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          prospect: {
-            civilite: d.civilite,
-            prenom: d.prenom,
-            nom: d.nom,
-            email: d.email
-          },
+          prospect: { civilite: d.civilite, prenom: d.prenom, nom: d.nom, email: d.email },
           estimation: {
-            prix_formate: fmt(est.prix_estime),
-            min_formate: fmt(est.prix_min),
-            max_formate: fmt(est.prix_max),
-            prix_m2_formate: fmt(est.prix_m2),
-            unite: est.unite,
-            confiance: est.confiance,
-            tendance: est.tendance,
-            analyse: est.analyse,
-            points_forts: est.points_forts,
-            vigilances: est.vigilances,
-            conseil: est.conseil,
-            nb_similaires: est.nb_similaires,
-            delai: est.delai
+            prix_formate: fmt(est.prix_estime), min_formate: fmt(est.prix_min),
+            max_formate: fmt(est.prix_max), prix_m2_formate: fmt(est.prix_m2),
+            unite: est.unite, confiance: est.confiance, tendance: est.tendance,
+            analyse: est.analyse, points_forts: est.points_forts, vigilances: est.vigilances,
+            conseil: est.conseil, nb_similaires: est.nb_similaires, delai: est.delai
           },
           bien: {
-            projet: projetLabel,
-            type: d.type_bien,
-            pieces: d.pieces,
-            surface: d.surface,
-            commune: d.commune,
-            adresse: d.adresse,
-            etat: d.etat,
-            dpe: d.dpe
+            projet: projetLabel, type: d.type_bien, pieces: d.pieces,
+            surface: d.surface, commune: d.commune, adresse: d.adresse,
+            etat: d.etat, dpe: d.dpe
           }
         })
       }).catch(() => {});
     }
 
-    // Envoi lead complet à Formspree
     fetch('/api/lead', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -762,12 +776,8 @@ Format attendu (remplace toutes les valeurs par les vraies) :
           </div>
           <div class="contact-body">
             <div class="contact-actions">
-              <a href="tel:0660022725" class="action-btn btn-phone">
-                📞 &nbsp; 06 60 02 27 25
-              </a>
-              <a href="https://calendly.com/tt-nguyen-proprietesprivees/rendez-vous-estimation-vente-achat" target="_blank" class="action-btn btn-rdv">
-                📅 &nbsp; Prendre RDV en ligne
-              </a>
+              <a href="tel:0660022725" class="action-btn btn-phone">📞 &nbsp; 06 60 02 27 25</a>
+              <a href="https://calendly.com/tt-nguyen-proprietesprivees/rendez-vous-estimation-vente-achat" target="_blank" class="action-btn btn-rdv">📅 &nbsp; Prendre RDV en ligne</a>
             </div>
             <div class="recap-box">
               <div class="r-title">Récapitulatif de votre demande</div>
