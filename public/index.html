@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -642,8 +643,10 @@ Construction : ${d.annee}. État : ${d.etat}. DPE : ${d.dpe}. Chauffage : ${d.ch
 ${d.projet === 'achat' ? 'Budget max : ' + d.budget + '€, apport : ' + d.apport + '€, financement : ' + d.financement + '.' : ''}
 Délai envisagé : ${d.delai}.
 
-Réponds UNIQUEMENT en JSON valide sans markdown :
-{"prix_estime":320000,"prix_min":295000,"prix_max":345000,"prix_m2":4267,"unite":"${unite}","confiance":"Élevée","tendance":"hausse modérée","analyse":"2 phrases personnalisées pour ${salutation} basées sur les transactions DVF réelles du secteur","points_forts":["atout 1","atout 2","atout 3"],"vigilances":["vigilance 1"],"conseil":"conseil réaliste et actionnable pour ${salutation} dans son projet de ${projetLabel}","nb_similaires":12,"delai":"45 jours"}`;
+Réponds UNIQUEMENT en JSON valide sans markdown. Les valeurs numériques DOIVENT être calculées précisément selon les caractéristiques du bien et les prix DVF réels de ${d.commune} — NE PAS utiliser des valeurs par défaut. Un studio de 25m² ne vaut pas 300 000€, une maison à rénover vaut moins qu'un bien neuf, etc.
+
+Format attendu (remplace toutes les valeurs par les vraies) :
+{"prix_estime":CALCULER_SELON_BIEN,"prix_min":CALCULER_SELON_BIEN,"prix_max":CALCULER_SELON_BIEN,"prix_m2":CALCULER_SELON_BIEN,"unite":"${unite}","confiance":"Élevée ou Modérée ou Faible","tendance":"hausse ou stable ou baisse","analyse":"analyse personnalisée basée sur DVF réels de ${d.commune}","points_forts":["atout spécifique au bien"],"vigilances":["vigilance spécifique"],"conseil":"conseil précis pour ${salutation}","nb_similaires":NOMBRE_REEL,"delai":"DELAI_REEL"}`;
 
   const fmt = n => Number(n).toLocaleString('fr-FR');
 
