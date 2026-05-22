@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -636,6 +635,8 @@ Délai : ${d.delai}.
 Réponds UNIQUEMENT en JSON valide sans markdown :
 {"prix_estime":320000,"prix_min":295000,"prix_max":345000,"prix_m2":4267,"unite":"${unite}","confiance":"Élevée","tendance":"hausse modérée","analyse":"2 phrases personnalisées pour ${salutation} sur le marché local et les facteurs clés","points_forts":["atout 1","atout 2","atout 3"],"vigilances":["vigilance 1"],"conseil":"conseil personnalisé pour ${salutation} dans son projet de ${projetLabel}","nb_similaires":12,"delai":"45 jours"}`;
 
+  const fmt = n => Number(n).toLocaleString('fr-FR');
+
   try {
     const res = await fetch('/api/estimate', {
       method: 'POST',
@@ -644,7 +645,10 @@ Réponds UNIQUEMENT en JSON valide sans markdown :
     });
     clearInterval(iv);
     if (!res.ok) throw new Error('Erreur ' + res.status);
-   const est = await res.json();
+    const rawText = await res.text();
+    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Réponse invalide');
+    const est = JSON.parse(jsonMatch[0]);
 
     // Envoi email au prospect si email renseigné
     if (d.email) {
@@ -712,7 +716,6 @@ Réponds UNIQUEMENT en JSON valide sans markdown :
       })
     }).catch(() => {});
 
-    const fmt = n => Number(n).toLocaleString('fr-FR');
     const forts = (est.points_forts||[]).map(p=>`<li>${p}</li>`).join('');
     const vigils = (est.vigilances||[]).map(p=>`<li>${p}</li>`).join('');
 
