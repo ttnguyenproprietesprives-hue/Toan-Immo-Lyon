@@ -1,9 +1,4 @@
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
   try {
@@ -32,10 +27,14 @@ export default async function handler(req, res) {
     if (!response.ok) return res.status(500).json({ error: data });
 
     const text = (data.content || []).map(b => b.text || '').join('');
-    const clean = text.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(clean);
+    
+    // Extraire le JSON même s'il y a du texte autour
+    const match = text.match(/\{[\s\S]*\}/);
+    if (!match) return res.status(500).json({ error: 'Pas de JSON dans la réponse', raw: text });
+    
+    const parsed = JSON.parse(match[0]);
     res.status(200).json(parsed);
-  } catch (e) {
-    res.status(500).json({ error: e.message, stack: e.stack });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
   }
 }
