@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex, nofollow"/>
 <title>Générateur de contenu – Toan Immo Lyon</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
@@ -15,11 +16,42 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; background: var(--gray-50); color: var(--gray-700); min-height: 100vh; }
 
+/* ── PIN SCREEN ── */
+#pin-screen {
+  position: fixed; inset: 0; background: var(--navy-deep);
+  display: flex; align-items: center; justify-content: center; z-index: 9999;
+}
+.pin-box {
+  background: var(--navy); border-radius: var(--radius);
+  border: 1px solid rgba(201,168,76,0.2); padding: 2.5rem 2rem;
+  text-align: center; width: 320px;
+}
+.pin-logo { width: 52px; height: 52px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: var(--navy-deep); margin: 0 auto 1.25rem; }
+.pin-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--white); margin-bottom: 0.4rem; }
+.pin-sub { font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 1.75rem; }
+.pin-dots { display: flex; justify-content: center; gap: 12px; margin-bottom: 1.75rem; }
+.pin-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(201,168,76,0.4); background: transparent; transition: all 0.2s; }
+.pin-dot.filled { background: var(--gold); border-color: var(--gold); }
+.pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.pin-key { padding: 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 500; color: var(--white); cursor: pointer; transition: all 0.15s; }
+.pin-key:hover { background: rgba(201,168,76,0.15); border-color: rgba(201,168,76,0.3); }
+.pin-key.del { font-size: 14px; color: rgba(255,255,255,0.5); }
+.pin-key.empty { visibility: hidden; }
+.pin-error { font-size: 12px; color: #e74c3c; margin-top: 1rem; min-height: 18px; }
+.pin-shake { animation: shake 0.4s ease; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)} }
+
+/* ── APP ── */
+#app { display: none; }
+
 header { background: var(--navy-deep); padding: 0 2rem; border-bottom: 1px solid rgba(201,168,76,0.2); }
-.header-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 12px; height: 60px; }
+.header-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+.header-left { display: flex; align-items: center; gap: 12px; }
 .logo-mark { width: 34px; height: 34px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 13px; font-weight: 600; color: var(--navy-deep); flex-shrink: 0; }
 .logo-text { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--white); }
 .logo-sub { font-size: 11px; color: rgba(255,255,255,0.4); margin-left: 8px; }
+.lock-btn { font-size: 12px; color: rgba(255,255,255,0.35); cursor: pointer; padding: 5px 10px; border: 1px solid rgba(255,255,255,0.1); border-radius: 99px; transition: all 0.15s; }
+.lock-btn:hover { color: var(--gold); border-color: rgba(201,168,76,0.3); }
 
 .hero { background: var(--navy); padding: 2.5rem 2rem; text-align: center; }
 .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.4rem, 3vw, 2rem); color: var(--white); font-weight: 500; margin-bottom: 0.5rem; }
@@ -27,31 +59,26 @@ header { background: var(--navy-deep); padding: 0 2rem; border-bottom: 1px solid
 .hero p { font-size: 13px; color: rgba(255,255,255,0.5); }
 
 .main { max-width: 900px; margin: 2rem auto 4rem; padding: 0 1.5rem; }
-
 .config-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--gray-100); padding: 2rem; margin-bottom: 1.5rem; }
 .config-card h2 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--navy); margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--gray-100); }
 .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .field { display: flex; flex-direction: column; gap: 5px; }
-.field.full { grid-column: 1 / -1; }
 .field label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-500); font-weight: 500; }
-.field select, .field input { padding: 10px 12px; border: 1px solid var(--gray-100); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--gray-700); background: var(--white); appearance: none; transition: border-color 0.15s; }
-.field select:focus, .field input:focus { outline: none; border-color: var(--navy); }
+.field select { padding: 10px 12px; border: 1px solid var(--gray-100); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--gray-700); background: var(--white); appearance: none; transition: border-color 0.15s; }
+.field select:focus { outline: none; border-color: var(--navy); }
 
 .generate-btn { width: 100%; padding: 15px; background: var(--navy); color: var(--white); border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; margin-top: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s; }
 .generate-btn:hover { background: var(--navy-deep); }
 .generate-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
 .spinner { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .results { display: none; }
 .results-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--navy); margin-bottom: 1.25rem; }
-
 .tabs { display: flex; gap: 4px; margin-bottom: 1.25rem; flex-wrap: wrap; }
 .tab-btn { padding: 8px 16px; border-radius: 99px; border: 1px solid var(--gray-100); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; color: var(--gray-500); transition: all 0.15s; }
 .tab-btn.active { background: var(--navy); color: var(--white); border-color: var(--navy); }
 .tab-btn:hover:not(.active) { border-color: var(--navy); color: var(--navy); }
-
 .tab-panel { display: none; }
 .tab-panel.active { display: block; }
 
@@ -64,38 +91,66 @@ header { background: var(--navy-deep); padding: 0 2rem; border-bottom: 1px solid
 .copy-btn { padding: 6px 14px; background: rgba(201,168,76,0.2); border: 1px solid rgba(201,168,76,0.4); color: var(--gold); border-radius: 99px; font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.15s; }
 .copy-btn:hover { background: rgba(201,168,76,0.35); }
 .copy-btn.copied { background: rgba(29,158,117,0.2); border-color: rgba(29,158,117,0.4); color: #1D9E75; }
-
 .content-body { padding: 1.5rem 20px; }
 .content-text { font-size: 14px; color: var(--gray-700); line-height: 1.75; white-space: pre-wrap; word-break: break-word; }
-
 .blog-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--gray-100); }
-.blog-meta-item { font-size: 12px; color: var(--gray-300); display: flex; align-items: center; gap: 4px; }
-
+.blog-meta-item { font-size: 12px; color: var(--gray-300); }
 .char-count { font-size: 11px; color: var(--gray-300); text-align: right; margin-top: 8px; }
 .char-ok { color: #1D9E75; }
 .char-warn { color: #C9A84C; }
 .char-err { color: #c0392b; }
-
 .tip-box { background: var(--gold-pale); border-left: 3px solid var(--gold); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 10px 14px; margin-top: 12px; font-size: 12px; color: var(--gray-700); line-height: 1.6; }
 .tip-box strong { color: var(--navy); }
-
 .error-msg { color: #c0392b; font-size: 13px; text-align: center; margin-top: 1rem; display: none; }
 
-@media (max-width: 600px) {
-  .fields-grid { grid-template-columns: 1fr; }
-  .tabs { gap: 6px; }
-}
+@media (max-width: 600px) { .fields-grid { grid-template-columns: 1fr; } .tabs { gap: 6px; } }
 </style>
 </head>
 <body>
 
+<!-- ── ÉCRAN PIN ── -->
+<div id="pin-screen">
+  <div class="pin-box" id="pin-box">
+    <div class="pin-logo">TI</div>
+    <div class="pin-title">Accès privé</div>
+    <div class="pin-sub">Générateur de contenu · Toan Immo Lyon</div>
+    <div class="pin-dots">
+      <div class="pin-dot" id="d0"></div>
+      <div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div>
+      <div class="pin-dot" id="d3"></div>
+    </div>
+    <div class="pin-keypad">
+      <button class="pin-key" onclick="addDigit('1')">1</button>
+      <button class="pin-key" onclick="addDigit('2')">2</button>
+      <button class="pin-key" onclick="addDigit('3')">3</button>
+      <button class="pin-key" onclick="addDigit('4')">4</button>
+      <button class="pin-key" onclick="addDigit('5')">5</button>
+      <button class="pin-key" onclick="addDigit('6')">6</button>
+      <button class="pin-key" onclick="addDigit('7')">7</button>
+      <button class="pin-key" onclick="addDigit('8')">8</button>
+      <button class="pin-key" onclick="addDigit('9')">9</button>
+      <button class="pin-key empty"></button>
+      <button class="pin-key" onclick="addDigit('0')">0</button>
+      <button class="pin-key del" onclick="delDigit()">⌫</button>
+    </div>
+    <div class="pin-error" id="pin-error"></div>
+  </div>
+</div>
+
+<!-- ── APPLICATION ── -->
+<div id="app">
+
 <header>
   <div class="header-inner">
-    <div class="logo-mark">TI</div>
-    <div>
-      <span class="logo-text">Toan Immo Lyon</span>
-      <span class="logo-sub">Générateur de contenu</span>
+    <div class="header-left">
+      <div class="logo-mark">TI</div>
+      <div>
+        <span class="logo-text">Toan Immo Lyon</span>
+        <span class="logo-sub">Générateur de contenu</span>
+      </div>
     </div>
+    <div class="lock-btn" onclick="verrouiller()">🔒 Verrouiller</div>
   </div>
 </header>
 
@@ -105,7 +160,6 @@ header { background: var(--navy-deep); padding: 0 2rem; border-bottom: 1px solid
 </section>
 
 <main class="main">
-
   <div class="config-card">
     <h2>⚙️ Paramètres de génération</h2>
     <div class="fields-grid">
@@ -158,140 +212,157 @@ header { background: var(--navy-deep); padding: 0 2rem; border-bottom: 1px solid
         </select>
       </div>
     </div>
-    <button class="generate-btn" onclick="generer()" id="gen-btn">
-      ✨ Générer mon contenu
-    </button>
+    <button class="generate-btn" onclick="generer()" id="gen-btn">✨ Générer mon contenu</button>
     <div class="error-msg" id="error-msg">Une erreur est survenue. Réessayez.</div>
   </div>
 
   <div class="results" id="results">
     <div class="results-title" id="results-title"></div>
     <div class="tabs">
-      <button class="tab-btn active" onclick="showTab('blog')">📝 Article Blog</button>
-      <button class="tab-btn" onclick="showTab('facebook')">👥 Facebook</button>
-      <button class="tab-btn" onclick="showTab('instagram')">📸 Instagram</button>
-      <button class="tab-btn" onclick="showTab('linkedin')">💼 LinkedIn</button>
-      <button class="tab-btn" onclick="showTab('google')">🗺️ Google Business</button>
+      <button class="tab-btn active" onclick="showTab('blog', this)">📝 Article Blog</button>
+      <button class="tab-btn" onclick="showTab('facebook', this)">👥 Facebook</button>
+      <button class="tab-btn" onclick="showTab('instagram', this)">📸 Instagram</button>
+      <button class="tab-btn" onclick="showTab('linkedin', this)">💼 LinkedIn</button>
+      <button class="tab-btn" onclick="showTab('google', this)">🗺️ Google Business</button>
     </div>
 
-    <!-- BLOG -->
     <div class="tab-panel active" id="tab-blog">
       <div class="content-card">
         <div class="content-header">
-          <div class="content-header-left">
-            <span class="platform-icon">📝</span>
-            <div>
-              <div class="platform-name">Article de Blog</div>
-              <div class="platform-note">À publier sur toanimmo-lyon.fr/blog/</div>
-            </div>
-          </div>
+          <div class="content-header-left"><span class="platform-icon">📝</span><div><div class="platform-name">Article de Blog</div><div class="platform-note">À publier sur toanimmo-lyon.fr/blog/</div></div></div>
           <button class="copy-btn" onclick="copier('blog-text', this)">Copier</button>
         </div>
         <div class="content-body">
-          <div class="blog-meta">
-            <span class="blog-meta-item">🕐 <span id="blog-temps">~4 min de lecture</span></span>
-            <span class="blog-meta-item">📅 <span id="blog-date"></span></span>
-            <span class="blog-meta-item">🏷️ <span id="blog-tags"></span></span>
-          </div>
+          <div class="blog-meta"><span class="blog-meta-item">📅 <span id="blog-date"></span></span><span class="blog-meta-item">🏷️ <span id="blog-tags"></span></span></div>
           <div class="content-text" id="blog-text"></div>
-          <div class="tip-box"><strong>💡 Conseil SEO :</strong> Enregistre cet article sous <code>public/blog/[commune]-[sujet].html</code> sur GitHub. Le titre H1 et la première phrase sont déjà optimisés pour Google.</div>
+          <div class="tip-box"><strong>💡 SEO :</strong> Enregistre sous <code>public/blog/[commune]-[sujet].html</code> sur GitHub.</div>
         </div>
       </div>
     </div>
 
-    <!-- FACEBOOK -->
     <div class="tab-panel" id="tab-facebook">
       <div class="content-card">
         <div class="content-header">
-          <div class="content-header-left">
-            <span class="platform-icon">👥</span>
-            <div>
-              <div class="platform-name">Facebook</div>
-              <div class="platform-note">Idéal : 100–250 mots · avec question pour l'engagement</div>
-            </div>
-          </div>
+          <div class="content-header-left"><span class="platform-icon">👥</span><div><div class="platform-name">Facebook</div><div class="platform-note">100–250 mots · avec question pour l'engagement</div></div></div>
           <button class="copy-btn" onclick="copier('facebook-text', this)">Copier</button>
         </div>
         <div class="content-body">
           <div class="content-text" id="facebook-text"></div>
           <div class="char-count" id="facebook-count"></div>
-          <div class="tip-box"><strong>💡 Conseil :</strong> Ajoute une photo de quartier ou un visuel avec le prix au m². Les posts avec image ont 3× plus de portée.</div>
+          <div class="tip-box"><strong>💡 Conseil :</strong> Ajoute une photo de quartier. Les posts avec image ont 3× plus de portée.</div>
         </div>
       </div>
     </div>
 
-    <!-- INSTAGRAM -->
     <div class="tab-panel" id="tab-instagram">
       <div class="content-card">
         <div class="content-header">
-          <div class="content-header-left">
-            <span class="platform-icon">📸</span>
-            <div>
-              <div class="platform-name">Instagram</div>
-              <div class="platform-note">Caption + hashtags · Max 2200 caractères</div>
-            </div>
-          </div>
+          <div class="content-header-left"><span class="platform-icon">📸</span><div><div class="platform-name">Instagram</div><div class="platform-note">Caption + hashtags · Max 2200 caractères</div></div></div>
           <button class="copy-btn" onclick="copier('instagram-text', this)">Copier</button>
         </div>
         <div class="content-body">
           <div class="content-text" id="instagram-text"></div>
           <div class="char-count" id="instagram-count"></div>
-          <div class="tip-box"><strong>💡 Conseil :</strong> Crée un visuel Canva avec le prix au m² en grand. Le visuel attire, la légende convainc.</div>
+          <div class="tip-box"><strong>💡 Conseil :</strong> Crée un visuel Canva avec le prix au m² en grand.</div>
         </div>
       </div>
     </div>
 
-    <!-- LINKEDIN -->
     <div class="tab-panel" id="tab-linkedin">
       <div class="content-card">
         <div class="content-header">
-          <div class="content-header-left">
-            <span class="platform-icon">💼</span>
-            <div>
-              <div class="platform-name">LinkedIn</div>
-              <div class="platform-note">Ton expert · 150–300 mots recommandés</div>
-            </div>
-          </div>
+          <div class="content-header-left"><span class="platform-icon">💼</span><div><div class="platform-name">LinkedIn</div><div class="platform-note">Ton expert · 150–300 mots recommandés</div></div></div>
           <button class="copy-btn" onclick="copier('linkedin-text', this)">Copier</button>
         </div>
         <div class="content-body">
           <div class="content-text" id="linkedin-text"></div>
           <div class="char-count" id="linkedin-count"></div>
-          <div class="tip-box"><strong>💡 Conseil :</strong> Sur LinkedIn, commence par une accroche forte sur la 1ère ligne — c'est ce qui décide si les gens cliquent sur "Voir plus".</div>
+          <div class="tip-box"><strong>💡 Conseil :</strong> La 1ère ligne décide si les gens cliquent sur "Voir plus".</div>
         </div>
       </div>
     </div>
 
-    <!-- GOOGLE BUSINESS -->
     <div class="tab-panel" id="tab-google">
       <div class="content-card">
         <div class="content-header">
-          <div class="content-header-left">
-            <span class="platform-icon">🗺️</span>
-            <div>
-              <div class="platform-name">Google Business</div>
-              <div class="platform-note">Post court · Max 1500 caractères · avec appel à l'action</div>
-            </div>
-          </div>
+          <div class="content-header-left"><span class="platform-icon">🗺️</span><div><div class="platform-name">Google Business</div><div class="platform-note">Max 1500 caractères · avec appel à l'action</div></div></div>
           <button class="copy-btn" onclick="copier('google-text', this)">Copier</button>
         </div>
         <div class="content-body">
           <div class="content-text" id="google-text"></div>
           <div class="char-count" id="google-count"></div>
-          <div class="tip-box"><strong>💡 Conseil :</strong> Publie 1 post Google Business par semaine. Ça améliore ton référencement local et tes avis Google. Va sur <strong>business.google.com</strong> → "Ajouter une mise à jour".</div>
+          <div class="tip-box"><strong>💡 Conseil :</strong> Publie 1 post/semaine sur <strong>business.google.com</strong> → "Ajouter une mise à jour".</div>
         </div>
       </div>
     </div>
-
   </div>
 </main>
+</div>
 
 <script>
-function showTab(name) {
+// ── PIN ──
+const PIN_CODE = '2025';
+let pinEntry = '';
+
+function addDigit(d) {
+  if (pinEntry.length >= 4) return;
+  pinEntry += d;
+  updateDots();
+  if (pinEntry.length === 4) checkPin();
+}
+
+function delDigit() {
+  pinEntry = pinEntry.slice(0, -1);
+  updateDots();
+  document.getElementById('pin-error').textContent = '';
+}
+
+function updateDots() {
+  for (let i = 0; i < 4; i++) {
+    document.getElementById('d' + i).classList.toggle('filled', i < pinEntry.length);
+  }
+}
+
+function checkPin() {
+  if (pinEntry === PIN_CODE) {
+    document.getElementById('pin-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    sessionStorage.setItem('toan_auth', '1');
+  } else {
+    document.getElementById('pin-error').textContent = 'Code incorrect. Réessayez.';
+    document.getElementById('pin-box').classList.add('pin-shake');
+    setTimeout(() => {
+      pinEntry = '';
+      updateDots();
+      document.getElementById('pin-box').classList.remove('pin-shake');
+    }, 500);
+  }
+}
+
+function verrouiller() {
+  sessionStorage.removeItem('toan_auth');
+  location.reload();
+}
+
+// Auth persistante le temps de la session
+if (sessionStorage.getItem('toan_auth') === '1') {
+  document.getElementById('pin-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+}
+
+// Clavier physique
+document.addEventListener('keydown', e => {
+  if (document.getElementById('pin-screen').style.display === 'none') return;
+  if (e.key >= '0' && e.key <= '9') addDigit(e.key);
+  if (e.key === 'Backspace') delDigit();
+});
+
+// ── APP ──
+function showTab(name, btn) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
-  event.target.classList.add('active');
+  btn.classList.add('active');
 }
 
 function copier(id, btn) {
@@ -310,12 +381,6 @@ function charCount(id, countId, max) {
   el.className = 'char-count ' + (len <= max * 0.8 ? 'char-ok' : len <= max ? 'char-warn' : 'char-err');
 }
 
-function setDate() {
-  const now = new Date();
-  const opts = { year: 'numeric', month: 'long', day: 'numeric' };
-  document.getElementById('blog-date').textContent = now.toLocaleDateString('fr-FR', opts);
-}
-
 async function generer() {
   const commune = document.getElementById('commune').value;
   const sujet = document.getElementById('sujet').value;
@@ -328,20 +393,20 @@ async function generer() {
   document.getElementById('error-msg').style.display = 'none';
   document.getElementById('results').style.display = 'none';
 
-  const prompt = `Tu es Toan Nguyen, mandataire immobilier expert du Grand Lyon (réseau Propriétés-Privées), basé à Lyon.
-Ton site : www.toanimmo-lyon.fr · Téléphone : 06 60 02 27 25
+  const prompt = `Tu es Toan Nguyen, mandataire immobilier expert du Grand Lyon (réseau Propriétés-Privées).
+Site : www.toanimmo-lyon.fr · Tél : 06 60 02 27 25
 
 Génère du contenu marketing immobilier sur : "${sujet}" à ${commune}, en ${saison}.
 Ton : ${ton}.
 
-Réponds UNIQUEMENT en JSON valide (pas de markdown, pas de backticks) avec exactement ces 5 clés :
+Réponds UNIQUEMENT en JSON valide (sans markdown, sans backticks) avec exactement ces 5 clés :
 
 {
-  "blog": "Article complet HTML-ready (500-700 mots). Commence par un titre H1 entre balises <h1></h1>. Structure avec des sous-titres <h2></h2>. Paragraphes en <p></p>. Inclus des données de marché réalistes, des conseils pratiques, et termine par un appel à l'action vers www.toanimmo-lyon.fr ou le 06 60 02 27 25. Optimisé SEO avec les mots-clés naturellement intégrés.",
-  "facebook": "Post Facebook engageant (150-200 mots). Commence par une accroche forte avec un emoji. Contenu utile et local. Termine par une question pour susciter des commentaires. Inclus un appel à l'action vers le site ou le téléphone. Ton conversationnel.",
-  "instagram": "Légende Instagram percutante (80-120 mots). Accroche choc sur la 1ère ligne (avant le 'plus'). 2-3 points clés. Appel à l'action (lien en bio). Puis une ligne vide et 15-20 hashtags pertinents en français et anglais (immobilier, Lyon, commune, etc.).",
-  "linkedin": "Post LinkedIn professionnel (180-250 mots). 1ère ligne = accroche forte. Partage d'expertise avec données marché. Conseil actionnable. Question finale pour l'engagement. Hashtags professionnels à la fin (5-8 max). Ton expert mais accessible.",
-  "google": "Post Google Business (150-200 mots max). Direct et informatif. Données locales concrètes. Appel à l'action clair (estimation gratuite, RDV, téléphone). Inclus le lien www.toanimmo-lyon.fr. Adapté pour apparaître dans les recherches locales Google Maps."
+  "blog": "Article complet (500-700 mots). Titre <h1></h1>, sous-titres <h2></h2>, paragraphes <p></p>. Données marché réalistes, conseils pratiques, appel à l'action vers www.toanimmo-lyon.fr ou le 06 60 02 27 25. Optimisé SEO.",
+  "facebook": "Post Facebook (150-200 mots). Accroche avec emoji, contenu local utile, question finale pour engagement, appel à l'action.",
+  "instagram": "Légende Instagram (80-120 mots). Accroche choc 1ère ligne, 2-3 points clés, appel à l'action (lien en bio). Ligne vide puis 15-20 hashtags pertinents.",
+  "linkedin": "Post LinkedIn (180-250 mots). 1ère ligne = accroche forte. Expertise + données marché. Conseil actionnable. Question finale. 5-8 hashtags pro.",
+  "google": "Post Google Business (150 mots max). Direct, données locales concrètes, appel à l'action clair, lien www.toanimmo-lyon.fr."
 }`;
 
   try {
@@ -361,31 +426,24 @@ Réponds UNIQUEMENT en JSON valide (pas de markdown, pas de backticks) avec exac
     if (!match) throw new Error('JSON invalide');
     const content = JSON.parse(match[0]);
 
-    // Remplissage
     document.getElementById('blog-text').innerHTML = content.blog;
     document.getElementById('facebook-text').textContent = content.facebook;
     document.getElementById('instagram-text').textContent = content.instagram;
     document.getElementById('linkedin-text').textContent = content.linkedin;
     document.getElementById('google-text').textContent = content.google;
 
-    // Tags blog
-    const communeShort = commune.split(' ')[0];
-    document.getElementById('blog-tags').textContent = `${communeShort} · Immobilier · Marché`;
+    const communeName = commune.split(' (')[0];
+    document.getElementById('blog-tags').textContent = `${communeName} · Immobilier · Marché`;
+    document.getElementById('blog-date').textContent = new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+    document.getElementById('results-title').textContent = `✅ Contenu généré — ${communeName}`;
 
-    // Compteurs
     charCount('facebook-text', 'facebook-count', 500);
     charCount('instagram-text', 'instagram-count', 2200);
     charCount('linkedin-text', 'linkedin-count', 3000);
     charCount('google-text', 'google-count', 1500);
 
-    // Titre résultats
-    const communeName = commune.split(' (')[0];
-    document.getElementById('results-title').textContent = `✅ Contenu généré — ${communeName}`;
-
-    setDate();
     document.getElementById('results').style.display = 'block';
     document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
-
   } catch(e) {
     document.getElementById('error-msg').style.display = 'block';
     console.error(e);
@@ -394,8 +452,6 @@ Réponds UNIQUEMENT en JSON valide (pas de markdown, pas de backticks) avec exac
     btn.innerHTML = '✨ Générer mon contenu';
   }
 }
-
-setDate();
 </script>
 </body>
 </html>
