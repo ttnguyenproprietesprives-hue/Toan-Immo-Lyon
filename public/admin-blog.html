@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -260,11 +259,11 @@
           </select>
         </div>
         <div class="field full">
-          <label>Nom du fichier (sans .html)</label>
-          <input type="text" id="filename" placeholder="Ex: prix-immobilier-bron-2026" />
+          <label>Nom du fichier (généré automatiquement)</label>
+          <input type="text" id="filename" placeholder="Se remplit automatiquement..." readonly style="background:var(--gray-50);color:var(--gray-500);" />
         </div>
       </div>
-      <div class="tip">💡 Le nom du fichier sera l'URL de ton article : <strong>toanimmo-lyon.fr/blog/[nom].html</strong></div>
+      <div class="tip">💡 Le nom du fichier est généré automatiquement selon la commune et le sujet. URL : <strong>toanimmo-lyon.fr/blog/[nom].html</strong></div>
       <button class="btn-primary" onclick="genererArticle()" id="gen-btn">✨ Générer l'article</button>
       <div class="error-msg" id="error1"></div>
     </div>
@@ -365,6 +364,15 @@ document.addEventListener('keydown', e => {
   if (defaultEl) defaultEl.selected = true;
 })();
 
+// Mise à jour auto du nom de fichier
+document.addEventListener('DOMContentLoaded', () => {
+  const commune = document.getElementById('commune');
+  const sujet = document.getElementById('sujet');
+  if (commune) commune.addEventListener('change', updateFilename);
+  if (sujet) sujet.addEventListener('change', updateFilename);
+  updateFilename();
+});
+
 // ── STEPS ──
 function showStep(n) {
   [1,2,3].forEach(i => {
@@ -378,6 +386,31 @@ function showStep(n) {
 function retourEtape1() { showStep(1); }
 function nouvelArticle() { showStep(1); document.getElementById('filename').value = ''; }
 
+// ── NOM FICHIER AUTO ──
+function slugify(str) {
+  return str.toLowerCase()
+    .replace(/[àáâãäå]/g, 'a')
+    .replace(/[èéêë]/g, 'e')
+    .replace(/[ìíîï]/g, 'i')
+    .replace(/[òóôõö]/g, 'o')
+    .replace(/[ùúûü]/g, 'u')
+    .replace(/[ý]/g, 'y')
+    .replace(/[ç]/g, 'c')
+    .replace(/[ñ]/g, 'n')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function updateFilename() {
+  const commune = document.getElementById('commune').value;
+  const sujet = document.getElementById('sujet').value;
+  const y = new Date().getFullYear();
+  const communeShort = commune.split(' (')[0].split(',')[0];
+  const sujetShort = sujet.split(' ')[0] + '-' + sujet.split(' ')[1];
+  const slug = slugify(communeShort) + '-' + slugify(sujetShort) + '-' + y;
+  document.getElementById('filename').value = slug.substring(0, 60);
+}
+
 // ── GÉNÉRATION ──
 let articleHTML = '';
 let articleTitre = '';
@@ -389,8 +422,7 @@ async function genererArticle() {
   const saison = document.getElementById('saison').value;
   const filename = document.getElementById('filename').value.trim();
 
-  if (!filename) { document.getElementById('error1').textContent = 'Merci de renseigner un nom de fichier.'; return; }
-  if (!/^[a-z0-9-]+$/.test(filename)) { document.getElementById('error1').textContent = 'Nom de fichier invalide (lettres minuscules, chiffres et tirets uniquement).'; return; }
+  if (!filename) { updateFilename(); }
 
   const btn = document.getElementById('gen-btn');
   btn.disabled = true;
