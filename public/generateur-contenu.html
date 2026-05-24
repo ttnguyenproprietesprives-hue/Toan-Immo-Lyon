@@ -241,14 +241,14 @@ header { background: var(--navy-deep); padding: 0 2rem; border-bottom: 1px solid
       <div class="field">
         <label>Sujet principal</label>
         <select id="sujet">
-          <option value="prix immobiliers et tendances du marché en 2026">Prix immobiliers 2026</option>
+          <option id="opt-prix">Prix immobiliers</option>
           <option value="conseils pour vendre rapidement et au meilleur prix">Vendre rapidement</option>
           <option value="les quartiers les plus demandés par les acheteurs">Quartiers demandés</option>
           <option value="conseils pour les primo-accédants et comment bien acheter">Conseils primo-accédants</option>
           <option value="impact du DPE sur la valeur et la vente d'un bien">DPE et valeur du bien</option>
           <option value="investissement locatif : rentabilité et opportunités">Investissement locatif</option>
           <option value="comment bien estimer son bien avant de vendre">Bien estimer son bien</option>
-          <option value="le marché immobilier au printemps 2026 : opportunités">Marché printemps 2026</option>
+          <option id="opt-marche">Marché printemps</option>
         </select>
       </div>
       <div class="field">
@@ -263,10 +263,10 @@ header { background: var(--navy-deep); padding: 0 2rem; border-bottom: 1px solid
       <div class="field">
         <label>Saison / Contexte</label>
         <select id="saison">
-          <option value="printemps 2026, période de reprise du marché">Printemps 2026</option>
-          <option value="été 2026, marché plus calme mais opportunités">Été 2026</option>
-          <option value="automne 2026, rentrée immobilière">Automne 2026</option>
-          <option value="fin d'année 2026, bilan et perspectives">Fin d'année 2026</option>
+          <option id="opt-printemps">Printemps</option>
+          <option id="opt-ete">Été</option>
+          <option id="opt-automne">Automne</option>
+          <option id="opt-fin">Fin d'année</option>
         </select>
       </div>
     </div>
@@ -507,6 +507,36 @@ Réponds UNIQUEMENT en JSON valide (sans markdown, sans backticks) avec exacteme
     btn.innerHTML = '✨ Générer mon contenu';
   }
 }
+</script>
+
+<script>
+(function() {
+  const y = new Date().getFullYear();
+  const m = new Date().getMonth();
+  const saison = m < 3 ? 'hiver' : m < 6 ? 'printemps' : m < 9 ? 'ete' : m < 11 ? 'automne' : 'fin';
+
+  const opts = {
+    'opt-printemps': { value: `printemps ${y}, période de reprise du marché`, text: `Printemps ${y}` },
+    'opt-ete':       { value: `été ${y}, marché plus calme mais opportunités`, text: `Été ${y}` },
+    'opt-automne':   { value: `automne ${y}, rentrée immobilière`, text: `Automne ${y}` },
+    'opt-fin':       { value: `fin d'année ${y}, bilan et perspectives`, text: `Fin d'année ${y}` },
+    'opt-prix':      { value: `prix immobiliers et tendances du marché en ${y}`, text: `Prix immobiliers ${y}` },
+    'opt-marche':    { value: `le marché immobilier au printemps ${y} : opportunités`, text: `Marché printemps ${y}` },
+  };
+
+  Object.entries(opts).forEach(([id, {value, text}]) => {
+    const el = document.getElementById(id);
+    if (el) { el.value = value; el.textContent = text; }
+  });
+
+  // Sélectionne la saison actuelle par défaut
+  const saisonMap = { 'printemps': 'opt-printemps', 'ete': 'opt-ete', 'automne': 'opt-automne', 'fin': 'opt-fin', 'hiver': 'opt-fin' };
+  const defaultId = saisonMap[saison];
+  if (defaultId) {
+    const el = document.getElementById(defaultId);
+    if (el) el.selected = true;
+  }
+})();
 </script>
 </body>
 </html>
