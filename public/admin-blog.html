@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -535,7 +534,7 @@ Réponds UNIQUEMENT en JSON valide (sans markdown, sans backticks) :
     <div class="hero-meta"><span>📅 ${dateStr}</span><span>⏱ 4 min de lecture</span><span>✍️ Toan Nguyen</span></div>
   </div>
 </section>
-${articlePhotoUrl ? `<div style="width:100%;max-height:400px;overflow:hidden;"><img src="${articlePhotoUrl}" alt="${article.titre}" style="width:100%;height:400px;object-fit:cover;" /></div><div style="text-align:right;padding:4px 1rem;font-size:11px;color:#B8B4AC;">Photo : <a href="${articlePhotoAuthorUrl}?utm_source=toanimmo-lyon&utm_medium=referral" target="_blank" style="color:#B8B4AC;">${articlePhotoAuthor}</a> · <a href="https://unsplash.com?utm_source=toanimmo-lyon&utm_medium=referral" target="_blank" style="color:#B8B4AC;">Unsplash</a></div>` : ''}
+' + (articlePhotoUrl ? '<div style="width:100%;max-height:400px;overflow:hidden;"><img src="' + articlePhotoUrl + '" alt="' + article.titre + '" style="width:100%;height:400px;object-fit:cover;" /></div><div style="text-align:right;padding:4px 1rem;font-size:11px;color:#B8B4AC;">Photo : <a href="' + articlePhotoAuthorUrl + '?utm_source=toanimmo-lyon&utm_medium=referral" target="_blank" style="color:#B8B4AC;">' + articlePhotoAuthor + '</a> · <a href="https://unsplash.com?utm_source=toanimmo-lyon&utm_medium=referral" target="_blank" style="color:#B8B4AC;">Unsplash</a></div>' : '') + '
 <main class="main">
   <div class="article-body">
     ${article.contenu}
@@ -578,7 +577,8 @@ ${articlePhotoUrl ? `<div style="width:100%;max-height:400px;overflow:hidden;"><
     document.getElementById('prev-commune').textContent = communeShort;
     document.getElementById('prev-date').textContent = dateStr;
     if (articlePhotoUrl) {
-      document.getElementById('preview-content').innerHTML = `<img src="${articlePhotoUrl}" style="width:100%;height:180px;object-fit:cover;border-radius:8px;margin-bottom:1rem;" /><p style="font-size:11px;color:var(--gray-300);margin-bottom:1rem;">Photo : ${articlePhotoAuthor} · Unsplash</p>` + article.contenu;
+      const photoHtml = '<img src="' + articlePhotoUrl + '" style="width:100%;height:180px;object-fit:cover;border-radius:8px;margin-bottom:0.5rem;" /><p style="font-size:11px;color:#B8B4AC;margin-bottom:1rem;">Photo : ' + articlePhotoAuthor + ' · Unsplash</p>';
+      document.getElementById('preview-content').innerHTML = photoHtml + article.contenu;
     } else {
       document.getElementById('preview-content').innerHTML = article.contenu;
     }
