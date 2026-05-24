@@ -10,7 +10,8 @@ export default async function handler(req, res) {
       });
       if (!r.ok) return res.status(404).json({ error: 'not found' });
       const data = await r.json();
-      return res.status(200).json({ sha: data.sha });
+      // Retourner sha ET contenu encodé pour pouvoir modifier le fichier
+      return res.status(200).json({ sha: data.sha, content: data.content.replace(/\n/g, '') });
     } catch(e) {
       return res.status(500).json({ error: e.message });
     }
