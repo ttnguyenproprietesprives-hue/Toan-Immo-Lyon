@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -582,7 +583,7 @@ async function publierArticle() {
   document.getElementById('error2').textContent = '';
 
   const path = `public/blog/${filename}.html`;
-  const content = btoa(unescape(encodeURIComponent(articleHTML)));
+  const encoded = btoa(unescape(encodeURIComponent(articleHTML)));
 
   try {
     // Vérifier si le fichier existe déjà
@@ -593,14 +594,16 @@ async function publierArticle() {
       sha = checkData.sha || null;
     }
 
-    // Publier via l'API
+    // Publier l'article
     const res = await fetch('/api/github-publish', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ path, content, sha, message: `Blog: ${articleTitre}` })
+      body: JSON.stringify({ path, content: encoded, sha, message: `Blog: ${articleTitre}` })
     });
+    if (!res.ok) throw new Error('Erreur publication article');
 
-    if (!res.ok) throw new Error('Erreur publication');
+    // Mettre à jour blog/index.html
+    await updateBlogIndex(filename, articleTitre);
 
     const url = `https://www.toanimmo-lyon.fr/blog/${filename}.html`;
     document.getElementById('article-link').href = url;
@@ -616,6 +619,53 @@ async function publierArticle() {
     btn.disabled = false;
     btn.innerHTML = '🚀 Publier sur le site';
   }
+}
+
+async function updateBlogIndex(filename, titre) {
+  const indexPath = 'public/blog/index.html';
+  const commune = document.getElementById('commune').value.split(' (')[0];
+  const sujet = document.getElementById('sujet').value;
+  const dateStr = new Date().toLocaleDateString('fr-FR', { year:'numeric', month:'long', day:'numeric' });
+
+  // Deviner le tag
+  let tag = 'Marché';
+  if (sujet.includes('DPE')) tag = 'DPE';
+  else if (sujet.includes('vendre') || sujet.includes('vente')) tag = 'Conseils vente';
+  else if (sujet.includes('primo')) tag = 'Primo-accédants';
+  else if (sujet.includes('invest')) tag = 'Investissement';
+  else if (sujet.includes('quartier')) tag = 'Quartiers';
+
+  // Récupérer le blog/index.html actuel
+  const checkRes = await fetch(`/api/github-publish?path=${encodeURIComponent(indexPath)}`);
+  if (!checkRes.ok) return;
+  const checkData = await checkRes.json();
+  const sha = checkData.sha;
+  const currentHTML = checkData.content;
+
+  // Décoder le contenu actuel
+  const decoded = decodeURIComponent(escape(atob(currentHTML)));
+
+  // Nouvelle carte article à insérer
+  const newCard = `
+    <a href="/blog/${filename}.html" class="article-card">
+      <div class="article-thumb"><div style="font-size:11px;padding:3px 10px;border-radius:99px;background:rgba(201,168,76,0.2);color:#C9A84C;border:1px solid rgba(201,168,76,0.3);">${tag}</div></div>
+      <div class="article-body">
+        <div class="article-tag">${commune} · ${tag}</div>
+        <div class="article-title">${titre}</div>
+        <div class="article-meta">📅 ${dateStr} · 4 min de lecture</div>
+      </div>
+    </a>`;
+
+  // Insérer au début de la liste d'articles
+  const updatedHTML = decoded.replace('<div class="articles">', '<div class="articles">' + newCard);
+
+  // Publier le nouvel index
+  const encoded = btoa(unescape(encodeURIComponent(updatedHTML)));
+  await fetch('/api/github-publish', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path: indexPath, content: encoded, sha, message: `Blog index: ajout ${titre}` })
+  });
 }
 </script>
 </body>
