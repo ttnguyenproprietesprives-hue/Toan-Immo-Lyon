@@ -1,693 +1,1274 @@
+
 <!DOCTYPE html>
+
 <html lang="fr">
+
 <head>
+
   <meta charset="UTF-8"/>
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
   <meta name="robots" content="noindex, nofollow"/>
+
   <title>Admin Blog – Toan Immo Lyon</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
   <style>
+
     :root{--navy:#1A2E4A;--navy-deep:#0F1E33;--gold:#C9A84C;--gold-pale:#FBF8F0;--white:#fff;--gray-50:#F8F7F5;--gray-100:#EEECE8;--gray-300:#B8B4AC;--gray-500:#7A7670;--gray-700:#3D3B38;--success:#1D9E75;--radius:12px;--radius-sm:8px;}
+
     *{box-sizing:border-box;margin:0;padding:0;}
+
     body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--gray-700);}
 
     /* PIN */
+
     #pin-screen{position:fixed;inset:0;background:var(--navy-deep);display:flex;align-items:center;justify-content:center;z-index:9999;}
+
     .pin-box{background:var(--navy);border-radius:var(--radius);border:1px solid rgba(201,168,76,0.2);padding:2.5rem 2rem;text-align:center;width:320px;}
+
     .pin-logo{width:52px;height:52px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:var(--navy-deep);margin:0 auto 1.25rem;}
+
     .pin-title{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--white);margin-bottom:0.4rem;}
+
     .pin-sub{font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:1.75rem;}
+
     .pin-dots{display:flex;justify-content:center;gap:12px;margin-bottom:1.75rem;}
+
     .pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(201,168,76,0.4);background:transparent;transition:all 0.2s;}
+
     .pin-dot.filled{background:var(--gold);border-color:var(--gold);}
+
     .pin-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+
     .pin-key{padding:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:18px;font-weight:500;color:var(--white);cursor:pointer;transition:all 0.15s;}
+
     .pin-key:hover{background:rgba(201,168,76,0.15);border-color:rgba(201,168,76,0.3);}
+
     .pin-key.del{font-size:14px;color:rgba(255,255,255,0.5);}
+
     .pin-key.empty{visibility:hidden;}
+
     .pin-error{font-size:12px;color:#e74c3c;margin-top:1rem;min-height:18px;}
+
     .pin-shake{animation:shake 0.4s ease;}
+
     @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
 
     /* APP */
+
     #app{display:none;}
+
     header{background:var(--navy-deep);padding:0 2rem;border-bottom:1px solid rgba(201,168,76,0.2);}
+
     .header-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px;}
+
     .header-left{display:flex;align-items:center;gap:12px;}
+
     .logo-mark{width:34px;height:34px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--navy-deep);}
+
     .logo-text{font-family:'Playfair Display',serif;font-size:16px;color:var(--white);}
+
     .logo-sub{font-size:11px;color:rgba(255,255,255,0.4);margin-left:8px;}
+
     .lock-btn{font-size:12px;color:rgba(255,255,255,0.35);cursor:pointer;padding:5px 10px;border:1px solid rgba(255,255,255,0.1);border-radius:99px;}
+
     .lock-btn:hover{color:var(--gold);border-color:rgba(201,168,76,0.3);}
 
     .hero{background:var(--navy);padding:2rem;text-align:center;}
+
     .hero h1{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--white);font-weight:500;margin-bottom:0.4rem;}
+
     .hero h1 em{font-style:italic;color:var(--gold);}
+
     .hero p{font-size:13px;color:rgba(255,255,255,0.5);}
 
     .main{max-width:900px;margin:2rem auto 4rem;padding:0 1.5rem;}
 
     /* ÉTAPES */
+
     .steps{display:flex;gap:0;margin-bottom:2rem;background:var(--white);border-radius:var(--radius);border:1px solid var(--gray-100);overflow:hidden;}
+
     .step{flex:1;padding:1rem;text-align:center;cursor:pointer;transition:all 0.2s;border-right:1px solid var(--gray-100);position:relative;}
+
     .step:last-child{border-right:none;}
+
     .step.active{background:var(--navy);}
+
     .step.done{background:var(--gray-50);}
+
     .step-num{width:24px;height:24px;border-radius:50%;background:var(--gray-100);color:var(--gray-500);font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;}
+
     .step.active .step-num{background:var(--gold);color:var(--navy-deep);}
+
     .step.done .step-num{background:var(--success);color:var(--white);}
+
     .step-label{font-size:12px;color:var(--gray-300);}
+
     .step.active .step-label{color:var(--white);}
 
     .card{background:var(--white);border-radius:var(--radius);border:1px solid var(--gray-100);padding:2rem;margin-bottom:1.5rem;}
+
     .card h2{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--navy);margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px solid var(--gray-100);}
+
     .fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
     .field{display:flex;flex-direction:column;gap:5px;}
+
     .field.full{grid-column:1/-1;}
+
     .field label{font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-500);font-weight:500;}
+
     .field select, .field input{padding:10px 12px;border:1px solid var(--gray-100);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--gray-700);background:var(--white);appearance:none;}
+
     .field select:focus, .field input:focus{outline:none;border-color:var(--navy);}
 
     .btn-primary{width:100%;padding:14px;background:var(--navy);color:var(--white);border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background 0.2s;margin-top:1.5rem;}
+
     .btn-primary:hover{background:var(--navy-deep);}
+
     .btn-primary:disabled{opacity:0.6;cursor:not-allowed;}
+
     .btn-gold{width:100%;padding:14px;background:var(--gold);color:var(--navy-deep);border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:1rem;}
+
     .btn-gold:hover{opacity:0.9;}
+
     .btn-gold:disabled{opacity:0.6;cursor:not-allowed;}
 
     .spinner{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);border-top-color:white;animation:spin 0.8s linear infinite;}
+
     @keyframes spin{to{transform:rotate(360deg);}}
 
     /* APERCU */
+
     .preview-box{background:var(--gray-50);border:1px solid var(--gray-100);border-radius:var(--radius-sm);padding:1.5rem;margin-top:1rem;max-height:400px;overflow-y:auto;}
+
     .preview-box h1{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--navy);margin-bottom:1rem;}
+
     .preview-box h2{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--navy);margin:1rem 0 0.5rem;}
+
     .preview-box p{font-size:14px;color:var(--gray-500);line-height:1.7;margin-bottom:0.75rem;}
 
     /* META */
+
     .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem;}
+
     .meta-item{background:var(--gray-50);border-radius:var(--radius-sm);padding:10px 14px;border:1px solid var(--gray-100);}
+
     .meta-item label{font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray-300);display:block;margin-bottom:4px;}
+
     .meta-item span{font-size:13px;color:var(--navy);font-weight:500;}
 
     /* SUCCES */
+
     .success-box{background:#E1F5EE;border-radius:var(--radius);padding:2rem;text-align:center;}
+
     .success-icon{font-size:48px;margin-bottom:1rem;}
+
     .success-title{font-family:'Playfair Display',serif;font-size:1.3rem;color:#0F6E56;margin-bottom:0.5rem;}
+
     .success-url{font-size:13px;color:#1D9E75;margin-bottom:1.5rem;}
+
     .success-url a{color:#1D9E75;font-weight:500;}
+
     .btn-outline{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border:1px solid var(--navy);border-radius:var(--radius-sm);color:var(--navy);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;background:var(--white);text-decoration:none;margin:0 6px;}
 
     .error-msg{color:#c0392b;font-size:13px;text-align:center;margin-top:1rem;}
+
     .tip{background:var(--gold-pale);border-left:3px solid var(--gold);padding:10px 14px;border-radius:0 var(--radius-sm) var(--radius-sm) 0;font-size:12px;color:var(--gray-700);margin-top:1rem;line-height:1.6;}
 
     .panel{display:none;}
+
     .panel.active{display:block;}
 
     @media(max-width:600px){.fields-grid{grid-template-columns:1fr;}.meta-grid{grid-template-columns:1fr;}.steps{flex-direction:column;}}
+
   </style>
+
 </head>
+
 <body>
 
 <!-- PIN -->
+
 <div id="pin-screen">
+
   <div class="pin-box" id="pin-box">
+
     <div class="pin-logo">TI</div>
+
     <div class="pin-title">Admin Blog</div>
+
     <div class="pin-sub">Publier un article · Toan Immo Lyon</div>
+
     <div class="pin-dots">
+
       <div class="pin-dot" id="d0"></div>
+
       <div class="pin-dot" id="d1"></div>
+
       <div class="pin-dot" id="d2"></div>
+
       <div class="pin-dot" id="d3"></div>
+
     </div>
+
     <div class="pin-keypad">
+
       <button class="pin-key" onclick="addDigit('1')">1</button>
+
       <button class="pin-key" onclick="addDigit('2')">2</button>
+
       <button class="pin-key" onclick="addDigit('3')">3</button>
+
       <button class="pin-key" onclick="addDigit('4')">4</button>
+
       <button class="pin-key" onclick="addDigit('5')">5</button>
+
       <button class="pin-key" onclick="addDigit('6')">6</button>
+
       <button class="pin-key" onclick="addDigit('7')">7</button>
+
       <button class="pin-key" onclick="addDigit('8')">8</button>
+
       <button class="pin-key" onclick="addDigit('9')">9</button>
+
       <button class="pin-key empty"></button>
+
       <button class="pin-key" onclick="addDigit('0')">0</button>
+
       <button class="pin-key del" onclick="delDigit()">⌫</button>
+
     </div>
+
     <div class="pin-error" id="pin-error"></div>
+
   </div>
+
 </div>
 
 <!-- APP -->
+
 <div id="app">
+
 <header>
+
   <div class="header-inner">
+
     <div class="header-left">
+
       <div class="logo-mark">TI</div>
+
       <div><span class="logo-text">Toan Immo Lyon</span><span class="logo-sub">Admin Blog</span></div>
+
     </div>
+
     <div class="lock-btn" onclick="verrouiller()">🔒 Verrouiller</div>
+
   </div>
+
 </header>
 
 <section class="hero">
+
   <h1>Publier un <em>article</em></h1>
+
   <p>Génère et publie automatiquement sur ton site · Sans toucher à GitHub</p>
+
 </section>
 
 <main class="main">
 
   <!-- ÉTAPES -->
+
   <div class="steps">
+
     <div class="step active" id="step1-tab"><div class="step-num">1</div><div class="step-label">Paramètres</div></div>
+
     <div class="step" id="step2-tab"><div class="step-num">2</div><div class="step-label">Aperçu</div></div>
+
     <div class="step" id="step3-tab"><div class="step-num">3</div><div class="step-label">Publication</div></div>
+
   </div>
 
   <!-- ÉTAPE 1 : PARAMÈTRES -->
+
   <div class="panel active" id="panel1">
+
     <div class="card">
+
       <h2>⚙️ Paramètres de l'article</h2>
+
       <div class="fields-grid">
+
         <div class="field">
+
           <label>Commune / Zone</label>
+
           <select id="commune">
+
             <option value="le département du Rhône (69)">🗺️ Tout le Rhône (69)</option>
+
             <option value="le Grand Lyon">🏙️ Grand Lyon (général)</option>
+
             <optgroup label="── Lyon ──">
+
               <option value="Lyon 1er (69001)">Lyon 1er</option>
+
               <option value="Lyon 2e (69002)">Lyon 2e</option>
+
               <option value="Lyon 3e (69003)">Lyon 3e</option>
+
               <option value="Lyon 4e (69004)">Lyon 4e</option>
+
               <option value="Lyon 5e (69005)">Lyon 5e</option>
+
               <option value="Lyon 6e (69006)">Lyon 6e</option>
+
               <option value="Lyon 7e (69007)">Lyon 7e</option>
+
               <option value="Lyon 8e (69008)">Lyon 8e</option>
+
               <option value="Lyon 9e (69009)">Lyon 9e</option>
+
             </optgroup>
+
             <optgroup label="── Est ──">
+
               <option value="Bron (69500)">Bron</option>
+
               <option value="Villeurbanne (69100)">Villeurbanne</option>
+
               <option value="Vaulx-en-Velin (69120)">Vaulx-en-Velin</option>
+
               <option value="Décines-Charpieu (69150)">Décines-Charpieu</option>
+
               <option value="Meyzieu (69330)">Meyzieu</option>
+
               <option value="Jonage (69330)">Jonage</option>
+
               <option value="Chassieu (69680)">Chassieu</option>
+
               <option value="Genas (69740)">Genas</option>
+
               <option value="Pusignan (69330)">Pusignan</option>
+
             </optgroup>
+
             <optgroup label="── Sud-Est ──">
+
               <option value="Saint-Priest (69800)">Saint-Priest</option>
+
               <option value="Mions (69780)">Mions</option>
+
               <option value="Corbas (69960)">Corbas</option>
+
             </optgroup>
+
             <optgroup label="── Sud ──">
+
               <option value="Vénissieux (69200)">Vénissieux</option>
+
               <option value="Oullins (69600)">Oullins</option>
+
               <option value="Saint-Fons (69190)">Saint-Fons</option>
+
               <option value="Feyzin (69320)">Feyzin</option>
+
               <option value="Irigny (69540)">Irigny</option>
+
               <option value="Givors (69700)">Givors</option>
+
             </optgroup>
+
             <optgroup label="── Ouest ──">
+
               <option value="Sainte-Foy-lès-Lyon (69110)">Sainte-Foy-lès-Lyon</option>
+
               <option value="Tassin-la-Demi-Lune (69160)">Tassin-la-Demi-Lune</option>
+
               <option value="Francheville (69340)">Francheville</option>
+
               <option value="Écully (69130)">Écully</option>
+
               <option value="Craponne (69290)">Craponne</option>
+
               <option value="Dardilly (69570)">Dardilly</option>
+
               <option value="Limonest (69760)">Limonest</option>
+
             </optgroup>
+
             <optgroup label="── Nord ──">
+
               <option value="Caluire-et-Cuire (69300)">Caluire-et-Cuire</option>
+
               <option value="Rillieux-la-Pape (69140)">Rillieux-la-Pape</option>
+
               <option value="Neuville-sur-Saône (69250)">Neuville-sur-Saône</option>
+
               <option value="Villefranche-sur-Saône (69400)">Villefranche-sur-Saône</option>
+
             </optgroup>
+
           </select>
+
         </div>
+
         <div class="field">
+
           <label>Sujet</label>
+
           <select id="sujet">
+
             <option id="opt-prix">Prix immobiliers</option>
+
             <option value="conseils pour vendre rapidement et au meilleur prix">Vendre rapidement</option>
+
             <option value="les quartiers les plus demandés par les acheteurs">Quartiers demandés</option>
+
             <option value="conseils pour les primo-accédants et comment bien acheter">Conseils primo-accédants</option>
+
             <option value="impact du DPE sur la valeur et la vente d'un bien">DPE et valeur du bien</option>
+
             <option value="investissement locatif : rentabilité et opportunités">Investissement locatif</option>
+
             <option value="comment bien estimer son bien avant de vendre">Bien estimer son bien</option>
+
             <option id="opt-marche">Marché printemps</option>
+
           </select>
+
         </div>
+
         <div class="field">
+
           <label>Ton</label>
+
           <select id="ton">
+
             <option value="professionnel et rassurant, comme un expert de confiance">Expert de confiance</option>
+
             <option value="dynamique et engageant, proche du client">Dynamique et proche</option>
+
             <option value="pédagogique et informatif, qui explique clairement">Pédagogique</option>
+
             <option value="direct et percutant, qui va à l'essentiel">Direct et percutant</option>
+
           </select>
+
         </div>
+
         <div class="field">
+
           <label>Saison</label>
+
           <select id="saison">
+
             <option id="opt-printemps">Printemps</option>
+
             <option id="opt-ete">Été</option>
+
             <option id="opt-automne">Automne</option>
+
             <option id="opt-fin">Fin d'année</option>
+
           </select>
+
         </div>
+
         <div class="field full">
+
           <label>Nom du fichier (généré automatiquement)</label>
+
           <input type="text" id="filename" placeholder="Se remplit automatiquement..." readonly style="background:var(--gray-50);color:var(--gray-500);" />
+
         </div>
+
       </div>
+
       <div class="tip">💡 Le nom du fichier est généré automatiquement selon la commune et le sujet. URL : <strong>toanimmo-lyon.fr/blog/[nom].html</strong></div>
+
       <button class="btn-primary" onclick="genererArticle()" id="gen-btn">✨ Générer l'article</button>
+
       <div class="error-msg" id="error1"></div>
+
     </div>
+
   </div>
 
   <!-- ÉTAPE 2 : APERÇU -->
+
   <div class="panel" id="panel2">
+
     <div class="card">
+
       <h2>👁️ Aperçu de l'article</h2>
+
       <div class="meta-grid">
+
         <div class="meta-item"><label>Titre</label><span id="prev-titre">—</span></div>
+
         <div class="meta-item"><label>URL</label><span id="prev-url">—</span></div>
+
         <div class="meta-item"><label>Commune</label><span id="prev-commune">—</span></div>
+
         <div class="meta-item"><label>Date</label><span id="prev-date">—</span></div>
+
       </div>
+
       <div class="preview-box" id="preview-content"></div>
+
       <button class="btn-gold" onclick="publierArticle()" id="pub-btn">🚀 Publier sur le site</button>
+
       <button class="btn-primary" style="background:var(--gray-500);margin-top:0.5rem;" onclick="retourEtape1()">← Modifier les paramètres</button>
+
       <div class="error-msg" id="error2"></div>
+
     </div>
+
   </div>
 
   <!-- ÉTAPE 3 : SUCCÈS -->
+
   <div class="panel" id="panel3">
+
     <div class="success-box">
+
       <div class="success-icon">🎉</div>
+
       <div class="success-title">Article publié avec succès !</div>
+
       <div class="success-url">Disponible sur : <a id="article-link" href="#" target="_blank"></a></div>
+
       <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:8px;">
+
         <a class="btn-outline" id="voir-article" href="#" target="_blank">👁️ Voir l'article</a>
+
         <button class="btn-outline" onclick="nouvelArticle()">✏️ Nouvel article</button>
+
       </div>
+
     </div>
+
   </div>
 
 </main>
+
 </div>
 
 <script>
+
 // ── PIN ──
+
 const PIN_CODE = '2025';
+
 let pinEntry = '';
 
 function addDigit(d) {
+
   if (pinEntry.length >= 4) return;
+
   pinEntry += d;
+
   updateDots();
+
   if (pinEntry.length === 4) checkPin();
+
 }
+
 function delDigit() {
+
   pinEntry = pinEntry.slice(0, -1);
+
   updateDots();
+
   document.getElementById('pin-error').textContent = '';
+
 }
+
 function updateDots() {
+
   for (let i = 0; i < 4; i++) document.getElementById('d'+i).classList.toggle('filled', i < pinEntry.length);
+
 }
+
 function checkPin() {
+
   if (pinEntry === PIN_CODE) {
+
     document.getElementById('pin-screen').style.display = 'none';
+
     document.getElementById('app').style.display = 'block';
+
     sessionStorage.setItem('toan_admin', '1');
+
   } else {
+
     document.getElementById('pin-error').textContent = 'Code incorrect.';
+
     document.getElementById('pin-box').classList.add('pin-shake');
+
     setTimeout(() => { pinEntry = ''; updateDots(); document.getElementById('pin-box').classList.remove('pin-shake'); }, 500);
+
   }
+
 }
+
 function verrouiller() { sessionStorage.removeItem('toan_admin'); location.reload(); }
+
 if (sessionStorage.getItem('toan_admin') === '1') {
+
   document.getElementById('pin-screen').style.display = 'none';
+
   document.getElementById('app').style.display = 'block';
+
 }
+
 document.addEventListener('keydown', e => {
+
   if (document.getElementById('pin-screen').style.display === 'none') return;
+
   if (e.key >= '0' && e.key <= '9') addDigit(e.key);
+
   if (e.key === 'Backspace') delDigit();
+
 });
 
 // ── ANNÉE AUTO ──
+
 (function() {
+
   const y = new Date().getFullYear();
+
   const m = new Date().getMonth();
+
   const opts = {
+
     'opt-printemps': { value: `printemps ${y}, période de reprise du marché`, text: `Printemps ${y}` },
+
     'opt-ete':       { value: `été ${y}, marché plus calme mais opportunités`, text: `Été ${y}` },
+
     'opt-automne':   { value: `automne ${y}, rentrée immobilière`, text: `Automne ${y}` },
+
     'opt-fin':       { value: `fin d'année ${y}, bilan et perspectives`, text: `Fin d'année ${y}` },
+
     'opt-prix':      { value: `prix immobiliers et tendances du marché en ${y}`, text: `Prix immobiliers ${y}` },
+
     'opt-marche':    { value: `le marché immobilier au printemps ${y} : opportunités`, text: `Marché printemps ${y}` },
+
   };
+
   Object.entries(opts).forEach(([id, {value, text}]) => {
+
     const el = document.getElementById(id);
+
     if (el) { el.value = value; el.textContent = text; }
+
   });
+
   const saisonMap = { 0:'opt-fin', 1:'opt-fin', 2:'opt-printemps', 3:'opt-printemps', 4:'opt-printemps', 5:'opt-ete', 6:'opt-ete', 7:'opt-ete', 8:'opt-automne', 9:'opt-automne', 10:'opt-automne', 11:'opt-fin' };
+
   const defaultEl = document.getElementById(saisonMap[m]);
+
   if (defaultEl) defaultEl.selected = true;
+
 })();
 
 // Mise à jour auto du nom de fichier
+
 document.addEventListener('DOMContentLoaded', () => {
+
   const commune = document.getElementById('commune');
+
   const sujet = document.getElementById('sujet');
+
   if (commune) commune.addEventListener('change', updateFilename);
+
   if (sujet) sujet.addEventListener('change', updateFilename);
+
   updateFilename();
+
 });
 
 // ── STEPS ──
+
 function showStep(n) {
+
   [1,2,3].forEach(i => {
+
     document.getElementById('panel'+i).classList.toggle('active', i === n);
+
     const tab = document.getElementById('step'+i+'-tab');
+
     tab.classList.remove('active','done');
+
     if (i === n) tab.classList.add('active');
+
     else if (i < n) tab.classList.add('done');
+
   });
+
 }
+
 function retourEtape1() { showStep(1); }
+
 function nouvelArticle() { showStep(1); document.getElementById('filename').value = ''; }
 
 // ── NOM FICHIER AUTO ──
+
 function slugify(str) {
+
   return str.toLowerCase()
+
     .replace(/[àáâãäå]/g, 'a')
+
     .replace(/[èéêë]/g, 'e')
+
     .replace(/[ìíîï]/g, 'i')
+
     .replace(/[òóôõö]/g, 'o')
+
     .replace(/[ùúûü]/g, 'u')
+
     .replace(/[ý]/g, 'y')
+
     .replace(/[ç]/g, 'c')
+
     .replace(/[ñ]/g, 'n')
+
     .replace(/[^a-z0-9]+/g, '-')
+
     .replace(/^-|-$/g, '');
+
 }
 
 function updateFilename() {
+
   const commune = document.getElementById('commune').value;
+
   const sujet = document.getElementById('sujet').value;
+
   const y = new Date().getFullYear();
+
   const communeShort = commune.split(' (')[0].split(',')[0];
+
   const sujetShort = sujet.split(' ')[0] + '-' + sujet.split(' ')[1];
+
   const slug = slugify(communeShort) + '-' + slugify(sujetShort) + '-' + y;
+
   document.getElementById('filename').value = slug.substring(0, 60);
+
 }
 
 // ── GÉNÉRATION ──
+
 let articleHTML = '';
+
 let articleTitre = '';
+
 let articlePhotoUrl = '';
+
 let articlePhotoAuthor = '';
+
 let articlePhotoAuthorUrl = '';
 
 async function genererArticle() {
+
   const commune = document.getElementById('commune').value;
+
   const sujet = document.getElementById('sujet').value;
+
   const ton = document.getElementById('ton').value;
+
   const saison = document.getElementById('saison').value;
+
   const filename = document.getElementById('filename').value.trim();
 
   if (!filename) { updateFilename(); }
 
   const btn = document.getElementById('gen-btn');
+
   btn.disabled = true;
+
   btn.innerHTML = '<div class="spinner"></div> Génération en cours…';
+
   document.getElementById('error1').textContent = '';
 
   const y = new Date().getFullYear();
+
   const dateStr = new Date().toLocaleDateString('fr-FR', { year:'numeric', month:'long', day:'numeric' });
+
   const communeShort = commune.split(' (')[0];
 
   const prompt = `Tu es Toan Nguyen, mandataire immobilier expert du Grand Lyon (réseau Propriétés-Privées).
+
 Site : www.toanimmo-lyon.fr · Tél : 06 60 02 27 25
 
 Génère un article de blog immobilier complet sur : "${sujet}" à ${commune}, en ${saison}.
+
 Ton : ${ton}.
 
 Réponds UNIQUEMENT en JSON valide (sans markdown, sans backticks) :
+
 {
+
   "titre": "Titre SEO accrocheur avec ${communeShort} et ${y}",
+
   "description": "Meta description SEO de 150 caractères max",
+
   "tags": ["tag1", "tag2", "tag3"],
+
   "contenu": "Article HTML complet avec balises <h2>, <p>, <ul>, <li>. 500-700 mots. Données marché réalistes. Appel à l'action vers www.toanimmo-lyon.fr ou 06 60 02 27 25. Ne pas inclure de balise <h1>."
+
 }`;
 
   try {
+
     const res = await fetch('/api/generate-content', {
+
       method: 'POST',
+
       headers: { 'Content-Type': 'application/json' },
+
       body: JSON.stringify({ prompt })
+
     });
+
     const data = await res.json();
+
     const raw = data.content.map(i => i.text || '').join('');
+
     const match = raw.match(/\{[\s\S]*\}/);
+
     if (!match) throw new Error('JSON invalide');
+
     const article = JSON.parse(match[0]);
 
     articleTitre = article.titre;
+
     const tags = (article.tags || []).map(t => `<span class="hero-tag">${t}</span>`).join('');
 
     // Construire la page HTML complète
-    articleHTML = `<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>${article.titre} | Toan Immo Lyon</title>
-  <meta name="description" content="${article.description}"/>
-  <meta name="robots" content="index, follow"/>
-  <link rel="canonical" href="https://www.toanimmo-lyon.fr/blog/${filename}.html"/>
-  <meta property="og:title" content="${article.titre}"/>
-  <meta property="og:description" content="${article.description}"/>
-  <meta property="og:url" content="https://www.toanimmo-lyon.fr/blog/${filename}.html"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
-  <style>
-    :root{--navy:#1A2E4A;--navy-deep:#0F1E33;--gold:#C9A84C;--gold-pale:#FBF8F0;--white:#fff;--gray-50:#F8F7F5;--gray-100:#EEECE8;--gray-300:#B8B4AC;--gray-500:#7A7670;--gray-700:#3D3B38;--success:#1D9E75;--radius:12px;--radius-sm:8px;}
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--gray-700);}
-    header{background:var(--navy-deep);padding:0 2rem;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(201,168,76,0.2);}
-    .header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;height:64px;gap:12px;}
-    .logo{display:flex;align-items:center;gap:12px;text-decoration:none;}
-    .logo-mark{width:38px;height:38px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:var(--navy-deep);}
-    .logo-text{font-family:'Playfair Display',serif;font-size:17px;color:var(--white);font-weight:500;}
-    .logo-sub{font-size:11px;color:rgba(255,255,255,0.45);margin-top:1px;}
-    .hero{background:var(--navy);padding:3rem 2rem;}
-    .hero-inner{max-width:720px;margin:0 auto;}
-    .breadcrumb{font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:1rem;}
-    .breadcrumb a{color:rgba(255,255,255,0.4);text-decoration:none;}
-    .hero-tags{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
-    .hero-tag{font-size:11px;padding:3px 12px;border-radius:99px;background:rgba(201,168,76,0.2);color:var(--gold);border:1px solid rgba(201,168,76,0.3);}
-    .hero h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,3.5vw,2rem);color:var(--white);font-weight:500;line-height:1.3;margin-bottom:1rem;}
-    .hero-meta{font-size:12px;color:rgba(255,255,255,0.4);display:flex;gap:16px;flex-wrap:wrap;}
-    .main{max-width:720px;margin:2rem auto 4rem;padding:0 1.5rem;}
-    .article-body{background:var(--white);border-radius:var(--radius);border:1px solid var(--gray-100);padding:2rem;margin-bottom:1.5rem;}
-    .article-body h2{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--navy);font-weight:500;margin:1.5rem 0 0.75rem;padding-bottom:0.5rem;border-bottom:1px solid var(--gray-100);}
-    .article-body h2:first-child{margin-top:0;}
-    .article-body p{font-size:15px;color:var(--gray-500);line-height:1.8;margin-bottom:1rem;font-weight:300;}
-    .article-body ul{list-style:none;margin:0 0 1rem;padding:0;}
-    .article-body ul li{font-size:14px;color:var(--gray-500);padding:5px 0;display:flex;gap:8px;line-height:1.5;}
-    .article-body ul li::before{content:'✓';color:var(--success);font-weight:600;flex-shrink:0;}
-    .author-box{display:flex;align-items:center;gap:16px;padding:1.25rem 1.5rem;background:var(--gray-50);border-radius:var(--radius-sm);border:1px solid var(--gray-100);margin-top:1.5rem;}
-    .author-avatar{width:48px;height:48px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:16px;color:var(--gold);flex-shrink:0;}
-    .author-name{font-size:14px;font-weight:500;color:var(--navy);}
-    .author-sub{font-size:12px;color:var(--gray-300);}
-    .cta-block{background:var(--navy);border-radius:var(--radius);padding:2rem;text-align:center;}
-    .cta-block h3{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--white);font-weight:500;margin-bottom:0.5rem;}
-    .cta-block p{font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:1.25rem;}
-    .cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
-    .btn-gold{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:var(--radius-sm);background:var(--gold);color:var(--navy-deep);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;text-decoration:none;}
-    .btn-white{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:var(--radius-sm);background:rgba(255,255,255,0.1);color:var(--white);border:1px solid rgba(255,255,255,0.2);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;text-decoration:none;}
-    footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300);}
-    @media(max-width:600px){.cta-btns{flex-direction:column;}}
-  </style>
-</head>
-<body>
-<header>
-  <div class="header-inner">
-    <a class="logo" href="/"><div class="logo-mark">TI</div><div><div class="logo-text">Toan Immo Lyon</div><div class="logo-sub">Conseiller immobilier · Grand Lyon</div></div></a>
-  </div>
-</header>
-<section class="hero">
-  <div class="hero-inner">
-    <div class="breadcrumb"><a href="/">Accueil</a> › <a href="/blog/">Blog</a> › Article</div>
-    <div class="hero-tags">${tags}</div>
-    <h1>${article.titre}</h1>
-    <div class="hero-meta"><span>📅 ${dateStr}</span><span>⏱ 4 min de lecture</span><span>✍️ Toan Nguyen</span></div>
-  </div>
-</section>
-' + (articlePhotoUrl ? '<div style="width:100%;max-height:400px;overflow:hidden;"><img src="' + articlePhotoUrl + '" alt="' + article.titre + '" style="width:100%;height:400px;object-fit:cover;" /></div><div style="text-align:right;padding:4px 1rem;font-size:11px;color:#B8B4AC;">Photo : <a href="' + articlePhotoAuthorUrl + '?utm_source=toanimmo-lyon&utm_medium=referral" target="_blank" style="color:#B8B4AC;">' + articlePhotoAuthor + '</a> · <a href="https://unsplash.com?utm_source=toanimmo-lyon&utm_medium=referral" target="_blank" style="color:#B8B4AC;">Unsplash</a></div>' : '') + '
-<main class="main">
-  <div class="article-body">
-    ${article.contenu}
-    <div class="author-box">
-      <div class="author-avatar">TN</div>
-      <div><div class="author-name">Toan Nguyen</div><div class="author-sub">Mandataire immobilier · Réseau Propriétés-Privées · Expert Grand Lyon</div></div>
-    </div>
-  </div>
-  <div class="cta-block">
-    <h3>Vous souhaitez estimer votre bien ?</h3>
-    <p>Estimation gratuite et instantanée basée sur les données DVF réelles · Sans engagement</p>
-    <div class="cta-btns">
-      <a href="/" class="btn-gold">🏠 Estimer mon bien gratuitement</a>
-      <a href="tel:0660022725" class="btn-white">📞 06 60 02 27 25</a>
-    </div>
-  </div>
-</main>
-<footer>
-  <strong style="color:var(--navy)">Toan Immo Lyon</strong> · NGUYEN Trung Toan · Conseiller immobilier indépendant · Réseau Propriétés-Privées<br/>
-  <a href="/" style="color:var(--gray-300)">Accueil</a> · <a href="/blog/" style="color:var(--gray-300)">Blog</a> · <a href="/mentions-legales.html" style="color:var(--gray-300)">Mentions légales</a>
-</footer>
-</body>
-</html>`;
 
-    // Récupérer photo Unsplash
+    // Récupérer photo Unsplash EN PREMIER
+
     const photoQuery = `immobilier ${communeShort} appartement`;
+
     try {
+
       const photoRes = await fetch(`/api/unsplash?query=${encodeURIComponent(photoQuery)}`);
+
       if (photoRes.ok) {
+
         const photoData = await photoRes.json();
+
         articlePhotoUrl = photoData.url;
+
         articlePhotoAuthor = photoData.author;
+
         articlePhotoAuthorUrl = photoData.author_url;
+
       }
+
     } catch(e) { articlePhotoUrl = ''; }
 
+    // Construire la section photo APRÈS avoir les variables
+
+    const photoBlockHtml = articlePhotoUrl
+
+      ? '<div style="width:100%;max-height:400px;overflow:hidden;"><img src="' + articlePhotoUrl + '" alt="' + article.titre + '" style="width:100%;height:400px;object-fit:cover;" /></div><div style="text-align:right;padding:4px 1rem;font-size:11px;color:#B8B4AC;">Photo : <a href="' + articlePhotoAuthorUrl + '?utm_source=toanimmo-lyon&utm_medium=referral" target="_blank" style="color:#B8B4AC;">' + articlePhotoAuthor + '</a> · <a href="https://unsplash.com?utm_source=toanimmo-lyon&utm_medium=referral" target="_blank" style="color:#B8B4AC;">Unsplash</a></div>'
+
+      : '';
+
+    articleHTML = `<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+
+  <meta charset="UTF-8"/>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>${article.titre} | Toan Immo Lyon</title>
+
+  <meta name="description" content="${article.description}"/>
+
+  <meta name="robots" content="index, follow"/>
+
+  <link rel="canonical" href="https://www.toanimmo-lyon.fr/blog/${filename}.html"/>
+
+  <meta property="og:title" content="${article.titre}"/>
+
+  <meta property="og:description" content="${article.description}"/>
+
+  <meta property="og:url" content="https://www.toanimmo-lyon.fr/blog/${filename}.html"/>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+
+    :root{--navy:#1A2E4A;--navy-deep:#0F1E33;--gold:#C9A84C;--gold-pale:#FBF8F0;--white:#fff;--gray-50:#F8F7F5;--gray-100:#EEECE8;--gray-300:#B8B4AC;--gray-500:#7A7670;--gray-700:#3D3B38;--success:#1D9E75;--radius:12px;--radius-sm:8px;}
+
+    *{box-sizing:border-box;margin:0;padding:0;}
+
+    body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--gray-700);}
+
+    header{background:var(--navy-deep);padding:0 2rem;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(201,168,76,0.2);}
+
+    .header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;height:64px;gap:12px;}
+
+    .logo{display:flex;align-items:center;gap:12px;text-decoration:none;}
+
+    .logo-mark{width:38px;height:38px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:var(--navy-deep);}
+
+    .logo-text{font-family:'Playfair Display',serif;font-size:17px;color:var(--white);font-weight:500;}
+
+    .logo-sub{font-size:11px;color:rgba(255,255,255,0.45);margin-top:1px;}
+
+    .hero{background:var(--navy);padding:3rem 2rem;}
+
+    .hero-inner{max-width:720px;margin:0 auto;}
+
+    .breadcrumb{font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:1rem;}
+
+    .breadcrumb a{color:rgba(255,255,255,0.4);text-decoration:none;}
+
+    .hero-tags{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
+
+    .hero-tag{font-size:11px;padding:3px 12px;border-radius:99px;background:rgba(201,168,76,0.2);color:var(--gold);border:1px solid rgba(201,168,76,0.3);}
+
+    .hero h1{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,3.5vw,2rem);color:var(--white);font-weight:500;line-height:1.3;margin-bottom:1rem;}
+
+    .hero-meta{font-size:12px;color:rgba(255,255,255,0.4);display:flex;gap:16px;flex-wrap:wrap;}
+
+    .main{max-width:720px;margin:2rem auto 4rem;padding:0 1.5rem;}
+
+    .article-body{background:var(--white);border-radius:var(--radius);border:1px solid var(--gray-100);padding:2rem;margin-bottom:1.5rem;}
+
+    .article-body h2{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--navy);font-weight:500;margin:1.5rem 0 0.75rem;padding-bottom:0.5rem;border-bottom:1px solid var(--gray-100);}
+
+    .article-body h2:first-child{margin-top:0;}
+
+    .article-body p{font-size:15px;color:var(--gray-500);line-height:1.8;margin-bottom:1rem;font-weight:300;}
+
+    .article-body ul{list-style:none;margin:0 0 1rem;padding:0;}
+
+    .article-body ul li{font-size:14px;color:var(--gray-500);padding:5px 0;display:flex;gap:8px;line-height:1.5;}
+
+    .article-body ul li::before{content:'✓';color:var(--success);font-weight:600;flex-shrink:0;}
+
+    .author-box{display:flex;align-items:center;gap:16px;padding:1.25rem 1.5rem;background:var(--gray-50);border-radius:var(--radius-sm);border:1px solid var(--gray-100);margin-top:1.5rem;}
+
+    .author-avatar{width:48px;height:48px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:16px;color:var(--gold);flex-shrink:0;}
+
+    .author-name{font-size:14px;font-weight:500;color:var(--navy);}
+
+    .author-sub{font-size:12px;color:var(--gray-300);}
+
+    .cta-block{background:var(--navy);border-radius:var(--radius);padding:2rem;text-align:center;}
+
+    .cta-block h3{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--white);font-weight:500;margin-bottom:0.5rem;}
+
+    .cta-block p{font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:1.25rem;}
+
+    .cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+
+    .btn-gold{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:var(--radius-sm);background:var(--gold);color:var(--navy-deep);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;text-decoration:none;}
+
+    .btn-white{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:var(--radius-sm);background:rgba(255,255,255,0.1);color:var(--white);border:1px solid rgba(255,255,255,0.2);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;text-decoration:none;}
+
+    footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300);}
+
+    @media(max-width:600px){.cta-btns{flex-direction:column;}}
+
+  </style>
+
+</head>
+
+<body>
+
+<header>
+
+  <div class="header-inner">
+
+    <a class="logo" href="/"><div class="logo-mark">TI</div><div><div class="logo-text">Toan Immo Lyon</div><div class="logo-sub">Conseiller immobilier · Grand Lyon</div></div></a>
+
+  </div>
+
+</header>
+
+<section class="hero">
+
+  <div class="hero-inner">
+
+    <div class="breadcrumb"><a href="/">Accueil</a> › <a href="/blog/">Blog</a> › Article</div>
+
+    <div class="hero-tags">${tags}</div>
+
+    <h1>${article.titre}</h1>
+
+    <div class="hero-meta"><span>📅 ${dateStr}</span><span>⏱ 4 min de lecture</span><span>✍️ Toan Nguyen</span></div>
+
+  </div>
+
+</section>
+
+${photoBlockHtml}
+
+<main class="main">
+
+  <div class="article-body">
+
+    ${article.contenu}
+
+    <div class="author-box">
+
+      <div class="author-avatar">TN</div>
+
+      <div><div class="author-name">Toan Nguyen</div><div class="author-sub">Mandataire immobilier · Réseau Propriétés-Privées · Expert Grand Lyon</div></div>
+
+    </div>
+
+  </div>
+
+  <div class="cta-block">
+
+    <h3>Vous souhaitez estimer votre bien ?</h3>
+
+    <p>Estimation gratuite et instantanée basée sur les données DVF réelles · Sans engagement</p>
+
+    <div class="cta-btns">
+
+      <a href="/" class="btn-gold">🏠 Estimer mon bien gratuitement</a>
+
+      <a href="tel:0660022725" class="btn-white">📞 06 60 02 27 25</a>
+
+    </div>
+
+  </div>
+
+</main>
+
+<footer>
+
+  <strong style="color:var(--navy)">Toan Immo Lyon</strong> · NGUYEN Trung Toan · Conseiller immobilier indépendant · Réseau Propriétés-Privées<br/>
+
+  <a href="/" style="color:var(--gray-300)">Accueil</a> · <a href="/blog/" style="color:var(--gray-300)">Blog</a> · <a href="/mentions-legales.html" style="color:var(--gray-300)">Mentions légales</a>
+
+</footer>
+
+</body>
+
+</html>`;
+
     // Afficher aperçu
+
     document.getElementById('prev-titre').textContent = article.titre;
+
     document.getElementById('prev-url').textContent = `/blog/${filename}.html`;
+
     document.getElementById('prev-commune').textContent = communeShort;
+
     document.getElementById('prev-date').textContent = dateStr;
+
     if (articlePhotoUrl) {
+
       const photoHtml = '<img src="' + articlePhotoUrl + '" style="width:100%;height:180px;object-fit:cover;border-radius:8px;margin-bottom:0.5rem;" /><p style="font-size:11px;color:#B8B4AC;margin-bottom:1rem;">Photo : ' + articlePhotoAuthor + ' · Unsplash</p>';
+
       document.getElementById('preview-content').innerHTML = photoHtml + article.contenu;
+
     } else {
+
       document.getElementById('preview-content').innerHTML = article.contenu;
+
     }
 
     showStep(2);
 
   } catch(e) {
+
     document.getElementById('error1').textContent = 'Erreur lors de la génération. Réessayez.';
+
     console.error(e);
+
   } finally {
+
     btn.disabled = false;
+
     btn.innerHTML = '✨ Générer l\'article';
+
   }
+
 }
 
 // ── PUBLICATION ──
+
 async function publierArticle() {
+
   const filename = document.getElementById('filename').value.trim();
+
   const btn = document.getElementById('pub-btn');
+
   btn.disabled = true;
+
   btn.innerHTML = '<div class="spinner"></div> Publication en cours…';
+
   document.getElementById('error2').textContent = '';
 
   const path = `public/blog/${filename}.html`;
+
   const encoded = btoa(unescape(encodeURIComponent(articleHTML)));
 
   try {
+
     // Vérifier si le fichier existe déjà
+
     let sha = null;
+
     const checkRes = await fetch(`/api/github-publish?path=${encodeURIComponent(path)}`);
+
     if (checkRes.ok) {
+
       const checkData = await checkRes.json();
+
       sha = checkData.sha || null;
+
     }
 
     // Publier l'article
+
     const res = await fetch('/api/github-publish', {
+
       method: 'POST',
+
       headers: { 'Content-Type': 'application/json' },
+
       body: JSON.stringify({ path, content: encoded, sha, message: `Blog: ${articleTitre}` })
+
     });
+
     if (!res.ok) throw new Error('Erreur publication article');
 
     // Mettre à jour blog/index.html
+
     await updateBlogIndex(filename, articleTitre);
 
     const url = `https://www.toanimmo-lyon.fr/blog/${filename}.html`;
+
     document.getElementById('article-link').href = url;
+
     document.getElementById('article-link').textContent = url;
+
     document.getElementById('voir-article').href = url;
 
     showStep(3);
 
   } catch(e) {
+
     document.getElementById('error2').textContent = 'Erreur lors de la publication. Vérifiez votre connexion et réessayez.';
+
     console.error(e);
+
   } finally {
+
     btn.disabled = false;
+
     btn.innerHTML = '🚀 Publier sur le site';
+
   }
+
 }
 
 async function updateBlogIndex(filename, titre) {
+
   const indexPath = 'public/blog/index.html';
+
   const commune = document.getElementById('commune').value.split(' (')[0];
+
   const sujet = document.getElementById('sujet').value;
+
   const dateStr = new Date().toLocaleDateString('fr-FR', { year:'numeric', month:'long', day:'numeric' });
 
   // Deviner le tag
+
   let tag = 'Marché';
+
   if (sujet.includes('DPE')) tag = 'DPE';
+
   else if (sujet.includes('vendre') || sujet.includes('vente')) tag = 'Conseils vente';
+
   else if (sujet.includes('primo')) tag = 'Primo-accédants';
+
   else if (sujet.includes('invest')) tag = 'Investissement';
+
   else if (sujet.includes('quartier')) tag = 'Quartiers';
 
   // Récupérer le blog/index.html actuel
+
   const checkRes = await fetch(`/api/github-publish?path=${encodeURIComponent(indexPath)}`);
+
   if (!checkRes.ok) return;
+
   const checkData = await checkRes.json();
+
   const sha = checkData.sha;
+
   const currentHTML = checkData.content;
 
   // Décoder le contenu actuel
+
   const decoded = decodeURIComponent(escape(atob(currentHTML)));
 
   // Nouvelle carte article à insérer
+
   const thumbStyle = articlePhotoUrl ? `background: url('${articlePhotoUrl}') center/cover; position: relative;` : 'background: var(--navy);';
+
   const newCard = `
+
     <a href="/blog/${filename}.html" class="article-card">
+
       <div class="article-thumb" style="${thumbStyle}"><div style="position:absolute;inset:0;background:rgba(26,46,74,0.5);"></div><div style="position:relative;font-size:11px;padding:3px 10px;border-radius:99px;background:rgba(201,168,76,0.2);color:#C9A84C;border:1px solid rgba(201,168,76,0.3);">${tag}</div></div>
+
       <div class="article-body">
+
         <div class="article-tag">${commune} · ${tag}</div>
+
         <div class="article-title">${titre}</div>
+
         <div class="article-meta">📅 ${dateStr} · 4 min de lecture</div>
+
       </div>
+
     </a>`;
 
   // Insérer au début de la liste d'articles
+
   const updatedHTML = decoded.replace('<div class="articles">', '<div class="articles">' + newCard);
 
   // Publier le nouvel index
+
   const encoded = btoa(unescape(encodeURIComponent(updatedHTML)));
+
   await fetch('/api/github-publish', {
+
     method: 'POST',
+
     headers: { 'Content-Type': 'application/json' },
+
     body: JSON.stringify({ path: indexPath, content: encoded, sha, message: `Blog index: ajout ${titre}` })
+
   });
+
 }
+
 </script>
+
 </body>
+
 </html>
