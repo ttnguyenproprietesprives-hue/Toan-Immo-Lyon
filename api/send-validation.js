@@ -1,7 +1,12 @@
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
 import { Resend } from 'resend';
 
 export const config = { runtime: 'nodejs' };
+
+const redis = new Redis({
+  url: process.env.STORAGE_URL,
+  token: process.env.STORAGE_TOKEN,
+});
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const BASE_URL = process.env.VERCEL_URL
@@ -15,7 +20,7 @@ const PLATFORM_LABELS = {
   google: { icon: '🗺️', name: 'Google Business', color: '#34A853' },
 };
 
-function truncate(str, max = 180) {
+function truncate(str, max = 300) {
   if (!str) return '';
   return str.length > max ? str.slice(0, max) + '…' : str;
 }
@@ -39,7 +44,7 @@ function buildEmailHtml({ token, commune, sujet, saison, content, images }) {
       </div>
       ${imgUrl ? `<img src="${imgUrl}" style="width:100%;max-height:280px;object-fit:cover;" alt="Visuel ${label.name}" />` : ''}
       <div style="padding:16px 20px;background:#fafafa;">
-        <p style="font-size:13px;color:#374151;line-height:1.7;white-space:pre-wrap;margin:0 0 16px;">${truncate(text, 300)}</p>
+        <p style="font-size:13px;color:#374151;line-height:1.7;white-space:pre-wrap;margin:0 0 16px;">${truncate(text)}</p>
         <div style="display:flex;gap:10px;">
           <a href="${approveUrl}" style="display:inline-block;padding:10px 22px;background:#1A2E4A;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">✅ Approuver</a>
           <a href="${rejectUrl}" style="display:inline-block;padding:10px 22px;background:#f3f4f6;color:#6b7280;border-radius:8px;text-decoration:none;font-size:14px;">❌ Rejeter</a>
@@ -73,22 +78,16 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { commune, sujet, saison, content, images } = req.body;
-
   if (!content || !commune) return res.status(400).json({ error: 'Missing data' });
 
-  // Generate unique token
   const token = crypto.randomUUID();
-  const expiresAt = Date.now() + 48 * 60 * 60 * 1000; // 48h
 
-  // Store in Vercel KV
-  await kv.set(`validation:${token}`, {
+  await redis.set(`validation:${token}`, {
     commune, sujet, saison, content, images,
     status: { facebook: 'pending', instagram: 'pending', linkedin: 'pending', google: 'pending' },
     createdAt: Date.now(),
-    expiresAt,
-  }, { ex: 172800 }); // TTL 48h
+  }, { ex: 172800 });
 
-  // Send email
   const html = buildEmailHtml({ token, commune, sujet, saison, content, images });
 
   const { error } = await resend.emails.send({
