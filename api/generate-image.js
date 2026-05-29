@@ -27,7 +27,7 @@ export default async function handler(req) {
 
   const communeName = commune.split(' (')[0];
 
-  const prompt = `Professional real estate marketing photo for Lyon metropolitan area, France.
+  const prompt = 'Professional real estate marketing photo. Modern French residential building exterior, bright natural light, clean architecture, no people, no text, no logos, photorealistic, high quality. Warm tones, blue sky, green trees.';
 Subject: ${sujet} in ${communeName}, ${saison}.
 Style: ${PLATFORM_STYLE[platform] || 'modern and professional'}.
 Mood: bright, aspirational, trustworthy French real estate.
