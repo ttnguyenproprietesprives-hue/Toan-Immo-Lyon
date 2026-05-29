@@ -2,7 +2,7 @@
   "name": "toanimmo-lyon",
   "version": "1.0.0",
   "dependencies": {
-    "@vercel/kv": "^1.0.0",
+    "@upstash/redis": "^1.0.0",
     "resend": "^3.0.0"
   }
 }
