@@ -2,8 +2,8 @@ export const config = { runtime: 'edge' };
 
 const PLATFORM_SIZES = {
   instagram: '1024x1024',
-  facebook: '1792x1024',
-  linkedin: '1792x1024',
+  facebook: '1024x1024',
+  linkedin: '1024x1024',
   google: '1024x1024',
 };
 
@@ -24,7 +24,7 @@ export default async function handler(req) {
       'Authorization': 'Bearer ' + process.env.OPENAI_API_KEY,
     },
     body: JSON.stringify({
-      model: 'dall-e-3',
+      model: 'dall-e-2',
       prompt: prompt,
       n: 1,
       size: PLATFORM_SIZES[platform] || '1024x1024',
