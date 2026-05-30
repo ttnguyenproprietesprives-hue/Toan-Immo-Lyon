@@ -1,10 +1,10 @@
 export const config = { runtime: 'edge' };
 
-const PLATFORM_SIZES = {
-  instagram: '1024x1024',
-  facebook: '1024x1024',
-  linkedin: '1024x1024',
-  google: '1024x1024',
+const QUERIES = {
+  instagram: 'modern apartment building Lyon France',
+  facebook: 'luxury real estate France exterior',
+  linkedin: 'professional real estate building France',
+  google: 'modern residential building France',
 };
 
 export default async function handler(req) {
@@ -14,36 +14,24 @@ export default async function handler(req) {
 
   const body = await req.json();
   const platform = body.platform || 'instagram';
+  const query = QUERIES[platform] || QUERIES.instagram;
 
-  const prompt = 'Professional real estate marketing photo. Modern French residential building exterior, bright natural light, clean architecture, no people, no text, no logos, photorealistic, high quality. Warm tones, blue sky, green trees.';
+  const unsplashRes = await fetch(
+    `https://api.unsplash.com/photos/random?query=${encodeURIComponent(query)}&orientation=landscape`,
+    {
+      headers: {
+        Authorization: 'Client-ID ' + process.env.UNSPLASH_ACCESS_KEY,
+      },
+    }
+  );
 
-  const openaiRes = await fetch('https://api.openai.com/v1/images/generations', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + process.env.OPENAI_API_KEY,
-    },
-    body: JSON.stringify({
-      model: 'dall-e-2',
-      prompt: prompt,
-      n: 1,
-      size: PLATFORM_SIZES[platform] || '1024x1024',
-      quality: 'standard',
-      
-    }),
-  });
+  const data = await unsplashRes.json();
 
-  const data = await openaiRes.json();
-
-  if (!openaiRes.ok) {
-    return new Response(JSON.stringify({ 
-      error: data.error,
-      status: openaiRes.status,
-      keyPresent: !!process.env.OPENAI_API_KEY
-    }), { status: 500 });
+  if (!unsplashRes.ok) {
+    return new Response(JSON.stringify({ error: data.errors || 'Unsplash error' }), { status: 500 });
   }
 
-  return new Response(JSON.stringify({ url: data.data[0].url, platform: platform }), {
+  return new Response(JSON.stringify({ url: data.urls.regular, platform: platform }), {
     status: 200,
     headers: { 'Content-Type': 'application/json' },
   });
