@@ -36,7 +36,11 @@ export default async function handler(req) {
   const data = await openaiRes.json();
 
   if (!openaiRes.ok) {
-    return new Response(JSON.stringify({ error: data.error || 'OpenAI error' }), { status: 500 });
+    return new Response(JSON.stringify({ 
+      error: data.error,
+      status: openaiRes.status,
+      keyPresent: !!process.env.OPENAI_API_KEY
+    }), { status: 500 });
   }
 
   return new Response(JSON.stringify({ url: data.data[0].url, platform: platform }), {
