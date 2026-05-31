@@ -16,8 +16,7 @@ async function publishFacebook(content, imageUrl) {
   if (imageUrl) {
     const photoRes = await fetch(`https://graph.facebook.com/v19.0/${pageId}/photos`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: imageUrl, caption: content, access_token: token }),
+      body: new URLSearchParams({ url: imageUrl, caption: content, access_token: token }),
     });
     const photoData = await photoRes.json();
     if (!photoRes.ok) throw new Error(photoData.error?.message || 'Facebook photo upload failed');
@@ -26,8 +25,7 @@ async function publishFacebook(content, imageUrl) {
 
   const postRes = await fetch(`https://graph.facebook.com/v19.0/${pageId}/feed`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: content, access_token: token }),
+    body: new URLSearchParams({ message: content, access_token: token }),
   });
   const postData = await postRes.json();
   if (!postRes.ok) throw new Error(postData.error?.message || 'Facebook post failed');
