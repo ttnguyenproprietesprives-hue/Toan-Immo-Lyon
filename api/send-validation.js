@@ -9,9 +9,7 @@ const redis = new Redis({
 });
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const BASE_URL = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : 'https://www.toanimmo-lyon.fr';
+const BASE_URL = 'https://www.toanimmo-lyon.fr';
 
 const PLATFORM_LABELS = {
   facebook: { icon: '👥', name: 'Facebook', color: '#1877F2' },
