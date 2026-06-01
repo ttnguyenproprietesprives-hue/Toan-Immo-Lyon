@@ -34,7 +34,7 @@ async function publishFacebook(content, imageUrl) {
 
 async function publishInstagram(content, imageUrl) {
   const accountId = process.env.INSTAGRAM_ACCOUNT_ID;
-  const token = process.env.META_PAGE_ACCESS_TOKEN;
+  const token = process.env.INSTAGRAM_ACCESS_TOKEN;
 
   if (!imageUrl) throw new Error('Instagram requires an image');
 
