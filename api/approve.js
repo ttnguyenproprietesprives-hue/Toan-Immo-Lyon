@@ -38,19 +38,17 @@ async function publishInstagram(content, imageUrl) {
 
   if (!imageUrl) throw new Error('Instagram requires an image');
 
-  const containerRes = await fetch(`https://graph.facebook.com/v19.0/${accountId}/media`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ image_url: imageUrl, caption: content, access_token: token }),
-  });
+  const containerRes = await fetch(
+    `https://graph.instagram.com/v19.0/${accountId}/media?image_url=${encodeURIComponent(imageUrl)}&caption=${encodeURIComponent(content)}&access_token=${token}`,
+    { method: 'POST' }
+  );
   const containerData = await containerRes.json();
   if (!containerRes.ok) throw new Error(containerData.error?.message || 'Instagram container failed');
 
-  const publishRes = await fetch(`https://graph.facebook.com/v19.0/${accountId}/media_publish`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ creation_id: containerData.id, access_token: token }),
-  });
+  const publishRes = await fetch(
+    `https://graph.instagram.com/v19.0/${accountId}/media_publish?creation_id=${containerData.id}&access_token=${token}`,
+    { method: 'POST' }
+  );
   const publishData = await publishRes.json();
   if (!publishRes.ok) throw new Error(publishData.error?.message || 'Instagram publish failed');
   return { id: publishData.id, platform: 'instagram' };
