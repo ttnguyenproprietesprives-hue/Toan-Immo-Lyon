@@ -855,8 +855,7 @@ Réponds UNIQUEMENT en JSON valide (sans markdown, sans backticks) :
 
     // Récupérer photo Unsplash EN PREMIER
 
-    const photoQuery = `immobilier ${communeShort} appartement`;
-
+    const photoQuery = `real estate apartment France`;
     try {
 
       const photoRes = await fetch(`/api/unsplash?query=${encodeURIComponent(photoQuery)}`);
