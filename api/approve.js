@@ -45,6 +45,9 @@ async function publishInstagram(content, imageUrl) {
   const containerData = await containerRes.json();
   if (!containerRes.ok) throw new Error(containerData.error?.message || 'Instagram container failed');
 
+  // Attendre que le média soit prêt
+  await new Promise(resolve => setTimeout(resolve, 5000));
+
   const publishRes = await fetch(
     `https://graph.instagram.com/v19.0/${accountId}/media_publish?creation_id=${containerData.id}&access_token=${token}`,
     { method: 'POST' }
