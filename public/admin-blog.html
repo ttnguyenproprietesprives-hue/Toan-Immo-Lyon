@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html lang="fr">
@@ -438,6 +437,14 @@
             <option value="comment bien estimer son bien avant de vendre">Bien estimer son bien</option>
 
             <option id="opt-marche">Marché printemps</option>
+
+            <option value="le quotidien d'un agent immobilier : coulisses du métier, visites, négociations">Le quotidien d'un agent</option>
+
+            <option value="comment un agent immobilier qualifie ses acquéreurs avant de proposer une visite (budget, financement, projet)">Qualifier ses clients avant visite</option>
+
+            <option value="conseils pour sécuriser et protéger sa maison (alarme, assurance, bonnes pratiques)">Sécuriser sa maison</option>
+
+            <option value="pourquoi consulter un courtier et son banquier avant d'acheter un bien immobilier">Consulter courtier et banquier</option>
 
           </select>
 
@@ -908,7 +915,7 @@ Réponds UNIQUEMENT en JSON valide (sans markdown, sans backticks) :
 
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
 
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 
   <style>
 
@@ -1207,6 +1214,14 @@ async function updateBlogIndex(filename, titre) {
   else if (sujet.includes('invest')) tag = 'Investissement';
 
   else if (sujet.includes('quartier')) tag = 'Quartiers';
+
+  else if (sujet.includes('quotidien')) tag = 'Métier';
+
+  else if (sujet.includes('qualifie')) tag = 'Conseils pro';
+
+  else if (sujet.includes('sécuriser') || sujet.includes('protéger')) tag = 'Sécurité';
+
+  else if (sujet.includes('courtier') || sujet.includes('banquier')) tag = 'Financement';
 
   // Récupérer le blog/index.html actuel
 
