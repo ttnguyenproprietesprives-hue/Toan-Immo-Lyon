@@ -15,17 +15,8 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; background: var(--gray-50); color: var(--gray-700); min-height: 100vh; }
-
-/* ── PIN SCREEN ── */
-#pin-screen {
-  position: fixed; inset: 0; background: var(--navy-deep);
-  display: flex; align-items: center; justify-content: center; z-index: 9999;
-}
-.pin-box {
-  background: var(--navy); border-radius: var(--radius);
-  border: 1px solid rgba(201,168,76,0.2); padding: 2.5rem 2rem;
-  text-align: center; width: 320px;
-}
+#pin-screen { position: fixed; inset: 0; background: var(--navy-deep); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+.pin-box { background: var(--navy); border-radius: var(--radius); border: 1px solid rgba(201,168,76,0.2); padding: 2.5rem 2rem; text-align: center; width: 320px; }
 .pin-logo { width: 52px; height: 52px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: var(--navy-deep); margin: 0 auto 1.25rem; }
 .pin-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--white); margin-bottom: 0.4rem; }
 .pin-sub { font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 1.75rem; }
@@ -40,8 +31,6 @@ body { font-family: 'DM Sans', sans-serif; background: var(--gray-50); color: va
 .pin-error { font-size: 12px; color: #e74c3c; margin-top: 1rem; min-height: 18px; }
 .pin-shake { animation: shake 0.4s ease; }
 @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)} }
-
-/* ── APP ── */
 #app { display: none; }
 header { background: var(--navy-deep); padding: 0 2rem; border-bottom: 1px solid rgba(201,168,76,0.2); }
 .header-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 60px; }
@@ -63,8 +52,6 @@ header { background: var(--navy-deep); padding: 0 2rem; border-bottom: 1px solid
 .field label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-500); font-weight: 500; }
 .field select { padding: 10px 12px; border: 1px solid var(--gray-100); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--gray-700); background: var(--white); appearance: none; transition: border-color 0.15s; }
 .field select:focus { outline: none; border-color: var(--navy); }
-
-/* ── IMAGE TOGGLE ── */
 .image-toggle { display: flex; align-items: center; gap: 10px; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--gray-100); }
 .toggle-label { font-size: 13px; color: var(--gray-700); }
 .toggle-sub { font-size: 11px; color: var(--gray-300); }
@@ -74,13 +61,11 @@ header { background: var(--navy-deep); padding: 0 2rem; border-bottom: 1px solid
 .slider:before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.2s; }
 input:checked + .slider { background: var(--navy); }
 input:checked + .slider:before { transform: translateX(20px); }
-
 .generate-btn { width: 100%; padding: 15px; background: var(--navy); color: var(--white); border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; margin-top: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s; }
 .generate-btn:hover { background: var(--navy-deep); }
 .generate-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 .spinner { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-
 .results { display: none; }
 .results-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 1.25rem; }
 .results-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--navy); }
@@ -88,7 +73,6 @@ input:checked + .slider:before { transform: translateX(20px); }
 .validate-btn:hover { background: #b8943e; }
 .validate-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 .validate-success { font-size: 13px; color: #1D9E75; font-weight: 500; }
-
 .tabs { display: flex; gap: 4px; margin-bottom: 1.25rem; flex-wrap: wrap; }
 .tab-btn { padding: 8px 16px; border-radius: 99px; border: 1px solid var(--gray-100); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; color: var(--gray-500); transition: all 0.15s; position: relative; }
 .tab-btn.active { background: var(--navy); color: var(--white); border-color: var(--navy); }
@@ -104,15 +88,12 @@ input:checked + .slider:before { transform: translateX(20px); }
 .copy-btn { padding: 6px 14px; background: rgba(201,168,76,0.2); border: 1px solid rgba(201,168,76,0.4); color: var(--gold); border-radius: 99px; font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.15s; }
 .copy-btn:hover { background: rgba(201,168,76,0.35); }
 .copy-btn.copied { background: rgba(29,158,117,0.2); border-color: rgba(29,158,117,0.4); color: #1D9E75; }
-
-/* ── Image preview ── */
 .img-preview-wrap { position: relative; background: var(--gray-50); border-bottom: 1px solid var(--gray-100); overflow: hidden; min-height: 60px; }
 .img-preview { width: 100%; max-height: 300px; object-fit: cover; display: block; }
 .img-loading { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 20px; font-size: 13px; color: var(--gray-300); }
 .img-placeholder { display: flex; align-items: center; justify-content: center; height: 80px; font-size: 12px; color: var(--gray-300); gap: 6px; }
 .img-regen-btn { position: absolute; top: 10px; right: 10px; padding: 6px 12px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 99px; font-size: 12px; cursor: pointer; transition: background 0.15s; }
 .img-regen-btn:hover { background: rgba(0,0,0,0.7); }
-
 .content-body { padding: 1.5rem 20px; }
 .content-text { font-size: 14px; color: var(--gray-700); line-height: 1.75; white-space: pre-wrap; word-break: break-word; }
 .blog-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--gray-100); }
@@ -124,19 +105,15 @@ input:checked + .slider:before { transform: translateX(20px); }
 .tip-box { background: var(--gold-pale); border-left: 3px solid var(--gold); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 10px 14px; margin-top: 12px; font-size: 12px; color: var(--gray-700); line-height: 1.6; }
 .tip-box strong { color: var(--navy); }
 .error-msg { color: #c0392b; font-size: 13px; text-align: center; margin-top: 1rem; display: none; }
-
-/* Progress bar */
 .progress-wrap { display: none; margin-top: 14px; }
 .progress-bar { height: 4px; background: var(--gray-100); border-radius: 99px; overflow: hidden; }
 .progress-fill { height: 100%; background: var(--gold); border-radius: 99px; transition: width 0.4s ease; width: 0%; }
 .progress-label { font-size: 11px; color: var(--gray-500); margin-top: 6px; text-align: center; }
-
 @media (max-width: 600px) { .fields-grid { grid-template-columns: 1fr; } .tabs { gap: 6px; } .results-header { flex-direction: column; align-items: flex-start; } }
 </style>
 </head>
 <body>
 
-<!-- ── ÉCRAN PIN ── -->
 <div id="pin-screen">
   <div class="pin-box" id="pin-box">
     <div class="pin-logo">TI</div>
@@ -166,7 +143,6 @@ input:checked + .slider:before { transform: translateX(20px); }
   </div>
 </div>
 
-<!-- ── APPLICATION ── -->
 <div id="app">
   <header>
     <div class="header-inner">
@@ -269,18 +245,39 @@ input:checked + .slider:before { transform: translateX(20px); }
         <div class="field">
           <label>Sujet principal</label>
           <select id="sujet">
-            <option id="opt-prix">Prix immobiliers</option>
-            <option value="conseils pour vendre rapidement et au meilleur prix">Vendre rapidement</option>
-            <option value="les quartiers les plus demandés par les acheteurs">Quartiers demandés</option>
-            <option value="conseils pour les primo-accédants et comment bien acheter">Conseils primo-accédants</option>
-            <option value="impact du DPE sur la valeur et la vente d'un bien">DPE et valeur du bien</option>
-            <option value="investissement locatif : rentabilité et opportunités">Investissement locatif</option>
-            <option value="comment bien estimer son bien avant de vendre">Bien estimer son bien</option>
-            <option id="opt-marche">Marché printemps</option>
-            <option value="le quotidien d'un agent immobilier : coulisses du métier, visites, négociations">Le quotidien d'un agent</option>
-            <option value="comment un agent immobilier qualifie ses acquéreurs avant de proposer une visite (budget, financement, projet)">Qualifier ses clients avant visite</option>
-            <option value="conseils pour sécuriser et protéger sa maison (alarme, assurance, bonnes pratiques)">Sécuriser sa maison</option>
-            <option value="pourquoi consulter un courtier et son banquier avant d'acheter un bien immobilier">Consulter courtier et banquier</option>
+            <optgroup label="── Marché ──">
+              <option id="opt-prix">Prix immobiliers</option>
+              <option id="opt-marche">Marché printemps</option>
+              <option value="les quartiers les plus demandés par les acheteurs">Quartiers demandés</option>
+            </optgroup>
+            <optgroup label="── Vente & Achat ──">
+              <option value="conseils pour vendre rapidement et au meilleur prix">Vendre rapidement</option>
+              <option value="comment bien estimer son bien avant de vendre">Bien estimer son bien</option>
+              <option value="conseils pour les primo-accédants et comment bien acheter">Conseils primo-accédants</option>
+              <option value="pourquoi consulter un courtier et son banquier avant d'acheter un bien immobilier">Consulter courtier et banquier</option>
+              <option value="fiscalité et plus-value immobilière : ce que tout vendeur doit savoir">Fiscalité plus-value immobilière</option>
+              <option value="succession et donation immobilière : conseils pratiques">Succession et donation immobilière</option>
+            </optgroup>
+            <optgroup label="── Investissement ──">
+              <option value="investissement locatif : rentabilité et opportunités">Investissement locatif</option>
+              <option value="impact du DPE sur la valeur et la vente d'un bien">DPE et valeur du bien</option>
+              <option value="copropriété : comprendre les charges et les travaux votés en assemblée générale">Copropriété charges et travaux</option>
+            </optgroup>
+            <optgroup label="── Travaux & Rénovation ──">
+              <option value="isolation thermique : avantages, inconvénients et impact sur la valeur du bien">Isolation thermique</option>
+              <option value="travaux dans son logement : faut-il faire soi-même ou passer par un professionnel ?">Travaux : soi-même ou pro ?</option>
+              <option value="chauffage et économies d'énergie : les bons choix pour votre logement">Chauffage et économies d'énergie</option>
+              <option value="aides à la rénovation : MaPrimeRénov', éco-PTZ et autres dispositifs en 2026">Aides MaPrimeRénov' éco-PTZ</option>
+              <option value="entretien de sa maison selon les saisons : le guide complet">Entretien maison selon saison</option>
+              <option value="rénovation avant vente : quels travaux sont rentables et lesquels éviter ?">Rénovation avant vente</option>
+              <option value="faire appel à un architecte d'intérieur ou une décoratrice avant de vendre : quand est-ce vraiment rentable ?">Architecte / déco avant vente</option>
+            </optgroup>
+            <optgroup label="── Conseils pratiques ──">
+              <option value="le quotidien d'un agent immobilier : coulisses du métier, visites, négociations">Le quotidien d'un agent</option>
+              <option value="comment un agent immobilier qualifie ses acquéreurs avant de proposer une visite (budget, financement, projet)">Qualifier ses clients avant visite</option>
+              <option value="conseils pour sécuriser et protéger sa maison (alarme, assurance, bonnes pratiques)">Sécuriser sa maison</option>
+              <option value="bien choisir son assurance habitation : les points clés à vérifier">Assurance habitation</option>
+            </optgroup>
           </select>
         </div>
 
@@ -305,7 +302,6 @@ input:checked + .slider:before { transform: translateX(20px); }
         </div>
       </div>
 
-      <!-- Image toggle -->
       <div class="image-toggle">
         <label class="switch">
           <input type="checkbox" id="gen-images" checked/>
@@ -344,7 +340,6 @@ input:checked + .slider:before { transform: translateX(20px); }
         <button class="tab-btn" onclick="showTab('google', this)">🗺️ Google Business</button>
       </div>
 
-      <!-- BLOG -->
       <div class="tab-panel active" id="tab-blog">
         <div class="content-card">
           <div class="content-header">
@@ -365,7 +360,6 @@ input:checked + .slider:before { transform: translateX(20px); }
         </div>
       </div>
 
-      <!-- FACEBOOK -->
       <div class="tab-panel" id="tab-facebook">
         <div class="content-card">
           <div class="content-header">
@@ -386,7 +380,6 @@ input:checked + .slider:before { transform: translateX(20px); }
         </div>
       </div>
 
-      <!-- INSTAGRAM -->
       <div class="tab-panel" id="tab-instagram">
         <div class="content-card">
           <div class="content-header">
@@ -407,7 +400,6 @@ input:checked + .slider:before { transform: translateX(20px); }
         </div>
       </div>
 
-      <!-- LINKEDIN -->
       <div class="tab-panel" id="tab-linkedin">
         <div class="content-card">
           <div class="content-header">
@@ -428,7 +420,6 @@ input:checked + .slider:before { transform: translateX(20px); }
         </div>
       </div>
 
-      <!-- GOOGLE -->
       <div class="tab-panel" id="tab-google">
         <div class="content-card">
           <div class="content-header">
@@ -453,26 +444,11 @@ input:checked + .slider:before { transform: translateX(20px); }
 </div>
 
 <script>
-// ── PIN ──────────────────────────────────────────────────────────────────────
 const PIN_CODE = '2025';
 let pinEntry = '';
-
-function addDigit(d) {
-  if (pinEntry.length >= 4) return;
-  pinEntry += d;
-  updateDots();
-  if (pinEntry.length === 4) checkPin();
-}
-function delDigit() {
-  pinEntry = pinEntry.slice(0, -1);
-  updateDots();
-  document.getElementById('pin-error').textContent = '';
-}
-function updateDots() {
-  for (let i = 0; i < 4; i++) {
-    document.getElementById('d' + i).classList.toggle('filled', i < pinEntry.length);
-  }
-}
+function addDigit(d) { if (pinEntry.length >= 4) return; pinEntry += d; updateDots(); if (pinEntry.length === 4) checkPin(); }
+function delDigit() { pinEntry = pinEntry.slice(0, -1); updateDots(); document.getElementById('pin-error').textContent = ''; }
+function updateDots() { for (let i = 0; i < 4; i++) { document.getElementById('d' + i).classList.toggle('filled', i < pinEntry.length); } }
 function checkPin() {
   if (pinEntry === PIN_CODE) {
     document.getElementById('pin-screen').style.display = 'none';
@@ -481,17 +457,10 @@ function checkPin() {
   } else {
     document.getElementById('pin-error').textContent = 'Code incorrect. Réessayez.';
     document.getElementById('pin-box').classList.add('pin-shake');
-    setTimeout(() => {
-      pinEntry = '';
-      updateDots();
-      document.getElementById('pin-box').classList.remove('pin-shake');
-    }, 500);
+    setTimeout(() => { pinEntry = ''; updateDots(); document.getElementById('pin-box').classList.remove('pin-shake'); }, 500);
   }
 }
-function verrouiller() {
-  sessionStorage.removeItem('toan_auth');
-  location.reload();
-}
+function verrouiller() { sessionStorage.removeItem('toan_auth'); location.reload(); }
 if (sessionStorage.getItem('toan_auth') === '1') {
   document.getElementById('pin-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
@@ -502,12 +471,10 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Backspace') delDigit();
 });
 
-// ── APP STATE ────────────────────────────────────────────────────────────────
 let currentImages = { facebook: null, instagram: null, linkedin: null, google: null };
 let currentContent = {};
 let currentParams = {};
 
-// ── HELPERS ──────────────────────────────────────────────────────────────────
 function showTab(name, btn) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -537,20 +504,14 @@ function setProgress(pct, label) {
 }
 
 function showImageLoading(platform) {
-  const wrap = document.getElementById('img-wrap-' + platform);
   const placeholder = document.getElementById('img-placeholder-' + platform);
-  if (placeholder) {
-    placeholder.innerHTML = '<div class="img-loading"><div class="spinner" style="border-color:rgba(0,0,0,.1);border-top-color:var(--navy);"></div> Génération du visuel…</div>';
-  }
+  if (placeholder) placeholder.innerHTML = '<div class="img-loading"><div class="spinner" style="border-color:rgba(0,0,0,.1);border-top-color:var(--navy);"></div> Génération du visuel…</div>';
 }
 
 function setImage(platform, url) {
   const wrap = document.getElementById('img-wrap-' + platform);
   if (!wrap) return;
-  wrap.innerHTML = `
-    <img class="img-preview" src="${url}" alt="Visuel ${platform}" loading="lazy"/>
-    <button class="img-regen-btn" onclick="regenImage('${platform}')">🔄 Régénérer</button>
-  `;
+  wrap.innerHTML = `<img class="img-preview" src="${url}" alt="Visuel ${platform}" loading="lazy"/><button class="img-regen-btn" onclick="regenImage('${platform}')">🔄 Régénérer</button>`;
   currentImages[platform] = url;
 }
 
@@ -559,36 +520,17 @@ function setImageError(platform) {
   if (wrap) wrap.innerHTML = `<div class="img-placeholder" id="img-placeholder-${platform}">⚠️ Visuel non disponible — <button onclick="regenImage('${platform}')" style="border:none;background:none;color:var(--navy);cursor:pointer;font-size:12px;text-decoration:underline;">réessayer</button></div>`;
 }
 
-// ── IMAGE GENERATION ─────────────────────────────────────────────────────────
 async function generateImageForPlatform(platform) {
   showImageLoading(platform);
   try {
-    const res = await fetch('/api/generate-image', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sujet: currentParams.sujet,
-        commune: currentParams.commune,
-        saison: currentParams.saison,
-        platform,
-      }),
-    });
+    const res = await fetch('/api/generate-image', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sujet: currentParams.sujet, commune: currentParams.commune, saison: currentParams.saison, platform }) });
     const data = await res.json();
-    if (data.url) {
-      setImage(platform, data.url);
-    } else {
-      setImageError(platform);
-    }
-  } catch {
-    setImageError(platform);
-  }
+    if (data.url) { setImage(platform, data.url); } else { setImageError(platform); }
+  } catch { setImageError(platform); }
 }
 
-async function regenImage(platform) {
-  await generateImageForPlatform(platform);
-}
+async function regenImage(platform) { await generateImageForPlatform(platform); }
 
-// ── MAIN GENERATE ────────────────────────────────────────────────────────────
 async function generer() {
   const commune = document.getElementById('commune').value;
   const sujet = document.getElementById('sujet').value;
@@ -624,11 +566,7 @@ Réponds UNIQUEMENT en JSON valide (sans markdown, sans backticks) avec exacteme
 }`;
 
   try {
-    const res = await fetch('/api/generate-content', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt }),
-    });
+    const res = await fetch('/api/generate-content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt }) });
     const data = await res.json();
     if (!data || !data.content) throw new Error('Réponse API invalide');
 
@@ -638,7 +576,6 @@ Réponds UNIQUEMENT en JSON valide (sans markdown, sans backticks) avec exacteme
     const content = JSON.parse(match[0]);
     currentContent = content;
 
-    // Populate texts
     document.getElementById('blog-text').innerHTML = content.blog;
     document.getElementById('facebook-text').textContent = content.facebook;
     document.getElementById('instagram-text').textContent = content.instagram;
@@ -659,25 +596,16 @@ Réponds UNIQUEMENT en JSON valide (sans markdown, sans backticks) avec exacteme
     document.getElementById('results').style.display = 'block';
     document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-    // Generate images in parallel if enabled
     if (genImages) {
       const platforms = ['facebook', 'instagram', 'linkedin', 'google'];
       setProgress(50, 'Génération des visuels en cours…');
-
       const imagePromises = platforms.map(p => generateImageForPlatform(p));
       let done = 0;
-      imagePromises.forEach(p => p.then(() => {
-        done++;
-        setProgress(50 + done * 12, `Visuels : ${done}/4 générés…`);
-      }));
+      imagePromises.forEach(p => p.then(() => { done++; setProgress(50 + done * 12, `Visuels : ${done}/4 générés…`); }));
       await Promise.allSettled(imagePromises);
       setProgress(100, 'Tout est prêt ✓');
     } else {
-      // Clear image placeholders
-      ['facebook', 'instagram', 'linkedin', 'google'].forEach(p => {
-        const wrap = document.getElementById('img-wrap-' + p);
-        if (wrap) wrap.innerHTML = '';
-      });
+      ['facebook', 'instagram', 'linkedin', 'google'].forEach(p => { const wrap = document.getElementById('img-wrap-' + p); if (wrap) wrap.innerHTML = ''; });
       setProgress(100, 'Textes générés ✓');
     }
 
@@ -693,44 +621,17 @@ Réponds UNIQUEMENT en JSON valide (sans markdown, sans backticks) avec exacteme
   }
 }
 
-// ── VALIDATION EMAIL ─────────────────────────────────────────────────────────
 async function envoyerValidation() {
   const btn = document.getElementById('validate-btn');
   const statusEl = document.getElementById('validate-status');
-
-  if (!currentContent.facebook) {
-    statusEl.innerHTML = '<p style="color:#c0392b;font-size:13px;">Génère d\'abord du contenu.</p>';
-    return;
-  }
-
+  if (!currentContent.facebook) { statusEl.innerHTML = '<p style="color:#c0392b;font-size:13px;">Génère d\'abord du contenu.</p>'; return; }
   btn.disabled = true;
   btn.innerHTML = '<div class="spinner" style="border-color:rgba(0,0,0,.1);border-top-color:var(--navy-deep);"></div> Envoi…';
   statusEl.innerHTML = '';
-
   try {
-    const res = await fetch('/api/send-validation', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        commune: currentParams.commune,
-        sujet: currentParams.sujet,
-        saison: currentParams.saison,
-        content: {
-          facebook: currentContent.facebook,
-          instagram: currentContent.instagram,
-          linkedin: currentContent.linkedin,
-          google: currentContent.google,
-        },
-        images: currentImages,
-      }),
-    });
+    const res = await fetch('/api/send-validation', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ commune: currentParams.commune, sujet: currentParams.sujet, saison: currentParams.saison, content: { facebook: currentContent.facebook, instagram: currentContent.instagram, linkedin: currentContent.linkedin, google: currentContent.google }, images: currentImages }) });
     const data = await res.json();
-
-    if (data.success) {
-      statusEl.innerHTML = '<p class="validate-success">✅ Email de validation envoyé ! Consulte ta boîte mail pour approuver chaque plateforme.</p>';
-    } else {
-      throw new Error(data.error || 'Erreur');
-    }
+    if (data.success) { statusEl.innerHTML = '<p class="validate-success">✅ Email de validation envoyé ! Consulte ta boîte mail pour approuver chaque plateforme.</p>'; } else { throw new Error(data.error || 'Erreur'); }
   } catch (e) {
     statusEl.innerHTML = `<p style="color:#c0392b;font-size:13px;">Erreur : ${e.message}</p>`;
   } finally {
@@ -739,7 +640,6 @@ async function envoyerValidation() {
   }
 }
 
-// ── SAISON / OPTIONS AUTO ────────────────────────────────────────────────────
 (function() {
   const y = new Date().getFullYear();
   const m = new Date().getMonth();
@@ -752,16 +652,10 @@ async function envoyerValidation() {
     'opt-prix': { value: `prix immobiliers et tendances du marché en ${y}`, text: `Prix immobiliers ${y}` },
     'opt-marche': { value: `le marché immobilier au printemps ${y} : opportunités`, text: `Marché printemps ${y}` },
   };
-  Object.entries(opts).forEach(([id, {value, text}]) => {
-    const el = document.getElementById(id);
-    if (el) { el.value = value; el.textContent = text; }
-  });
+  Object.entries(opts).forEach(([id, {value, text}]) => { const el = document.getElementById(id); if (el) { el.value = value; el.textContent = text; } });
   const saisonMap = { 'printemps': 'opt-printemps', 'ete': 'opt-ete', 'automne': 'opt-automne', 'fin': 'opt-fin', 'hiver': 'opt-fin' };
   const defaultId = saisonMap[saison];
-  if (defaultId) {
-    const el = document.getElementById(defaultId);
-    if (el) el.selected = true;
-  }
+  if (defaultId) { const el = document.getElementById(defaultId); if (el) el.selected = true; }
 })();
 </script>
 </body>
