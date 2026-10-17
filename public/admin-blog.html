@@ -188,45 +188,13 @@
 
     <div class="pin-sub">Publier un article · Toan Immo Lyon</div>
 
-    <div class="pin-dots">
+    <form onsubmit="checkPin(event)" style="display:grid;gap:10px;">
 
-      <div class="pin-dot" id="d0"></div>
+      <input type="password" id="admin-pass" class="pin-key" placeholder="Mot de passe" autocomplete="current-password" autofocus style="cursor:text;text-align:center;font-size:15px;" />
 
-      <div class="pin-dot" id="d1"></div>
+      <button type="submit" class="pin-key">Entrer</button>
 
-      <div class="pin-dot" id="d2"></div>
-
-      <div class="pin-dot" id="d3"></div>
-
-    </div>
-
-    <div class="pin-keypad">
-
-      <button class="pin-key" onclick="addDigit('1')">1</button>
-
-      <button class="pin-key" onclick="addDigit('2')">2</button>
-
-      <button class="pin-key" onclick="addDigit('3')">3</button>
-
-      <button class="pin-key" onclick="addDigit('4')">4</button>
-
-      <button class="pin-key" onclick="addDigit('5')">5</button>
-
-      <button class="pin-key" onclick="addDigit('6')">6</button>
-
-      <button class="pin-key" onclick="addDigit('7')">7</button>
-
-      <button class="pin-key" onclick="addDigit('8')">8</button>
-
-      <button class="pin-key" onclick="addDigit('9')">9</button>
-
-      <button class="pin-key empty"></button>
-
-      <button class="pin-key" onclick="addDigit('0')">0</button>
-
-      <button class="pin-key del" onclick="delDigit()">⌫</button>
-
-    </div>
+    </form>
 
     <div class="pin-error" id="pin-error"></div>
 
@@ -586,63 +554,23 @@
 
 <script>
 
-const PIN_CODE = '2025';
+// Le mot de passe est vérifié par le serveur (variable ADMIN_PASSWORD sur Vercel)
 
-let pinEntry = '';
+// et envoyé avec chaque appel /api/ via l'en-tête x-admin-key.
 
-function addDigit(d) {
+let adminKey = sessionStorage.getItem('toan_admin_key') || '';
 
-  if (pinEntry.length >= 4) return;
+const _fetch = window.fetch.bind(window);
 
-  pinEntry += d;
+window.fetch = (url, opts = {}) => {
 
-  updateDots();
+  if (typeof url === 'string' && url.startsWith('/api/')) opts.headers = { ...(opts.headers || {}), 'x-admin-key': adminKey };
 
-  if (pinEntry.length === 4) checkPin();
+  return _fetch(url, opts);
 
-}
+};
 
-function delDigit() {
-
-  pinEntry = pinEntry.slice(0, -1);
-
-  updateDots();
-
-  document.getElementById('pin-error').textContent = '';
-
-}
-
-function updateDots() {
-
-  for (let i = 0; i < 4; i++) document.getElementById('d'+i).classList.toggle('filled', i < pinEntry.length);
-
-}
-
-function checkPin() {
-
-  if (pinEntry === PIN_CODE) {
-
-    document.getElementById('pin-screen').style.display = 'none';
-
-    document.getElementById('app').style.display = 'block';
-
-    sessionStorage.setItem('toan_admin', '1');
-
-  } else {
-
-    document.getElementById('pin-error').textContent = 'Code incorrect.';
-
-    document.getElementById('pin-box').classList.add('pin-shake');
-
-    setTimeout(() => { pinEntry = ''; updateDots(); document.getElementById('pin-box').classList.remove('pin-shake'); }, 500);
-
-  }
-
-}
-
-function verrouiller() { sessionStorage.removeItem('toan_admin'); location.reload(); }
-
-if (sessionStorage.getItem('toan_admin') === '1') {
+function ouvrirApp() {
 
   document.getElementById('pin-screen').style.display = 'none';
 
@@ -650,15 +578,35 @@ if (sessionStorage.getItem('toan_admin') === '1') {
 
 }
 
-document.addEventListener('keydown', e => {
+async function checkPin(e) {
 
-  if (document.getElementById('pin-screen').style.display === 'none') return;
+  e.preventDefault();
 
-  if (e.key >= '0' && e.key <= '9') addDigit(e.key);
+  adminKey = document.getElementById('admin-pass').value;
 
-  if (e.key === 'Backspace') delDigit();
+  const r = await fetch('/api/admin-check', { method: 'POST' }).catch(() => null);
 
-});
+  if (r && r.ok) {
+
+    sessionStorage.setItem('toan_admin_key', adminKey);
+
+    ouvrirApp();
+
+  } else {
+
+    document.getElementById('pin-error').textContent = 'Mot de passe incorrect.';
+
+    document.getElementById('pin-box').classList.add('pin-shake');
+
+    setTimeout(() => { document.getElementById('admin-pass').value = ''; document.getElementById('pin-box').classList.remove('pin-shake'); }, 500);
+
+  }
+
+}
+
+function verrouiller() { sessionStorage.removeItem('toan_admin_key'); location.reload(); }
+
+if (adminKey) ouvrirApp();
 
 (function() {
 

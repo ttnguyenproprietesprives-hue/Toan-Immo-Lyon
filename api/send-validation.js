@@ -1,5 +1,6 @@
 import { Redis } from '@upstash/redis';
 import { Resend } from 'resend';
+import { isAdmin } from './_auth.js';
 
 export const config = { runtime: 'nodejs' };
 
@@ -74,6 +75,7 @@ function buildEmailHtml({ token, commune, sujet, saison, content, images }) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (!isAdmin(req)) return res.status(401).json({ error: 'Non autorisé' });
 
   const { commune, sujet, saison, content, images } = req.body;
   if (!content || !commune) return res.status(400).json({ error: 'Missing data' });

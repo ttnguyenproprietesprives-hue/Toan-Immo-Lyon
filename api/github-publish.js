@@ -1,4 +1,8 @@
+import { isAdmin } from './_auth.js';
+
 export default async function handler(req, res) {
+  if (!isAdmin(req)) return res.status(401).json({ error: 'Non autorisé' });
+
   const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
   const REPO = 'ttnguyenproprietesprives-hue/Toan-Immo-Lyon';
 

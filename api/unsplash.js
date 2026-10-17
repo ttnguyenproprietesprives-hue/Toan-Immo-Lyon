@@ -1,5 +1,8 @@
+import { isAdmin } from './_auth.js';
+
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
+  if (!isAdmin(req)) return res.status(401).json({ error: 'Non autorisé' });
   const { query } = req.query;
   const ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
   try {

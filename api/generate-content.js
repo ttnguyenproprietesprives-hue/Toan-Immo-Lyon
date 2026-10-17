@@ -1,5 +1,8 @@
+import { isAdmin } from './_auth.js';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
+  if (!isAdmin(req)) return res.status(401).json({ error: 'Non autorisé' });
 
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;

@@ -1,4 +1,4 @@
-export const config = { runtime: 'edge' };
+import { isAdmin } from './_auth.js';
 
 const QUERIES = {
   instagram: 'modern apartment building Lyon France',
@@ -7,12 +7,11 @@ const QUERIES = {
   google: 'modern residential building France',
 };
 
-export default async function handler(req) {
-  if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405 });
-  }
+export default async function handler(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (!isAdmin(req)) return res.status(401).json({ error: 'Non autorisé' });
 
-  const body = await req.json();
+  const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
   const platform = body.platform || 'instagram';
   const query = QUERIES[platform] || QUERIES.instagram;
 
@@ -28,11 +27,8 @@ export default async function handler(req) {
   const data = await unsplashRes.json();
 
   if (!unsplashRes.ok) {
-    return new Response(JSON.stringify({ error: data.errors || 'Unsplash error' }), { status: 500 });
+    return res.status(500).json({ error: data.errors || 'Unsplash error' });
   }
 
-  return new Response(JSON.stringify({ url: data.urls.regular, platform: platform }), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json' },
-  });
+  return res.status(200).json({ url: data.urls.regular, platform: platform });
 }

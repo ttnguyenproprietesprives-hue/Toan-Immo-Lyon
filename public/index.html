@@ -674,12 +674,16 @@ function setProjet(p){
   ['vente','location','achat'].forEach(x=>document.getElementById('btn-'+x).classList.toggle('active',x===p));
   document.getElementById('bloc-financement').classList.toggle('hidden',p!=='achat');
 }
-// FORMSPREE — remplace TON_ID_VENDRE / TON_ID_RECHERCHE / TON_ID_CONTACT par tes vrais IDs Formspree
+// Envoi des formulaires via /api/lead (Formspree côté serveur, variable FORMSPREE_ID sur Vercel)
+async function posterLead(formulaire,champs){
+  try{const r=await fetch('/api/lead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({formulaire,champs})});return r.ok;}catch(e){return false;}
+}
+const ECHEC_ENVOI="L'envoi a échoué. Réessayez ou appelez-moi directement au 06 60 02 27 25.";
 async function envoyerVendre(){
   const nom=document.getElementById('vn-nom').value.trim();
   const tel=document.getElementById('vn-tel').value.trim();
   if(!nom||!tel){alert('Merci de renseigner votre nom et votre téléphone.');return;}
-  try{await fetch('https://formspree.io/f/TON_ID_VENDRE',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({_subject:'[Toan Immo] Nouveau bien à vendre',nom:document.getElementById('vn-nom').value,tel:document.getElementById('vn-tel').value,email:document.getElementById('vn-email').value,type:document.getElementById('vn-type').value,commune:document.getElementById('vn-commune').value,surface:document.getElementById('vn-surface').value,prix:document.getElementById('vn-prix').value,message:document.getElementById('vn-message').value})});}catch(e){}
+  if(!await posterLead('vendre',{nom:document.getElementById('vn-nom').value,tel:document.getElementById('vn-tel').value,email:document.getElementById('vn-email').value,type:document.getElementById('vn-type').value,commune:document.getElementById('vn-commune').value,surface:document.getElementById('vn-surface').value,prix:document.getElementById('vn-prix').value,message:document.getElementById('vn-message').value})){alert(ECHEC_ENVOI);return;}
   document.getElementById('vendre-confirm').classList.add('show');
   document.querySelectorAll('#vendre-deposer input,#vendre-deposer select,#vendre-deposer textarea').forEach(el=>el.value='');
 }
@@ -687,7 +691,7 @@ async function envoyerRecherche(){
   const nom=document.getElementById('rn-nom').value.trim();
   const tel=document.getElementById('rn-tel').value.trim();
   if(!nom||!tel){alert('Merci de renseigner votre nom et votre téléphone.');return;}
-  try{await fetch('https://formspree.io/f/TON_ID_RECHERCHE',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({_subject:'[Toan Immo] Nouvelle demande de recherche',nom:document.getElementById('rn-nom').value,tel:document.getElementById('rn-tel').value,email:document.getElementById('rn-email').value,type:document.getElementById('rn-type').value,commune:document.getElementById('rn-commune').value,budget:document.getElementById('rn-budget').value,surface:document.getElementById('rn-surface').value,criteres:document.getElementById('rn-message').value})});}catch(e){}
+  if(!await posterLead('recherche',{nom:document.getElementById('rn-nom').value,tel:document.getElementById('rn-tel').value,email:document.getElementById('rn-email').value,type:document.getElementById('rn-type').value,commune:document.getElementById('rn-commune').value,budget:document.getElementById('rn-budget').value,surface:document.getElementById('rn-surface').value,criteres:document.getElementById('rn-message').value})){alert(ECHEC_ENVOI);return;}
   document.getElementById('recherche-confirm').classList.add('show');
   document.querySelectorAll('#rechercher-demande input,#rechercher-demande select,#rechercher-demande textarea').forEach(el=>el.value='');
 }
@@ -695,11 +699,11 @@ async function envoyerContact(){
   const nom=document.getElementById('ct-nom').value.trim();
   const tel=document.getElementById('ct-tel').value.trim();
   if(!nom||!tel){alert('Merci de renseigner votre nom et votre téléphone.');return;}
-  try{await fetch('https://formspree.io/f/TON_ID_CONTACT',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({_subject:'[Toan Immo] Nouveau message de contact',nom:document.getElementById('ct-nom').value,tel:document.getElementById('ct-tel').value,email:document.getElementById('ct-email').value,objet:document.getElementById('ct-objet').value,message:document.getElementById('ct-message').value})});}catch(e){}
+  if(!await posterLead('contact',{nom:document.getElementById('ct-nom').value,tel:document.getElementById('ct-tel').value,email:document.getElementById('ct-email').value,objet:document.getElementById('ct-objet').value,message:document.getElementById('ct-message').value})){alert(ECHEC_ENVOI);return;}
   document.getElementById('contact-confirm').classList.add('show');
   document.querySelectorAll('#contact input,#contact select,#contact textarea').forEach(el=>{if(el.id!=='ct-objet')el.value='';});
 }
-// ESTIMATION IA — logique originale conservée intégralement
+// ESTIMATION IA — le prompt, l'envoi du lead et l'email sont gérés par /api/estimate
 const loadingMsgs=["Consultation des données DVF (transactions réelles)…","Analyse des annonces LeBonCoin, PAP, SeLoger…","Comparaison avec les biens similaires à proximité…","Génération de votre estimation personnalisée…"];
 async function lancerEstimation(){
   const prenom=document.getElementById('prenom').value.trim();
@@ -717,24 +721,24 @@ async function lancerEstimation(){
   document.getElementById('error-msg').style.display='none';
   let mi=0;
   const iv=setInterval(()=>{if(mi<loadingMsgs.length)document.getElementById('loading-msg').textContent=loadingMsgs[mi++];},1800);
-  const unite=d.projet==='location'?'€/mois':'€';
-  const salutation=`${civilite} ${prenom} ${nom}`.trim();
+  // Tout texte inséré dans la page est échappé (saisie du visiteur et réponse de l'IA)
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const escObj=o=>Object.fromEntries(Object.entries(o).map(([k,v])=>[k,Array.isArray(v)?v.map(esc):(typeof v==='number'?v:esc(v))]));
+  const x=escObj(d);
+  const salutation=esc(`${civilite} ${prenom} ${nom}`.trim());
   const projetLabel=d.projet==='vente'?'vente':d.projet==='location'?'mise en location':'achat';
-  const prompt=`Tu es un expert immobilier du Grand Lyon, spécialiste de l'estimation à la valeur réelle de marché.\nRÈGLES IMPORTANTES pour l'estimation :\n- Base-toi EXCLUSIVEMENT sur les prix de vente réels DVF\n- Les prix d'annonces sont en moyenne 8 à 12% au-dessus des prix de vente réels\n- L'estimation doit être RÉALISTE et VENDABLE\nBien à estimer pour ${salutation} — projet : ${projetLabel} — commune : ${d.commune}.\nCaractéristiques : ${d.type_bien} de ${d.surface}m², ${d.pieces} pièce(s), ${d.sdb} SDB, ${d.nb_etages}.\nAdresse : ${d.adresse||'non renseignée'}, ${d.commune}, environnement : ${d.environnement}.\nConstruction : ${d.annee}. État : ${d.etat}. DPE : ${d.dpe}. Chauffage : ${d.chauffage}.\nÉtage : ${d.etage}. Exposition : ${d.expo}. Luminosité : ${d.lumineux}. Vue : ${d.vue}.\nÉquipements : ${d.parking}, ${d.exterieur}, ${d.ascenseur}, ${d.cave}, ${d.cuisine}, ${d.clim}, ${d.parquet}.\n${d.projet==='achat'?'Budget max : '+d.budget+'€, apport : '+d.apport+'€, financement : '+d.financement+'.':''}\nDélai envisagé : ${d.delai}.\nRéponds UNIQUEMENT en JSON valide sans markdown.\nFormat attendu : {"prix_estime":NOMBRE,"prix_min":NOMBRE,"prix_max":NOMBRE,"prix_m2":NOMBRE,"unite":"${unite}","confiance":"Élevée ou Modérée ou Faible","tendance":"hausse ou stable ou baisse","analyse":"texte","points_forts":["texte"],"vigilances":["texte"],"conseil":"texte","nb_similaires":NOMBRE,"delai":"texte"}`;
   const fmt=n=>Number(n).toLocaleString('fr-FR');
   try{
-    const res=await fetch('/api/estimate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
+    const res=await fetch('/api/estimate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...d,rgpd:true})});
     clearInterval(iv);
     if(!res.ok)throw new Error('Erreur '+res.status);
     const rawText=await res.text();
     const jsonMatch=rawText.match(/\{[\s\S]*\}/);
     if(!jsonMatch)throw new Error('Réponse invalide');
-    const est=JSON.parse(jsonMatch[0]);
-    if(d.email){fetch('/api/send-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prospect:{civilite:d.civilite,prenom:d.prenom,nom:d.nom,email:d.email},estimation:{prix_formate:fmt(est.prix_estime),min_formate:fmt(est.prix_min),max_formate:fmt(est.prix_max),prix_m2_formate:fmt(est.prix_m2),unite:est.unite,confiance:est.confiance,tendance:est.tendance,analyse:est.analyse,points_forts:est.points_forts,vigilances:est.vigilances,conseil:est.conseil,nb_similaires:est.nb_similaires,delai:est.delai},bien:{projet:projetLabel,type:d.type_bien,pieces:d.pieces,surface:d.surface,commune:d.commune,adresse:d.adresse,etat:d.etat,dpe:d.dpe}})}).catch(()=>{});}
-    fetch('/api/lead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({'PROJET':projetLabel.toUpperCase(),'Civilité':d.civilite,'Prénom':d.prenom,'Nom':d.nom,'Téléphone':d.tel,'Email':d.email,'Délai':d.delai,'Financement':d.financement,'Budget':d.budget,'Apport':d.apport,'Adresse':d.adresse,'Commune':d.commune,'Environnement':d.environnement,'Type de bien':d.type_bien,'Pièces':d.pieces,'Surface':d.surface+' m²','SDB':d.sdb,'Étages':d.nb_etages,'Construction':d.annee,'État':d.etat,'DPE':d.dpe,'Chauffage':d.chauffage,'Étage':d.etage,'Exposition':d.expo,'Vue':d.vue,'Luminosité':d.lumineux,'Parking':d.parking,'Extérieur':d.exterieur,'Ascenseur':d.ascenseur,'Cave':d.cave,'Cuisine':d.cuisine,'Clim':d.clim,'Parquet':d.parquet,'ESTIMATION':Number(est.prix_estime).toLocaleString('fr-FR')+' '+est.unite,'Fourchette':Number(est.prix_min).toLocaleString('fr-FR')+' – '+Number(est.prix_max).toLocaleString('fr-FR')+' '+est.unite,'Prix m²':Number(est.prix_m2).toLocaleString('fr-FR')+' €/m²','Tendance':est.tendance,'Source':'Toan Immo Lyon – Outil estimation','Consentement RGPD':'OUI'})}).catch(()=>{});
+    const est=escObj(JSON.parse(jsonMatch[0]));
     const forts=(est.points_forts||[]).map(p=>`<li>${p}</li>`).join('');
     const vigils=(est.vigilances||[]).map(p=>`<li>${p}</li>`).join('');
-    document.getElementById('result-zone').innerHTML=`<div class="result-hero"><div class="result-meta">Bonjour ${salutation} · Estimation ${est.unite==='€/mois'?'locative':'vénale'} · ${d.commune}</div><div class="result-price">${fmt(est.prix_estime)} <span style="font-size:1.5rem">${est.unite}</span></div><div class="result-range">Fourchette réaliste : ${fmt(est.prix_min)} – ${fmt(est.prix_max)} ${est.unite}</div><div class="result-metrics"><div class="rm"><div class="rm-val">${fmt(est.prix_m2)} €</div><div class="rm-lbl">Prix / m²</div></div><div class="rm"><div class="rm-val">${est.nb_similaires||'~10'}</div><div class="rm-lbl">Annonces similaires</div></div><div class="rm"><div class="rm-val">${est.delai||'–'}</div><div class="rm-lbl">Délai moyen</div></div></div><div class="result-badges"><div class="rbadge"><div class="dot"></div>Confiance ${est.confiance}</div><div class="rbadge"><div class="dot"></div>Marché : ${est.tendance}</div></div></div><div class="result-body"><p class="analysis-text">${est.analyse}</p><div class="pts-grid">${forts?`<div class="pts-block forts"><div class="pts-title">Points forts</div><ul>${forts}</ul></div>`:''} ${vigils?`<div class="pts-block vigil"><div class="pts-title">Points de vigilance</div><ul>${vigils}</ul></div>`:''}</div>${est.conseil?`<div class="conseil-box"><div class="c-lbl">Conseil de Toan</div><p>${est.conseil}</p></div>`:''}<div class="divider"></div><div class="contact-final"><div class="contact-header"><h3>Votre estimation est prête, ${d.prenom} !</h3><p>Toan Immo Lyon vous propose un avis de valeur complet et gratuit</p></div><div class="contact-body"><div class="contact-actions"><a href="tel:0660022725" class="action-btn btn-phone">📞 &nbsp; 06 60 02 27 25</a><a href="https://calendly.com/tt-nguyen-proprietesprivees/rendez-vous-estimation-vente-achat" target="_blank" class="action-btn btn-rdv">📅 &nbsp; Prendre RDV en ligne</a></div><div class="recap-box"><div class="r-title">Récapitulatif de votre demande</div><div class="recap-grid"><div class="recap-item"><strong>Projet :</strong> ${projetLabel}</div><div class="recap-item"><strong>Bien :</strong> ${d.type_bien} – ${d.pieces} pièces</div><div class="recap-item"><strong>Surface :</strong> ${d.surface} m²</div><div class="recap-item"><strong>Commune :</strong> ${d.commune}</div>${d.adresse?`<div class="recap-item" style="grid-column:1/-1"><strong>Adresse :</strong> ${d.adresse}</div>`:''}<div class="recap-item"><strong>État :</strong> ${d.etat}</div><div class="recap-item"><strong>DPE :</strong> ${d.dpe}</div><div class="recap-item"><strong>Délai :</strong> ${d.delai}</div>${d.financement!=='N/A'?`<div class="recap-item"><strong>Financement :</strong> ${d.financement}</div>`:''}</div></div><div class="confirm-msg">✅ Votre demande a bien été transmise à Toan · Vous serez recontacté sous 24h</div></div></div></div>`;
+    document.getElementById('result-zone').innerHTML=`<div class="result-hero"><div class="result-meta">Bonjour ${salutation} · Estimation ${est.unite==='€/mois'?'locative':'vénale'} · ${x.commune}</div><div class="result-price">${fmt(est.prix_estime)} <span style="font-size:1.5rem">${est.unite}</span></div><div class="result-range">Fourchette réaliste : ${fmt(est.prix_min)} – ${fmt(est.prix_max)} ${est.unite}</div><div class="result-metrics"><div class="rm"><div class="rm-val">${fmt(est.prix_m2)} €</div><div class="rm-lbl">Prix / m²</div></div><div class="rm"><div class="rm-val">${est.nb_similaires||'~10'}</div><div class="rm-lbl">Annonces similaires</div></div><div class="rm"><div class="rm-val">${est.delai||'–'}</div><div class="rm-lbl">Délai moyen</div></div></div><div class="result-badges"><div class="rbadge"><div class="dot"></div>Confiance ${est.confiance}</div><div class="rbadge"><div class="dot"></div>Marché : ${est.tendance}</div></div></div><div class="result-body"><p class="analysis-text">${est.analyse}</p><div class="pts-grid">${forts?`<div class="pts-block forts"><div class="pts-title">Points forts</div><ul>${forts}</ul></div>`:''} ${vigils?`<div class="pts-block vigil"><div class="pts-title">Points de vigilance</div><ul>${vigils}</ul></div>`:''}</div>${est.conseil?`<div class="conseil-box"><div class="c-lbl">Conseil de Toan</div><p>${est.conseil}</p></div>`:''}<div class="divider"></div><div class="contact-final"><div class="contact-header"><h3>Votre estimation est prête, ${x.prenom} !</h3><p>Toan Immo Lyon vous propose un avis de valeur complet et gratuit</p></div><div class="contact-body"><div class="contact-actions"><a href="tel:0660022725" class="action-btn btn-phone">📞 &nbsp; 06 60 02 27 25</a><a href="https://calendly.com/tt-nguyen-proprietesprivees/rendez-vous-estimation-vente-achat" target="_blank" class="action-btn btn-rdv">📅 &nbsp; Prendre RDV en ligne</a></div><div class="recap-box"><div class="r-title">Récapitulatif de votre demande</div><div class="recap-grid"><div class="recap-item"><strong>Projet :</strong> ${projetLabel}</div><div class="recap-item"><strong>Bien :</strong> ${x.type_bien} – ${x.pieces} pièces</div><div class="recap-item"><strong>Surface :</strong> ${x.surface} m²</div><div class="recap-item"><strong>Commune :</strong> ${x.commune}</div>${x.adresse?`<div class="recap-item" style="grid-column:1/-1"><strong>Adresse :</strong> ${x.adresse}</div>`:''}<div class="recap-item"><strong>État :</strong> ${x.etat}</div><div class="recap-item"><strong>DPE :</strong> ${x.dpe}</div><div class="recap-item"><strong>Délai :</strong> ${x.delai}</div>${x.financement!=='N/A'?`<div class="recap-item"><strong>Financement :</strong> ${x.financement}</div>`:''}</div></div><div class="confirm-msg">✅ Votre demande a bien été transmise à Toan · Vous serez recontacté sous 24h</div></div></div></div>`;
     document.getElementById('loading-zone').style.display='none';
     document.getElementById('result-zone').style.display='block';
   }catch(e){
@@ -742,7 +746,11 @@ async function lancerEstimation(){
     document.getElementById('loading-zone').style.display='none';
     document.getElementById('form-zone').style.display='block';
     document.getElementById('error-msg').style.display='block';
-    document.getElementById('error-msg').textContent='Une erreur est survenue. Vérifiez votre connexion et réessayez.';
+    // 502 : l'IA a échoué mais le serveur a bien transmis la demande à Toan
+    document.getElementById('error-msg').textContent=e.message==='Erreur 502'
+      ?"L'estimation automatique est momentanément indisponible, mais votre demande a bien été transmise : Toan vous recontacte sous 24h."
+      :e.message==='Erreur 429'?'Trop de demandes depuis votre connexion. Réessayez dans une heure ou appelez le 06 60 02 27 25.'
+      :'Une erreur est survenue. Vérifiez votre connexion et réessayez.';
   }
 }
 </script>
