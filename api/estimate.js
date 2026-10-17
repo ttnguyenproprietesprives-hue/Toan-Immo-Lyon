@@ -110,7 +110,6 @@ function emailEstimation(d, est, projetLabel) {
     <div class="range">Fourchette réaliste : ${fmt(est.prix_min)} – ${fmt(est.prix_max)} ${esc(est.unite)}</div>
     <div class="metrics">
       <div class="metric"><div class="mv">${fmt(est.prix_m2)} €</div><div class="ml">Prix / m²</div></div>
-      <div class="metric"><div class="mv">${esc(est.nb_similaires || '~10')}</div><div class="ml">Annonces similaires</div></div>
       <div class="metric"><div class="mv">${esc(est.delai || '–')}</div><div class="ml">Délai moyen</div></div>
     </div>
   </div>
@@ -150,7 +149,8 @@ function emailEstimation(d, est, projetLabel) {
   <div class="footer">
     <p><strong style="color:rgba(255,255,255,0.6)">Toan Immo Lyon</strong> · NGUYEN Trung Toan · Conseiller immobilier indépendant<br/>
     Réseau Propriétés-Privées · SIRET 889 789 186 00018<br/>
-    Cette estimation est fournie à titre indicatif sur la base des données de marché disponibles.</p>
+    Estimation indicative générée automatiquement par intelligence artificielle à partir des informations saisies.<br/>
+    Elle ne remplace pas un avis de valeur réalisé par un professionnel après visite du bien.</p>
   </div>
 </div>
 </body></html>`;
