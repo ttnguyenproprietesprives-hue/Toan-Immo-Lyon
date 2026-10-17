@@ -129,6 +129,17 @@ header{background:var(--navy-deep);position:sticky;top:0;z-index:100;border-bott
 .hidden{display:none!important}
 .submit-btn{width:100%;padding:15px;background:var(--navy);color:var(--white);border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;margin-top:1.5rem;display:flex;align-items:center;justify-content:center;gap:8px;transition:background 0.2s}
 .submit-btn:hover{background:var(--navy-deep)}
+.steps-progress{margin-bottom:1.5rem}
+.steps-head{display:flex;justify-content:space-between;font-size:12px;color:var(--gray-500);margin-bottom:8px}
+#step-name{color:var(--navy);font-weight:500}
+.steps-bar{height:6px;background:var(--gray-100);border-radius:99px;overflow:hidden}
+.steps-fill{height:100%;width:33.34%;background:var(--gold);border-radius:99px;transition:width 0.35s ease}
+.step-hint{font-size:13px;color:var(--gray-500);margin:0 0 0.5rem}
+.step-nav{display:flex;gap:10px;align-items:stretch}
+.step-nav .submit-btn{flex:1}
+.step-back{margin-top:1.5rem;padding:15px 18px;background:var(--white);color:var(--navy);border:1px solid var(--gray-100);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer}
+.step-back:hover{border-color:var(--navy)}
+@media(max-width:520px){.step-nav{flex-direction:column-reverse;gap:8px}.step-back{margin-top:0;padding:11px}}
 .loading{padding:3rem 2rem;text-align:center}
 .spinner-ring{width:48px;height:48px;border-radius:50%;border:3px solid var(--gray-100);border-top-color:var(--gold);animation:spin 0.9s linear infinite;margin:0 auto 1.5rem}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -376,31 +387,19 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300)}
   <div class="card">
     <div class="card-header">
       <div class="card-header-icon">🏠</div>
-      <div><h2>Estimez votre bien</h2><p>Remplissez le formulaire · Estimation indicative en quelques instants</p></div>
+      <div><h2>Estimez votre bien</h2><p>3 étapes rapides · Estimation indicative en quelques instants</p></div>
     </div>
     <div id="form-zone" class="form-body">
+      <div class="steps-progress" aria-live="polite">
+        <div class="steps-head"><span id="step-count">Étape 1 sur 3</span><span id="step-name">Votre bien</span></div>
+        <div class="steps-bar"><div class="steps-fill" id="steps-fill"></div></div>
+      </div>
+      <div class="etape" id="etape-1">
       <div class="section-label">Votre projet</div>
       <div class="projet-selector">
         <button class="projet-btn active" onclick="setProjet('vente')" id="btn-vente"><span class="pb-icon">🏷️</span><span class="pb-label">Je vends</span><span class="pb-sub">Estimer mon bien</span></button>
         <button class="projet-btn" onclick="setProjet('location')" id="btn-location"><span class="pb-icon">🔑</span><span class="pb-label">Je mets en location</span><span class="pb-sub">Estimer mon loyer</span></button>
         <button class="projet-btn" onclick="setProjet('achat')" id="btn-achat"><span class="pb-icon">🔍</span><span class="pb-label">Je cherche à acheter</span><span class="pb-sub">Connaître les prix</span></button>
-      </div>
-      <div class="section-label">Vos coordonnées</div>
-      <div class="grid-3">
-        <div class="field"><label for="civilite">Civilité</label><select id="civilite" autocomplete="honorific-prefix"><option value="M.">M.</option><option value="Mme">Mme</option></select></div>
-        <div class="field"><label for="prenom">Prénom *</label><input type="text" id="prenom" autocomplete="given-name" placeholder="Votre prénom"/></div>
-        <div class="field"><label for="nom">Nom *</label><input type="text" id="nom" autocomplete="family-name" placeholder="Votre nom"/></div>
-        <div class="field"><label for="tel">Téléphone *</label><input type="tel" id="tel" autocomplete="tel" placeholder="06 00 00 00 00"/></div>
-        <div class="field"><label for="email">Email</label><input type="email" id="email" autocomplete="email" placeholder="votre@email.fr"/></div>
-        <div class="field"><label for="delai">Délai envisagé</label><select id="delai"><option value="je ne sais pas encore">Je ne sais pas encore</option><option value="1 à 3 mois">1 à 3 mois</option><option value="3 à 6 mois">3 à 6 mois</option><option value="plus de 6 mois">Plus de 6 mois</option></select></div>
-      </div>
-      <div id="bloc-financement" class="hidden">
-        <div class="section-label">Financement</div>
-        <div class="grid-3">
-          <div class="field"><label for="financement">Besoin de financement</label><select id="financement"><option value="non, achat comptant">Non, achat comptant</option><option value="oui, à rechercher">Oui, à rechercher</option><option value="oui, accord de principe">Oui, accord de principe</option><option value="oui, offre de prêt obtenue">Oui, offre de prêt obtenue</option></select></div>
-          <div class="field"><label for="budget">Budget max (€)</label><input type="number" id="budget" placeholder="Ex: 350000"/></div>
-          <div class="field"><label for="apport">Apport personnel (€)</label><input type="number" id="apport" placeholder="Ex: 50000"/></div>
-        </div>
       </div>
       <div class="section-label">Localisation du bien</div>
       <div class="grid-2">
@@ -426,6 +425,10 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300)}
         <div class="field"><label for="nb_etages">Étages du bien</label><select id="nb_etages"><option value="plain-pied">Plain-pied</option><option value="1 étage">1 étage</option><option value="2 étages">2 étages</option><option value="3 étages et +">3 étages et +</option></select></div>
         <div class="field"><label for="annee">Année de construction</label><select id="annee"><option value="avant 1914">Avant 1914</option><option value="1914-1970">1914–1970</option><option value="1970-2000" selected>1970–2000</option><option value="2000-2015">2000–2015</option><option value="après 2015">Après 2015</option></select></div>
       </div>
+      <div class="step-nav"><button type="button" class="submit-btn" onclick="allerEtape(2)">Suivant : ses atouts →</button></div>
+      </div>
+      <div class="etape hidden" id="etape-2">
+      <p class="step-hint">Les réponses sont pré-remplies : ajustez seulement ce qui ne correspond pas à votre bien.</p>
       <div class="section-label">État et caractéristiques</div>
       <div class="grid-3">
         <div class="field"><label for="etat">État général</label><select id="etat"><option value="à rénover">À rénover</option><option value="bon état" selected>Bon état</option><option value="rénové récemment">Rénové récemment</option><option value="neuf">Neuf</option></select></div>
@@ -443,6 +446,26 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300)}
         <div class="field"><label for="clim">Climatisation</label><select id="clim"><option value="sans clim">Non</option><option value="avec clim">Oui</option></select></div>
         <div class="field"><label for="parquet">Sols en parquet</label><select id="parquet"><option value="sans parquet">Non</option><option value="parquet">Oui</option></select></div>
       </div>
+      <div class="step-nav"><button type="button" class="step-back" onclick="allerEtape(1)">← Retour</button><button type="button" class="submit-btn" onclick="allerEtape(3)">Suivant : vos coordonnées →</button></div>
+      </div>
+      <div class="etape hidden" id="etape-3">
+      <div class="section-label">Vos coordonnées</div>
+      <div class="grid-3">
+        <div class="field"><label for="civilite">Civilité</label><select id="civilite" autocomplete="honorific-prefix"><option value="M.">M.</option><option value="Mme">Mme</option></select></div>
+        <div class="field"><label for="prenom">Prénom *</label><input type="text" id="prenom" autocomplete="given-name" placeholder="Votre prénom"/></div>
+        <div class="field"><label for="nom">Nom *</label><input type="text" id="nom" autocomplete="family-name" placeholder="Votre nom"/></div>
+        <div class="field"><label for="tel">Téléphone *</label><input type="tel" id="tel" autocomplete="tel" placeholder="06 00 00 00 00"/></div>
+        <div class="field"><label for="email">Email</label><input type="email" id="email" autocomplete="email" placeholder="votre@email.fr"/></div>
+        <div class="field"><label for="delai">Délai envisagé</label><select id="delai"><option value="je ne sais pas encore">Je ne sais pas encore</option><option value="1 à 3 mois">1 à 3 mois</option><option value="3 à 6 mois">3 à 6 mois</option><option value="plus de 6 mois">Plus de 6 mois</option></select></div>
+      </div>
+      <div id="bloc-financement" class="hidden">
+        <div class="section-label">Financement</div>
+        <div class="grid-3">
+          <div class="field"><label for="financement">Besoin de financement</label><select id="financement"><option value="non, achat comptant">Non, achat comptant</option><option value="oui, à rechercher">Oui, à rechercher</option><option value="oui, accord de principe">Oui, accord de principe</option><option value="oui, offre de prêt obtenue">Oui, offre de prêt obtenue</option></select></div>
+          <div class="field"><label for="budget">Budget max (€)</label><input type="number" id="budget" placeholder="Ex: 350000"/></div>
+          <div class="field"><label for="apport">Apport personnel (€)</label><input type="number" id="apport" placeholder="Ex: 50000"/></div>
+        </div>
+      </div>
       <div style="margin-top:1.5rem;padding:14px 16px;background:var(--gray-50);border-radius:var(--radius-sm);border:1px solid var(--gray-100)">
         <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
           <input type="checkbox" id="rgpd-consent" style="margin-top:3px;flex-shrink:0;accent-color:var(--navy);width:16px;height:16px"/>
@@ -450,8 +473,9 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300)}
         </label>
         <div id="rgpd-error" style="display:none;color:#c0392b;font-size:12px;margin-top:8px;margin-left:26px">Veuillez accepter la politique de confidentialité pour continuer.</div>
       </div>
-      <button class="submit-btn" onclick="lancerEstimation()">Obtenir mon estimation gratuite →</button>
+      <div class="step-nav"><button type="button" class="step-back" onclick="allerEtape(2)">← Retour</button><button class="submit-btn" onclick="lancerEstimation()">Obtenir mon estimation gratuite →</button></div>
       <p style="font-size:12px;color:var(--gray-300);text-align:center;margin-top:10px">Sans engagement · Estimation indicative, à confirmer par un avis de valeur gratuit</p>
+      </div>
     </div>
     <div id="loading-zone" style="display:none" class="loading"><div class="spinner-ring"></div><div class="loading-msg" id="loading-msg">Analyse du marché lyonnais en cours…</div></div>
     <div id="result-zone" style="display:none"></div>
@@ -718,7 +742,21 @@ async function envoyerContact(){
   document.getElementById('contact-confirm').classList.add('show');
   document.querySelectorAll('#contact input,#contact select,#contact textarea').forEach(el=>{if(el.id!=='ct-objet')el.value='';});
 }
-// ESTIMATION IA — le prompt, l'envoi du lead et l'email sont gérés par /api/estimate
+// Formulaire d'estimation en 3 étapes
+const NOMS_ETAPES=['Votre bien','Ses atouts','Vos coordonnées'];
+let etapeActuelle=1;
+function allerEtape(n){
+  if(n>etapeActuelle&&etapeActuelle===1){
+    const s=Number(document.getElementById('surface').value);
+    if(!s||s<10){alert('Merci d\'indiquer la surface du bien (en m²).');document.getElementById('surface').focus();return;}
+  }
+  etapeActuelle=n;
+  [1,2,3].forEach(i=>document.getElementById('etape-'+i).classList.toggle('hidden',i!==n));
+  document.getElementById('step-count').textContent='Étape '+n+' sur 3';
+  document.getElementById('step-name').textContent=NOMS_ETAPES[n-1];
+  document.getElementById('steps-fill').style.width=(n*100/3)+'%';
+  document.getElementById('form-zone').closest('.card').scrollIntoView({behavior:'smooth',block:'start'});
+}// ESTIMATION IA — le prompt, l'envoi du lead et l'email sont gérés par /api/estimate
 const loadingMsgs=["Analyse des caractéristiques de votre bien…","Prise en compte de la localisation et de l'état du bien…","Comparaison avec les niveaux de prix du secteur…","Génération de votre estimation indicative…"];
 async function lancerEstimation(){
   const prenom=document.getElementById('prenom').value.trim();
