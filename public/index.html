@@ -292,20 +292,20 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300)}
     <div class="tab-content" id="vendre-deposer">
       <div class="form-box">
         <p style="font-size:13px;color:var(--gray-500);line-height:1.7;margin-bottom:1.2rem">Déposez votre bien en quelques secondes. Je vous recontacte sous 24h.</p>
-        <label>Prénom et nom *</label><input type="text" id="vn-nom" placeholder="Marie Dupont">
+        <label for="vn-nom">Prénom et nom *</label><input type="text" id="vn-nom" autocomplete="name" placeholder="Marie Dupont">
         <div class="grid-2-form" style="margin-top:14px">
-          <div><label style="margin-top:0">Téléphone *</label><input type="tel" id="vn-tel" placeholder="06 xx xx xx xx"></div>
-          <div><label style="margin-top:0">Email</label><input type="email" id="vn-email" placeholder="votre@email.fr"></div>
+          <div><label style="margin-top:0" for="vn-tel">Téléphone *</label><input type="tel" id="vn-tel" autocomplete="tel" placeholder="06 xx xx xx xx"></div>
+          <div><label style="margin-top:0" for="vn-email">Email</label><input type="email" id="vn-email" autocomplete="email" placeholder="votre@email.fr"></div>
         </div>
         <div class="grid-2-form">
-          <div><label>Type de bien</label><select id="vn-type"><option>Appartement</option><option>Maison</option><option>Studio</option><option>Loft</option></select></div>
-          <div><label>Commune</label><select id="vn-commune"><option>Lyon (précisez arr.)</option><option>Villeurbanne</option><option>Bron</option><option>Vaulx-en-Velin</option><option>Décines-Charpieu</option><option>Meyzieu</option><option>Jonage</option><option>Pusignan</option><option>Chassieu</option><option>Genas</option><option>Saint-Priest</option><option>Mions</option><option>Corbas</option><option>Vénissieux</option><option>Saint-Fons</option><option>Caluire-et-Cuire</option><option>Autre</option></select></div>
+          <div><label for="vn-type">Type de bien</label><select id="vn-type"><option>Appartement</option><option>Maison</option><option>Studio</option><option>Loft</option></select></div>
+          <div><label for="vn-commune">Commune</label><select id="vn-commune"><option>Lyon (précisez arr.)</option><option>Villeurbanne</option><option>Bron</option><option>Vaulx-en-Velin</option><option>Décines-Charpieu</option><option>Meyzieu</option><option>Jonage</option><option>Pusignan</option><option>Chassieu</option><option>Genas</option><option>Saint-Priest</option><option>Mions</option><option>Corbas</option><option>Vénissieux</option><option>Saint-Fons</option><option>Caluire-et-Cuire</option><option>Autre</option></select></div>
         </div>
         <div class="grid-2-form">
-          <div><label>Surface (m²)</label><input type="number" id="vn-surface" placeholder="ex : 85"></div>
-          <div><label>Prix souhaité (€)</label><input type="text" id="vn-prix" placeholder="ex : 280 000"></div>
+          <div><label for="vn-surface">Surface (m²)</label><input type="number" id="vn-surface" placeholder="ex : 85"></div>
+          <div><label for="vn-prix">Prix souhaité (€)</label><input type="text" id="vn-prix" inputmode="numeric" placeholder="ex : 280 000"></div>
         </div>
-        <label>Description / informations complémentaires</label>
+        <label for="vn-message">Description / informations complémentaires</label>
         <textarea id="vn-message" placeholder="Décrivez votre bien, travaux réalisés, situation (libre, loué...)..."></textarea>
         <button class="btn-submit" onclick="envoyerVendre()">Soumettre mon bien →</button>
         <div class="form-confirm" id="vendre-confirm">✅ Votre bien a bien été transmis. Je vous recontacte sous 24h — Toan</div>
@@ -348,20 +348,20 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300)}
     <div class="tab-content" id="rechercher-demande">
       <div class="form-box">
         <p style="font-size:13px;color:var(--gray-500);line-height:1.7;margin-bottom:1.2rem">Décrivez le bien que vous recherchez. J'active mon réseau et vous alerte dès qu'un bien correspond — même avant la mise en ligne.</p>
-        <label>Prénom et nom *</label><input type="text" id="rn-nom" placeholder="Jean Martin">
+        <label for="rn-nom">Prénom et nom *</label><input type="text" id="rn-nom" autocomplete="name" placeholder="Jean Martin">
         <div class="grid-2-form" style="margin-top:14px">
-          <div><label style="margin-top:0">Téléphone *</label><input type="tel" id="rn-tel" placeholder="06 xx xx xx xx"></div>
-          <div><label style="margin-top:0">Email</label><input type="email" id="rn-email" placeholder="votre@email.fr"></div>
+          <div><label style="margin-top:0" for="rn-tel">Téléphone *</label><input type="tel" id="rn-tel" autocomplete="tel" placeholder="06 xx xx xx xx"></div>
+          <div><label style="margin-top:0" for="rn-email">Email</label><input type="email" id="rn-email" autocomplete="email" placeholder="votre@email.fr"></div>
         </div>
         <div class="grid-2-form">
-          <div><label>Type de bien</label><select id="rn-type"><option value="">Indifférent</option><option>Appartement</option><option>Maison</option><option>Studio</option></select></div>
-          <div><label>Commune souhaitée</label><select id="rn-commune"><option value="">Tous secteurs</option><option>Est lyonnais (toutes communes)</option><option>Lyon (centre)</option><option>Villeurbanne</option><option>Bron</option><option>Vaulx-en-Velin</option><option>Décines-Charpieu</option><option>Meyzieu</option><option>Jonage</option><option>Pusignan</option><option>Chassieu</option><option>Genas</option><option>Saint-Priest</option><option>Mions</option><option>Corbas</option><option>Vénissieux</option><option>Saint-Fons</option><option>Caluire-et-Cuire</option></select></div>
+          <div><label for="rn-type">Type de bien</label><select id="rn-type"><option value="">Indifférent</option><option>Appartement</option><option>Maison</option><option>Studio</option></select></div>
+          <div><label for="rn-commune">Commune souhaitée</label><select id="rn-commune"><option value="">Tous secteurs</option><option>Est lyonnais (toutes communes)</option><option>Lyon (centre)</option><option>Villeurbanne</option><option>Bron</option><option>Vaulx-en-Velin</option><option>Décines-Charpieu</option><option>Meyzieu</option><option>Jonage</option><option>Pusignan</option><option>Chassieu</option><option>Genas</option><option>Saint-Priest</option><option>Mions</option><option>Corbas</option><option>Vénissieux</option><option>Saint-Fons</option><option>Caluire-et-Cuire</option></select></div>
         </div>
         <div class="grid-2-form">
-          <div><label>Budget maximum (€)</label><input type="text" id="rn-budget" placeholder="ex : 300 000"></div>
-          <div><label>Surface minimum (m²)</label><input type="number" id="rn-surface" placeholder="ex : 70"></div>
+          <div><label for="rn-budget">Budget maximum (€)</label><input type="text" id="rn-budget" inputmode="numeric" placeholder="ex : 300 000"></div>
+          <div><label for="rn-surface">Surface minimum (m²)</label><input type="number" id="rn-surface" placeholder="ex : 70"></div>
         </div>
-        <label>Critères importants</label>
+        <label for="rn-message">Critères importants</label>
         <textarea id="rn-message" placeholder="Jardin, garage, plain-pied, proximité écoles, secteur précis..."></textarea>
         <button class="btn-submit" onclick="envoyerRecherche()">Envoyer ma demande →</button>
         <div class="form-confirm" id="recherche-confirm">✅ Votre demande a bien été reçue. Je vous recontacte sous 24-48h — Toan</div>
@@ -387,25 +387,25 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300)}
       </div>
       <div class="section-label">Vos coordonnées</div>
       <div class="grid-3">
-        <div class="field"><label>Civilité</label><select id="civilite"><option value="M.">M.</option><option value="Mme">Mme</option></select></div>
-        <div class="field"><label>Prénom *</label><input type="text" id="prenom" placeholder="Votre prénom"/></div>
-        <div class="field"><label>Nom *</label><input type="text" id="nom" placeholder="Votre nom"/></div>
-        <div class="field"><label>Téléphone *</label><input type="tel" id="tel" placeholder="06 00 00 00 00"/></div>
-        <div class="field"><label>Email</label><input type="email" id="email" placeholder="votre@email.fr"/></div>
-        <div class="field"><label>Délai envisagé</label><select id="delai"><option value="je ne sais pas encore">Je ne sais pas encore</option><option value="1 à 3 mois">1 à 3 mois</option><option value="3 à 6 mois">3 à 6 mois</option><option value="plus de 6 mois">Plus de 6 mois</option></select></div>
+        <div class="field"><label for="civilite">Civilité</label><select id="civilite" autocomplete="honorific-prefix"><option value="M.">M.</option><option value="Mme">Mme</option></select></div>
+        <div class="field"><label for="prenom">Prénom *</label><input type="text" id="prenom" autocomplete="given-name" placeholder="Votre prénom"/></div>
+        <div class="field"><label for="nom">Nom *</label><input type="text" id="nom" autocomplete="family-name" placeholder="Votre nom"/></div>
+        <div class="field"><label for="tel">Téléphone *</label><input type="tel" id="tel" autocomplete="tel" placeholder="06 00 00 00 00"/></div>
+        <div class="field"><label for="email">Email</label><input type="email" id="email" autocomplete="email" placeholder="votre@email.fr"/></div>
+        <div class="field"><label for="delai">Délai envisagé</label><select id="delai"><option value="je ne sais pas encore">Je ne sais pas encore</option><option value="1 à 3 mois">1 à 3 mois</option><option value="3 à 6 mois">3 à 6 mois</option><option value="plus de 6 mois">Plus de 6 mois</option></select></div>
       </div>
       <div id="bloc-financement" class="hidden">
         <div class="section-label">Financement</div>
         <div class="grid-3">
-          <div class="field"><label>Besoin de financement</label><select id="financement"><option value="non, achat comptant">Non, achat comptant</option><option value="oui, à rechercher">Oui, à rechercher</option><option value="oui, accord de principe">Oui, accord de principe</option><option value="oui, offre de prêt obtenue">Oui, offre de prêt obtenue</option></select></div>
-          <div class="field"><label>Budget max (€)</label><input type="number" id="budget" placeholder="Ex: 350000"/></div>
-          <div class="field"><label>Apport personnel (€)</label><input type="number" id="apport" placeholder="Ex: 50000"/></div>
+          <div class="field"><label for="financement">Besoin de financement</label><select id="financement"><option value="non, achat comptant">Non, achat comptant</option><option value="oui, à rechercher">Oui, à rechercher</option><option value="oui, accord de principe">Oui, accord de principe</option><option value="oui, offre de prêt obtenue">Oui, offre de prêt obtenue</option></select></div>
+          <div class="field"><label for="budget">Budget max (€)</label><input type="number" id="budget" placeholder="Ex: 350000"/></div>
+          <div class="field"><label for="apport">Apport personnel (€)</label><input type="number" id="apport" placeholder="Ex: 50000"/></div>
         </div>
       </div>
       <div class="section-label">Localisation du bien</div>
       <div class="grid-2">
-        <div class="field full"><label>Adresse du bien</label><input type="text" id="adresse" placeholder="Ex: 12 rue de la Paix"/></div>
-        <div class="field"><label>Commune</label>
+        <div class="field full"><label for="adresse">Adresse du bien</label><input type="text" id="adresse" autocomplete="street-address" placeholder="Ex: 12 rue de la Paix"/></div>
+        <div class="field"><label for="commune">Commune</label>
           <select id="commune">
             <optgroup label="── Lyon ──"><option value="Lyon 1er (69001)">Lyon 1er arr. – 69001</option><option value="Lyon 2e (69002)">Lyon 2e arr. – 69002</option><option value="Lyon 3e (69003)">Lyon 3e arr. – 69003</option><option value="Lyon 4e (69004)">Lyon 4e arr. – 69004</option><option value="Lyon 5e (69005)">Lyon 5e arr. – 69005</option><option value="Lyon 6e (69006)" selected>Lyon 6e arr. – 69006</option><option value="Lyon 7e (69007)">Lyon 7e arr. – 69007</option><option value="Lyon 8e (69008)">Lyon 8e arr. – 69008</option><option value="Lyon 9e (69009)">Lyon 9e arr. – 69009</option></optgroup>
             <optgroup label="── Est ──"><option value="Villeurbanne (69100)">Villeurbanne – 69100</option><option value="Bron (69500)">Bron – 69500</option><option value="Vaulx-en-Velin (69120)">Vaulx-en-Velin – 69120</option><option value="Décines-Charpieu (69150)">Décines-Charpieu – 69150</option><option value="Meyzieu (69330)">Meyzieu – 69330</option><option value="Jonage (69330)">Jonage – 69330</option><option value="Genas (69740)">Genas – 69740</option><option value="Chassieu (69680)">Chassieu – 69680</option></optgroup>
@@ -415,33 +415,33 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300)}
             <optgroup label="── Nord ──"><option value="Caluire-et-Cuire (69300)">Caluire-et-Cuire – 69300</option><option value="Rillieux-la-Pape (69140)">Rillieux-la-Pape – 69140</option><option value="Neuville-sur-Saône (69250)">Neuville-sur-Saône – 69250</option></optgroup>
           </select>
         </div>
-        <div class="field"><label>Environnement</label><select id="environnement"><option value="ville / centre urbain">Ville / Centre urbain</option><option value="lotissement">Lotissement</option><option value="nouveau village">Nouveau village</option><option value="isolé / campagne">Isolé / Campagne</option></select></div>
+        <div class="field"><label for="environnement">Environnement</label><select id="environnement"><option value="ville / centre urbain">Ville / Centre urbain</option><option value="lotissement">Lotissement</option><option value="nouveau village">Nouveau village</option><option value="isolé / campagne">Isolé / Campagne</option></select></div>
       </div>
       <div class="section-label">Description du bien</div>
       <div class="grid-3">
-        <div class="field"><label>Type de bien</label><select id="type_bien"><option value="appartement">Appartement</option><option value="maison">Maison</option><option value="studio">Studio</option><option value="loft">Loft</option><option value="duplex">Duplex</option></select></div>
-        <div class="field"><label>Nombre de pièces</label><select id="pieces"><option value="1">1 pièce</option><option value="2">2 pièces (T2)</option><option value="3" selected>3 pièces (T3)</option><option value="4">4 pièces (T4)</option><option value="5">5 pièces et +</option></select></div>
-        <div class="field"><label>Surface (m²)</label><input type="number" id="surface" value="65" min="10" max="1000"/></div>
-        <div class="field"><label>Nb de salles de bain</label><select id="sdb"><option value="1">1</option><option value="2">2</option><option value="3 et +">3 et +</option></select></div>
-        <div class="field"><label>Étages du bien</label><select id="nb_etages"><option value="plain-pied">Plain-pied</option><option value="1 étage">1 étage</option><option value="2 étages">2 étages</option><option value="3 étages et +">3 étages et +</option></select></div>
-        <div class="field"><label>Année de construction</label><select id="annee"><option value="avant 1914">Avant 1914</option><option value="1914-1970">1914–1970</option><option value="1970-2000" selected>1970–2000</option><option value="2000-2015">2000–2015</option><option value="après 2015">Après 2015</option></select></div>
+        <div class="field"><label for="type_bien">Type de bien</label><select id="type_bien"><option value="appartement">Appartement</option><option value="maison">Maison</option><option value="studio">Studio</option><option value="loft">Loft</option><option value="duplex">Duplex</option></select></div>
+        <div class="field"><label for="pieces">Nombre de pièces</label><select id="pieces"><option value="1">1 pièce</option><option value="2">2 pièces (T2)</option><option value="3" selected>3 pièces (T3)</option><option value="4">4 pièces (T4)</option><option value="5">5 pièces et +</option></select></div>
+        <div class="field"><label for="surface">Surface (m²)</label><input type="number" id="surface" value="65" min="10" max="1000"/></div>
+        <div class="field"><label for="sdb">Nb de salles de bain</label><select id="sdb"><option value="1">1</option><option value="2">2</option><option value="3 et +">3 et +</option></select></div>
+        <div class="field"><label for="nb_etages">Étages du bien</label><select id="nb_etages"><option value="plain-pied">Plain-pied</option><option value="1 étage">1 étage</option><option value="2 étages">2 étages</option><option value="3 étages et +">3 étages et +</option></select></div>
+        <div class="field"><label for="annee">Année de construction</label><select id="annee"><option value="avant 1914">Avant 1914</option><option value="1914-1970">1914–1970</option><option value="1970-2000" selected>1970–2000</option><option value="2000-2015">2000–2015</option><option value="après 2015">Après 2015</option></select></div>
       </div>
       <div class="section-label">État et caractéristiques</div>
       <div class="grid-3">
-        <div class="field"><label>État général</label><select id="etat"><option value="à rénover">À rénover</option><option value="bon état" selected>Bon état</option><option value="rénové récemment">Rénové récemment</option><option value="neuf">Neuf</option></select></div>
-        <div class="field"><label>DPE</label><select id="dpe"><option value="A ou B">A ou B</option><option value="C ou D" selected>C ou D</option><option value="E ou F">E ou F</option><option value="G (passoire)">G – passoire</option></select></div>
-        <div class="field"><label>Chauffage</label><select id="chauffage"><option value="électrique">Électrique</option><option value="sol chauffant">Sol chauffant</option><option value="pompe à chaleur">Pompe à chaleur</option><option value="gaz ancien">Gaz ancien</option><option value="gaz récent (- 10 ans)">Gaz récent (- 10 ans)</option><option value="collectif">Collectif</option></select></div>
-        <div class="field"><label>Étage</label><select id="etage"><option value="rez-de-chaussée">RDC</option><option value="étage bas (1-3)">Étage bas (1-3)</option><option value="étage moyen" selected>Étage moyen</option><option value="étage élevé">Étage élevé</option><option value="dernier étage">Dernier étage</option></select></div>
-        <div class="field"><label>Exposition</label><select id="expo"><option value="nord">Nord</option><option value="est">Est</option><option value="ouest">Ouest</option><option value="sud" selected>Sud</option><option value="traversant">Traversant</option></select></div>
-        <div class="field"><label>Type de vue</label><select id="vue"><option value="vue normale">Normale</option><option value="vue dégagée">Dégagée</option><option value="vue remarquable">Remarquable</option><option value="sans vis-à-vis">Sans vis-à-vis</option></select></div>
-        <div class="field"><label>Luminosité</label><select id="lumineux"><option value="peu lumineux">Peu lumineux</option><option value="lumineux" selected>Lumineux</option><option value="très lumineux">Très lumineux</option></select></div>
-        <div class="field"><label>Parking / Garage</label><select id="parking"><option value="sans parking">Non</option><option value="avec parking" selected>Oui</option></select></div>
-        <div class="field"><label>Extérieur</label><select id="exterieur"><option value="aucun">Aucun</option><option value="balcon" selected>Balcon</option><option value="terrasse">Terrasse</option><option value="jardin">Jardin</option></select></div>
-        <div class="field"><label>Ascenseur</label><select id="ascenseur"><option value="sans ascenseur">Non</option><option value="avec ascenseur">Oui</option></select></div>
-        <div class="field"><label>Cave</label><select id="cave"><option value="sans cave">Non</option><option value="avec cave">Oui</option></select></div>
-        <div class="field"><label>Cuisine équipée</label><select id="cuisine"><option value="cuisine non équipée">Non</option><option value="cuisine équipée">Oui</option></select></div>
-        <div class="field"><label>Climatisation</label><select id="clim"><option value="sans clim">Non</option><option value="avec clim">Oui</option></select></div>
-        <div class="field"><label>Sols en parquet</label><select id="parquet"><option value="sans parquet">Non</option><option value="parquet">Oui</option></select></div>
+        <div class="field"><label for="etat">État général</label><select id="etat"><option value="à rénover">À rénover</option><option value="bon état" selected>Bon état</option><option value="rénové récemment">Rénové récemment</option><option value="neuf">Neuf</option></select></div>
+        <div class="field"><label for="dpe">DPE</label><select id="dpe"><option value="A ou B">A ou B</option><option value="C ou D" selected>C ou D</option><option value="E ou F">E ou F</option><option value="G (passoire)">G – passoire</option></select></div>
+        <div class="field"><label for="chauffage">Chauffage</label><select id="chauffage"><option value="électrique">Électrique</option><option value="sol chauffant">Sol chauffant</option><option value="pompe à chaleur">Pompe à chaleur</option><option value="gaz ancien">Gaz ancien</option><option value="gaz récent (- 10 ans)">Gaz récent (- 10 ans)</option><option value="collectif">Collectif</option></select></div>
+        <div class="field"><label for="etage">Étage</label><select id="etage"><option value="rez-de-chaussée">RDC</option><option value="étage bas (1-3)">Étage bas (1-3)</option><option value="étage moyen" selected>Étage moyen</option><option value="étage élevé">Étage élevé</option><option value="dernier étage">Dernier étage</option></select></div>
+        <div class="field"><label for="expo">Exposition</label><select id="expo"><option value="nord">Nord</option><option value="est">Est</option><option value="ouest">Ouest</option><option value="sud" selected>Sud</option><option value="traversant">Traversant</option></select></div>
+        <div class="field"><label for="vue">Type de vue</label><select id="vue"><option value="vue normale">Normale</option><option value="vue dégagée">Dégagée</option><option value="vue remarquable">Remarquable</option><option value="sans vis-à-vis">Sans vis-à-vis</option></select></div>
+        <div class="field"><label for="lumineux">Luminosité</label><select id="lumineux"><option value="peu lumineux">Peu lumineux</option><option value="lumineux" selected>Lumineux</option><option value="très lumineux">Très lumineux</option></select></div>
+        <div class="field"><label for="parking">Parking / Garage</label><select id="parking"><option value="sans parking">Non</option><option value="avec parking" selected>Oui</option></select></div>
+        <div class="field"><label for="exterieur">Extérieur</label><select id="exterieur"><option value="aucun">Aucun</option><option value="balcon" selected>Balcon</option><option value="terrasse">Terrasse</option><option value="jardin">Jardin</option></select></div>
+        <div class="field"><label for="ascenseur">Ascenseur</label><select id="ascenseur"><option value="sans ascenseur">Non</option><option value="avec ascenseur">Oui</option></select></div>
+        <div class="field"><label for="cave">Cave</label><select id="cave"><option value="sans cave">Non</option><option value="avec cave">Oui</option></select></div>
+        <div class="field"><label for="cuisine">Cuisine équipée</label><select id="cuisine"><option value="cuisine non équipée">Non</option><option value="cuisine équipée">Oui</option></select></div>
+        <div class="field"><label for="clim">Climatisation</label><select id="clim"><option value="sans clim">Non</option><option value="avec clim">Oui</option></select></div>
+        <div class="field"><label for="parquet">Sols en parquet</label><select id="parquet"><option value="sans parquet">Non</option><option value="parquet">Oui</option></select></div>
       </div>
       <div style="margin-top:1.5rem;padding:14px 16px;background:var(--gray-50);border-radius:var(--radius-sm);border:1px solid var(--gray-100)">
         <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
@@ -638,14 +638,14 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300)}
       </div>
       <div class="form-box" style="background:var(--gray-50)">
         <p style="font-size:13px;color:var(--gray-500);margin-bottom:1.2rem;line-height:1.6">Envoyez-moi un message, je vous recontacte sous 24h.</p>
-        <label>Prénom et nom *</label><input type="text" id="ct-nom" placeholder="Marie Dupont">
+        <label for="ct-nom">Prénom et nom *</label><input type="text" id="ct-nom" autocomplete="name" placeholder="Marie Dupont">
         <div class="grid-2-form" style="margin-top:14px">
-          <div><label style="margin-top:0">Téléphone *</label><input type="tel" id="ct-tel" placeholder="06 xx xx xx xx"></div>
-          <div><label style="margin-top:0">Email</label><input type="email" id="ct-email" placeholder="votre@email.fr"></div>
+          <div><label style="margin-top:0" for="ct-tel">Téléphone *</label><input type="tel" id="ct-tel" autocomplete="tel" placeholder="06 xx xx xx xx"></div>
+          <div><label style="margin-top:0" for="ct-email">Email</label><input type="email" id="ct-email" autocomplete="email" placeholder="votre@email.fr"></div>
         </div>
-        <label>Objet</label>
+        <label for="ct-objet">Objet</label>
         <select id="ct-objet"><option>Estimation de mon bien</option><option>Mise en vente</option><option>Recherche d'un bien</option><option>Renseignements</option><option>Autre</option></select>
-        <label>Message</label>
+        <label for="ct-message">Message</label>
         <textarea id="ct-message" placeholder="Décrivez votre projet en quelques mots..."></textarea>
         <button class="btn-submit" onclick="envoyerContact()">Envoyer mon message →</button>
         <div class="form-confirm" id="contact-confirm">✅ Message envoyé ! Je vous recontacte sous 24h — Toan</div>
