@@ -850,6 +850,25 @@ Réponds UNIQUEMENT en JSON valide (sans markdown, sans backticks) :
   <meta property="og:title" content="${article.titre}"/>
   <meta property="og:description" content="${article.description}"/>
   <meta property="og:url" content="https://www.toanimmo-lyon.fr/blog/${filename}.html"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:site_name" content="Toan Immo Lyon"/>
+  <meta property="og:locale" content="fr_FR"/>
+  <meta property="og:image" content="${articlePhotoUrl || 'https://www.toanimmo-lyon.fr/og-image.png'}"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <link rel="icon" href="/favicon.ico" sizes="any"/>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+  <link rel="manifest" href="/site.webmanifest"/>
+  <meta name="theme-color" content="#0F1E33"/>
+  <script type="application/ld+json">${JSON.stringify({
+    '@context': 'https://schema.org', '@type': 'BlogPosting',
+    headline: article.titre, description: article.description,
+    datePublished: new Date().toISOString().slice(0, 10), inLanguage: 'fr-FR',
+    mainEntityOfPage: 'https://www.toanimmo-lyon.fr/blog/' + filename + '.html',
+    image: articlePhotoUrl || 'https://www.toanimmo-lyon.fr/og-image.png',
+    author: { '@type': 'Person', name: 'Toan Nguyen', url: 'https://www.toanimmo-lyon.fr/' },
+    publisher: { '@type': 'Organization', name: 'Toan Immo Lyon', logo: { '@type': 'ImageObject', url: 'https://www.toanimmo-lyon.fr/icon-512.png' } }
+  }).replace(/</g, '\\u003c')}<\/script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
