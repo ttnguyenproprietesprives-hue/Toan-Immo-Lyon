@@ -478,7 +478,7 @@
 
               <option value="comment un agent immobilier qualifie ses acquéreurs avant de proposer une visite (budget, financement, projet)">Qualifier ses clients avant visite</option>
 
-              <option value="conseils pour sécuriser et protéger sa maison (alarme, assurance, bonnes pratiques)">Sécuriser sa maison</option>
+              <option value="sécuriser et protéger sa maison : alarme, assurance et bonnes pratiques">Sécuriser sa maison</option>
 
               <option value="bien choisir son assurance habitation : les points clés à vérifier">Assurance habitation</option>
 
@@ -1145,6 +1145,8 @@ async function updateBlogIndex(filename, titre) {
   else if (sujet.includes('préjugés')) tag = 'Métier';
 
   else if (sujet.includes('honoraires')) tag = 'Honoraires';
+
+  else if (sujet.includes('sécuriser')) tag = 'Sécurité';
 
   else if (sujet.includes('vendre') || sujet.includes('vente')) tag = 'Conseils vente';
 
