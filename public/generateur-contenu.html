@@ -255,7 +255,7 @@ input:checked + .slider:before { transform: translateX(20px); }
               <option value="isolation thermique : avantages, inconvénients et impact sur la valeur du bien">Isolation thermique</option>
               <option value="travaux dans son logement : faut-il faire soi-même ou passer par un professionnel ?">Travaux : soi-même ou pro ?</option>
               <option value="chauffage et économies d'énergie : les bons choix pour votre logement">Chauffage et économies d'énergie</option>
-              <option value="aides à la rénovation : MaPrimeRénov', éco-PTZ et autres dispositifs en 2026">Aides MaPrimeRénov' éco-PTZ</option>
+              <option id="opt-aides" value="aides à la rénovation : MaPrimeRénov', éco-PTZ et autres dispositifs en 2026">Aides MaPrimeRénov' éco-PTZ</option>
               <option value="entretien de sa maison selon les saisons : le guide complet">Entretien maison selon saison</option>
               <option value="rénovation avant vente : quels travaux sont rentables et lesquels éviter ?">Rénovation avant vente</option>
               <option value="faire appel à un architecte d'intérieur ou une décoratrice avant de vendre : quand est-ce vraiment rentable ?">Architecte / déco avant vente</option>
@@ -642,6 +642,7 @@ async function envoyerValidation() {
     'opt-fin': { value: `fin d'année ${y}, bilan et perspectives`, text: `Fin d'année ${y}` },
     'opt-prix': { value: `prix immobiliers et tendances du marché en ${y}`, text: `Prix immobiliers ${y}` },
     'opt-marche': { value: `le marché immobilier au printemps ${y} : opportunités`, text: `Marché printemps ${y}` },
+    'opt-aides': { value: `aides à la rénovation : MaPrimeRénov', éco-PTZ et autres dispositifs en ${y}`, text: `Aides MaPrimeRénov' éco-PTZ` },
   };
   Object.entries(opts).forEach(([id, {value, text}]) => { const el = document.getElementById(id); if (el) { el.value = value; el.textContent = text; } });
   const saisonMap = { 'printemps': 'opt-printemps', 'ete': 'opt-ete', 'automne': 'opt-automne', 'fin': 'opt-fin', 'hiver': 'opt-fin' };
