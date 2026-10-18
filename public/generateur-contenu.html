@@ -237,12 +237,18 @@ input:checked + .slider:before { transform: translateX(20px); }
               <option id="opt-prix">Prix immobiliers</option>
               <option id="opt-marche">Marché printemps</option>
               <option value="les quartiers les plus demandés par les acheteurs">Quartiers demandés</option>
+              <option value="taxe foncière dans votre commune : comment elle est calculée, qui vote les taux et pourquoi elle varie d'une commune à l'autre">Taxe foncière dans ma commune</option>
+              <option value="inflation et prix immobiliers : quel impact sur les prix, les taux d'emprunt et le pouvoir d'achat ?">Inflation et prix immobiliers</option>
+              <option value="vivre hors de la métropole lyonnaise : prix, stationnement, transports et qualité de vie comparés">Vivre hors de la métropole ?</option>
             </optgroup>
             <optgroup label="── Vente & Achat ──">
               <option value="conseils pour vendre rapidement et au meilleur prix">Vendre rapidement</option>
-              <option value="comment bien estimer son bien avant de vendre">Bien estimer son bien</option>
-              <option value="conseils pour les primo-accédants et comment bien acheter">Conseils primo-accédants</option>
-              <option value="pourquoi consulter un courtier et son banquier avant d'acheter un bien immobilier">Consulter courtier et banquier</option>
+              <option value="avant de mettre en vente son bien : diagnostics, documents, présentation et prix, la check-list complète">Avant de mettre en vente</option>
+              <option value="comment bien estimer son bien et fixer son prix de mise en vente : les risques d'un prix trop élevé">Bien estimer son bien</option>
+              <option value="estimation par un agent immobilier ou estimation en ligne : ce que vaut vraiment une estimation (avis de valeur, expertise)">Pourquoi une estimation par un agent ?</option>
+              <option value="premier achat ou premier investissement immobilier : conseils pour les primo-accédants et futurs investisseurs">Premier achat ou premier investissement</option>
+              <option id="opt-taux">Taux actuels : courtier ou banque ?</option>
+              <option value="frais de notaire : combien ça coûte et ce que ça couvre (achat dans l'ancien ou le neuf, succession, donation)">Frais de notaire</option>
               <option value="fiscalité et plus-value immobilière : ce que tout vendeur doit savoir">Fiscalité plus-value immobilière</option>
               <option value="succession et donation immobilière : conseils pratiques">Succession et donation immobilière</option>
             </optgroup>
@@ -547,6 +553,7 @@ async function generer() {
 Site : www.toanimmo-lyon.fr · Tél : 06 60 02 27 25
 Génère du contenu marketing immobilier sur : "${sujet}" à ${commune}, en ${saison}.
 Ton : ${ton}.
+Chiffres (taux, taxe foncière, frais de notaire, prix) : donne des ordres de grandeur prudents, n'invente jamais de chiffre précis, rappelle que chaque situation est différente et invite à appeler le 06 60 02 27 25 pour un calcul personnalisé.
 Réponds UNIQUEMENT en JSON valide (sans markdown, sans backticks) avec exactement ces 5 clés :
 {
   "blog": "Article complet (500-700 mots). Titre <h1></h1>, sous-titres <h2></h2>, paragraphes <p></p>. Données marché réalistes, conseils pratiques, appel à l'action vers www.toanimmo-lyon.fr ou le 06 60 02 27 25. Optimisé SEO.",
@@ -643,6 +650,7 @@ async function envoyerValidation() {
     'opt-prix': { value: `prix immobiliers et tendances du marché en ${y}`, text: `Prix immobiliers ${y}` },
     'opt-marche': { value: `le marché immobilier au printemps ${y} : opportunités`, text: `Marché printemps ${y}` },
     'opt-aides': { value: `aides à la rénovation : MaPrimeRénov', éco-PTZ et autres dispositifs en ${y}`, text: `Aides MaPrimeRénov' éco-PTZ` },
+    'opt-taux': { value: `taux d'emprunt ${y} : tendances actuelles et pourquoi passer par un courtier ou par sa banque`, text: `Taux actuels : courtier ou banque ?` },
   };
   Object.entries(opts).forEach(([id, {value, text}]) => { const el = document.getElementById(id); if (el) { el.value = value; el.textContent = text; } });
   const saisonMap = { 'printemps': 'opt-printemps', 'ete': 'opt-ete', 'automne': 'opt-automne', 'fin': 'opt-fin', 'hiver': 'opt-fin' };
