@@ -856,7 +856,7 @@ Réponds UNIQUEMENT en JSON valide (sans markdown, sans backticks) :
 
     });
 
-    const data = await res.json();
+    const data = await lireReponseIA(res);
 
     const raw = data.content.map(i => i.text || '').join('');
 
@@ -1032,7 +1032,7 @@ ${photoBlockHtml}
 
   } catch(e) {
 
-    document.getElementById('error1').textContent = 'Erreur lors de la génération. Réessayez.';
+    document.getElementById('error1').textContent = e.message || 'Erreur lors de la génération. Réessayez.';
 
     console.error(e);
 
@@ -1046,6 +1046,13 @@ ${photoBlockHtml}
 
 }
 
+// Lit la réponse de /api/generate-content et lève une erreur au message clair (crédit IA épuisé, session expirée…)
+async function lireReponseIA(res) {
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 401) { sessionStorage.removeItem('toan_admin_key'); throw new Error('Session expirée : rechargez la page et saisissez à nouveau votre mot de passe.'); }
+  if (!res.ok || !data.content) throw new Error(data.error || "Le service d'IA n'a pas répondu. Réessayez dans quelques minutes.");
+  return data;
+}
 async function publierArticle() {
 
   const filename = document.getElementById('filename').value.trim();
@@ -1089,6 +1096,9 @@ async function publierArticle() {
     if (!res.ok) throw new Error('Erreur publication article');
 
     await updateBlogIndex(filename, articleTitre);
+
+    // Le sitemap n'est pas bloquant : l'article reste publié même si cette étape échoue
+    try { await updateSitemap(filename); } catch (e) { console.error('sitemap', e); }
 
     const url = `https://www.toanimmo-lyon.fr/blog/${filename}.html`;
 
@@ -1198,6 +1208,9 @@ async function updateBlogIndex(filename, titre) {
 
   const decoded = decodeURIComponent(escape(atob(currentHTML)));
 
+  // Article republié sous le même nom : sa carte existe déjà, on n'en ajoute pas une seconde
+  if (decoded.includes(`href="/blog/${filename}.html"`)) return;
+
   const thumbStyle = articlePhotoUrl ? `background: url('${articlePhotoUrl}') center/cover; position: relative;` : 'background: var(--navy);';
 
   const newCard = `
@@ -1229,6 +1242,47 @@ async function updateBlogIndex(filename, titre) {
     headers: { 'Content-Type': 'application/json' },
 
     body: JSON.stringify({ path: indexPath, content: encoded, sha, message: `Blog index: ajout ${titre}` })
+
+  });
+
+}
+
+// Ajoute l'article au sitemap (ou met à jour sa date s'il y figure déjà)
+async function updateSitemap(filename) {
+
+  const sitemapPath = 'public/sitemap.xml';
+
+  const url = `https://www.toanimmo-lyon.fr/blog/${filename}.html`;
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  const checkRes = await fetch(`/api/github-publish?path=${encodeURIComponent(sitemapPath)}`);
+
+  if (!checkRes.ok) return;
+
+  const checkData = await checkRes.json();
+
+  let xml = decodeURIComponent(escape(atob(checkData.content)));
+
+  const entry = `  <url><loc>${url}</loc><lastmod>${today}</lastmod><changefreq>yearly</changefreq><priority>0.6</priority></url>`;
+
+  const existing = new RegExp('[ \\t]*<url><loc>' + url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '</loc>.*?</url>');
+
+  if (existing.test(xml)) xml = xml.replace(existing, () => entry);
+
+  else if (xml.includes('  <!-- Pages légales -->')) xml = xml.replace('  <!-- Pages légales -->', () => entry + '\n  <!-- Pages légales -->');
+
+  else xml = xml.replace('</urlset>', () => entry + '\n</urlset>');
+
+  const encoded = btoa(unescape(encodeURIComponent(xml)));
+
+  await fetch('/api/github-publish', {
+
+    method: 'POST',
+
+    headers: { 'Content-Type': 'application/json' },
+
+    body: JSON.stringify({ path: sitemapPath, content: encoded, sha: checkData.sha, message: `Sitemap: ajout ${filename}` })
 
   });
 

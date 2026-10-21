@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { parseBody, esc, clip, envoyerLead, limiteAtteinte } from './_util.js';
+import { parseBody, esc, clip, envoyerLead, limiteAtteinte, erreurIA } from './_util.js';
 
 // Champs acceptés depuis le formulaire d'estimation (tout le reste est ignoré)
 const CHAMPS = ['projet', 'civilite', 'prenom', 'nom', 'tel', 'email', 'delai', 'financement', 'budget', 'apport',
@@ -47,7 +47,8 @@ async function estimer(prompt) {
   });
 
   const data = await response.json();
-  if (!response.ok) throw new Error('Anthropic ' + response.status);
+  // Message clair repris dans l'email du lead (ex. « Crédit IA épuisé… »)
+  if (!response.ok) throw new Error(erreurIA(response.status, data));
 
   const text = (data.content || []).map(b => b.text || '').join('');
   // Extraire le JSON même s'il y a du texte autour

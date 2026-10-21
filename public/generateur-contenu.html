@@ -565,8 +565,7 @@ Réponds UNIQUEMENT en JSON valide (sans markdown, sans backticks) avec exacteme
 
   try {
     const res = await fetch('/api/generate-content', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt }) });
-    const data = await res.json();
-    if (!data || !data.content) throw new Error('Réponse API invalide');
+    const data = await lireReponseIA(res);
 
     const raw = data.content.map(i => i.text || '').join('');
     const match = raw.match(/\{[\s\S]*\}/);
@@ -610,6 +609,7 @@ Réponds UNIQUEMENT en JSON valide (sans markdown, sans backticks) avec exacteme
     setTimeout(() => { progressWrap.style.display = 'none'; }, 1500);
 
   } catch (e) {
+    document.getElementById('error-msg').textContent = e.message || 'Une erreur est survenue. Réessayez.';
     document.getElementById('error-msg').style.display = 'block';
     progressWrap.style.display = 'none';
     console.error(e);
@@ -619,6 +619,13 @@ Réponds UNIQUEMENT en JSON valide (sans markdown, sans backticks) avec exacteme
   }
 }
 
+// Lit la réponse de /api/generate-content et lève une erreur au message clair (crédit IA épuisé, session expirée…)
+async function lireReponseIA(res) {
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 401) { sessionStorage.removeItem('toan_admin_key'); throw new Error('Session expirée : rechargez la page et saisissez à nouveau votre mot de passe.'); }
+  if (!res.ok || !data.content) throw new Error(data.error || "Le service d'IA n'a pas répondu. Réessayez dans quelques minutes.");
+  return data;
+}
 async function envoyerValidation() {
   const btn = document.getElementById('validate-btn');
   const statusEl = document.getElementById('validate-status');

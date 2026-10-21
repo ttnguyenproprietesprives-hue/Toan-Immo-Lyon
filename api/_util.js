@@ -15,6 +15,17 @@ export function clip(v, max = 200) {
   return String(v ?? '').trim().slice(0, max);
 }
 
+// Traduit une erreur de l'API Anthropic en message clair pour l'utilisateur
+export function erreurIA(status, data) {
+  const msg = String(data?.error?.message || '').toLowerCase();
+  if (msg.includes('credit balance')) return "Crédit IA épuisé : rechargez votre compte sur console.anthropic.com (rubrique Plans & Billing).";
+  if (status === 401 || status === 403) return "Clé API Anthropic invalide ou désactivée : vérifiez la variable ANTHROPIC_API_KEY dans Vercel.";
+  if (status === 404) return "Le modèle d'IA utilisé n'est plus disponible : le site doit être mis à jour.";
+  if (status === 429) return "Trop de demandes envoyées à l'IA : patientez une minute et réessayez.";
+  if (status >= 500) return "Le service d'IA est momentanément surchargé : réessayez dans quelques minutes.";
+  return `Erreur du service d'IA (code ${status}).`;
+}
+
 // Envoi d'un lead par email via Formspree (FORMSPREE_ID sur Vercel)
 export async function envoyerLead(payload) {
   const r = await fetch('https://formspree.io/f/' + process.env.FORMSPREE_ID, {
