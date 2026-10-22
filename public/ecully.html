@@ -79,13 +79,13 @@
   </div>
 </header>
 <section class="hero">
-  <div class="hero-tag">Marché immobilier 2026</div>
+  <div class="hero-tag">Marché immobilier <span class="annee">2026</span></div>
   <h1>Estimation immobilière<br/>à <em>Écully</em></h1>
   <p>Commune verdoyante de l'ouest lyonnais, Écully accueille de grandes écoles et offre un cadre résidentiel recherché. Prix au m², quartiers, transports : l'essentiel avant de vendre ou d'acheter.</p>
 </section>
 <main class="main">
   <div class="card">
-    <h2>Prix immobiliers à Écully en 2026</h2>
+    <h2>Prix immobiliers à Écully en <span class="annee">2026</span></h2>
     <div class="prix-grid">
       <div class="prix-card"><div class="type">Appartement</div><div class="val">4 000 – 5 500</div><div class="unit">€ / m²</div></div>
       <div class="prix-card"><div class="type">Maison</div><div class="val">4 800 – 7 000</div><div class="unit">€ / m²</div></div>
@@ -164,5 +164,12 @@
   <strong style="color:var(--navy)">Toan Immo Lyon</strong> · NGUYEN Trung Toan · Conseiller immobilier indépendant · Réseau Propriétés-Privées<br/>
   SIRET 889 789 186 00018 · <a href="/mentions-legales.html" style="color:var(--gray-300)">Mentions légales</a> · <a href="/confidentialite.html" style="color:var(--gray-300)">Politique de confidentialité</a>
 </footer>
+<script>
+// Année automatique : remplace 2026 par l'année en cours (titre, descriptions, textes marqués .annee)
+(function(){var y=String(new Date().getFullYear());if(y<='2026')return;
+document.title=document.title.replace(/2026/g,y);
+document.querySelectorAll('meta[name="description"],meta[property="og:title"],meta[property="og:description"]').forEach(function(m){m.setAttribute('content',m.getAttribute('content').replace(/2026/g,y));});
+document.querySelectorAll('.annee').forEach(function(e){e.textContent=y;});})();
+</script>
 </body>
 </html>

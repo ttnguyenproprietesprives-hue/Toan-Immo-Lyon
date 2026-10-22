@@ -98,7 +98,7 @@
 </header>
 
 <section class="hero">
-  <div class="hero-tag">Marché immobilier 2026</div>
+  <div class="hero-tag">Marché immobilier <span class="annee">2026</span></div>
   <h1>Estimation immobilière<br/>à <em>Vaulx-en-Velin</em></h1>
   <p>Entre le Carré de Soie, le Village et le Grand Parc de Miribel-Jonage, Vaulx-en-Velin offre des prix parmi les plus accessibles de la métropole. Prix au m², quartiers, transports : l'essentiel avant de vendre ou d'acheter.</p>
 </section>
@@ -106,7 +106,7 @@
 <main class="main">
 
   <div class="card">
-    <h2>Prix immobiliers à Vaulx-en-Velin en 2026</h2>
+    <h2>Prix immobiliers à Vaulx-en-Velin en <span class="annee">2026</span></h2>
     <div class="prix-grid">
       <div class="prix-card">
         <div class="type">Appartement</div>
@@ -217,5 +217,12 @@
   <a href="/confidentialite.html" style="color:var(--gray-300)">Politique de confidentialité</a>
   </span>
 </footer>
+<script>
+// Année automatique : remplace 2026 par l'année en cours (titre, descriptions, textes marqués .annee)
+(function(){var y=String(new Date().getFullYear());if(y<='2026')return;
+document.title=document.title.replace(/2026/g,y);
+document.querySelectorAll('meta[name="description"],meta[property="og:title"],meta[property="og:description"]').forEach(function(m){m.setAttribute('content',m.getAttribute('content').replace(/2026/g,y));});
+document.querySelectorAll('.annee').forEach(function(e){e.textContent=y;});})();
+</script>
 </body>
 </html>
