@@ -22,7 +22,7 @@
   <meta property="og:image:width" content="1200"/>
   <meta property="og:image:height" content="630"/>
   <meta name="twitter:card" content="summary_large_image"/>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"RealEstateAgent","@id":"https://www.toanimmo-lyon.fr/#agent","name":"Toan Immo Lyon","alternateName":"Trung Toan Nguyen – Propriétés-Privées","description":"Conseiller immobilier indépendant du réseau Propriétés-Privées : estimation, vente et recherche de biens à Lyon et dans l'Est lyonnais.","url":"https://www.toanimmo-lyon.fr/","logo":"https://www.toanimmo-lyon.fr/icon-512.png","image":"https://www.toanimmo-lyon.fr/og-image.png","telephone":"+33660022725","email":"tt-nguyen@proprietes-privees.com","employee":{"@type":"Person","name":"Trung Toan Nguyen","jobTitle":"Conseiller immobilier"},"parentOrganization":{"@type":"Organization","name":"Propriétés-Privées","url":"https://www.proprietes-privees.com"},"sameAs":["https://maps.app.goo.gl/Bmr8cC62UCyVGJCR8","https://www.immodvisor.com/professionnels/mandataire-immobilier/pro/proprietes-privees-trung-toam-nguyen-36743","https://www.proprietes-privees.com/negociateur/trungtoam.nguyen","https://www.instagram.com/trungtoan.immobilier/","https://www.facebook.com/trungtoamnguyen","https://www.linkedin.com/in/trung-toam-nguyen-b09812139/"],"areaServed":["Lyon","Villeurbanne","Bron","Vaulx-en-Velin","Décines-Charpieu","Meyzieu","Jonage","Pusignan","Chassieu","Genas","Saint-Priest","Mions","Corbas","Vénissieux","Saint-Fons","Est lyonnais","Grand Lyon"]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"RealEstateAgent","@id":"https://www.toanimmo-lyon.fr/#agent","name":"Toan Immo Lyon","alternateName":"Trung Toan Nguyen – Propriétés-Privées","description":"Conseiller immobilier indépendant du réseau Propriétés-Privées : estimation, vente et recherche de biens à Lyon et dans l'Est lyonnais.","url":"https://www.toanimmo-lyon.fr/","logo":"https://www.toanimmo-lyon.fr/icon-512.png","image":"https://www.toanimmo-lyon.fr/og-image.png","telephone":"+33660022725","email":"tt-nguyen@proprietes-privees.com","employee":{"@type":"Person","name":"Trung Toan Nguyen","jobTitle":"Conseiller immobilier"},"parentOrganization":{"@type":"Organization","name":"Propriétés-Privées","url":"https://www.proprietes-privees.com"},"sameAs":["https://maps.app.goo.gl/Bmr8cC62UCyVGJCR8","https://www.immodvisor.com/professionnels/mandataire-immobilier/pro/proprietes-privees-trung-toam-nguyen-36743","https://www.proprietes-privees.com/negociateur/trungtoam.nguyen","https://www.instagram.com/trungtoan.immobilier/","https://www.facebook.com/proprietespriveescomJonage/","https://www.facebook.com/trungtoamnguyen","https://www.linkedin.com/in/trung-toam-nguyen-b09812139/"],"areaServed":["Lyon","Villeurbanne","Bron","Vaulx-en-Velin","Décines-Charpieu","Meyzieu","Jonage","Pusignan","Chassieu","Genas","Saint-Priest","Mions","Corbas","Vénissieux","Saint-Fons","Est lyonnais","Grand Lyon"]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
@@ -51,6 +51,16 @@ header{background:var(--navy-deep);position:sticky;top:0;z-index:100;border-bott
 .hero-stats{display:flex;justify-content:center;gap:3rem;flex-wrap:wrap}
 .hero-stat .num{font-family:'Playfair Display',serif;font-size:1.75rem;color:var(--gold)}
 .hero-stat .lbl{font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.06em;margin-top:2px}
+.hero-agent{display:inline-flex;align-items:center;gap:12px;margin:0 auto 2rem;padding:8px 18px 8px 8px;border:1px solid rgba(201,168,76,0.3);border-radius:99px;background:rgba(255,255,255,0.04);text-align:left}
+.hero-agent img{width:52px;height:52px;border-radius:50%;object-fit:cover;object-position:50% 30%;border:2px solid var(--gold)}
+.hero-agent strong{display:block;color:var(--white);font-weight:500;font-size:14px}
+.hero-agent span{display:block;color:rgba(255,255,255,0.6);font-size:12px;font-weight:300}
+.contact-photo{width:120px;height:120px;border-radius:50%;object-fit:cover;object-position:50% 30%;border:3px solid var(--gold);margin-bottom:1rem;display:block}
+.socials{display:flex;gap:10px;margin-top:1.25rem}
+.socials a{width:38px;height:38px;border-radius:50%;background:var(--navy);color:var(--white);display:flex;align-items:center;justify-content:center;transition:background 0.2s}
+.socials a:hover{background:var(--gold);color:var(--navy-deep)}
+.socials svg{width:18px;height:18px;fill:currentColor}
+footer .socials{justify-content:center;margin:0 0 1rem}
 .section-wrap{padding:4rem 2rem}
 .section-inner{max-width:1100px;margin:0 auto}
 .section-eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:6px;display:block}
@@ -241,6 +251,10 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300)}
     <div class="hero-tag">Estimation indicative gratuite</div>
     <h1>Quelle est la valeur<br/>de votre bien <em>aujourd'hui</em> ?</h1>
     <p>Une première fourchette de prix en ligne, calculée par intelligence artificielle à partir des caractéristiques de votre bien, puis un avis de valeur précis réalisé par Toan, conseiller sur le Grand Lyon.</p>
+    <a href="#contact" class="hero-agent" style="text-decoration:none">
+      <img src="/toan-nguyen.jpg" alt="Toan Nguyen, conseiller immobilier Propriétés-Privées sur le Grand Lyon" width="52" height="52">
+      <div><strong>Toan Nguyen</strong><span>Votre conseiller sur le Grand Lyon</span></div>
+    </a>
     <div class="hero-stats">
       <div class="hero-stat"><div class="num">30+</div><div class="lbl">Communes du Grand Lyon</div></div>
       <div class="hero-stat"><div class="num">100%</div><div class="lbl">Gratuit et sans engagement</div></div>
@@ -650,6 +664,7 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300)}
     <h2 class="section-heading">Parlons de votre projet</h2>
     <div class="contact-layout">
       <div>
+        <img src="/toan-nguyen.jpg" alt="Toan Nguyen, mandataire immobilier Propriétés-Privées" class="contact-photo" width="120" height="120" loading="lazy">
         <p style="font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--navy);margin-bottom:1rem;font-weight:400">Toan Nguyen<br><em style="font-weight:300;font-size:1rem">Mandataire Propriétés-Privées</em></p>
         <p style="font-size:14px;color:var(--gray-500);line-height:1.7;margin-bottom:1.5rem;font-weight:300">Disponible 6j/7, je réponds rapidement à toute demande.</p>
         <div class="contact-item"><div class="contact-icon">📞</div><span>06 60 02 27 25</span></div>
@@ -658,6 +673,11 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300)}
         <div style="display:flex;gap:10px;margin-top:1.5rem;flex-wrap:wrap">
           <a href="tel:0660022725" class="btn-primary">📞 Appeler</a>
           <a href="https://calendly.com/tt-nguyen-proprietesprivees/rendez-vous-estimation-vente-achat" target="_blank" class="btn-gold">📅 Prendre RDV</a>
+        </div>
+        <div class="socials">
+          <a href="https://www.facebook.com/proprietespriveescomJonage/" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.09 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.7 4.53-4.7 1.31 0 2.69.24 2.69.24v2.97h-1.52c-1.49 0-1.95.93-1.95 1.89v2.26h3.33l-.53 3.49h-2.8V24C19.61 23.09 24 18.1 24 12.07z"/></svg></a>
+          <a href="https://www.instagram.com/trungtoan.immobilier/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="4.3" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="17.6" cy="6.4" r="1.4"/></svg></a>
+          <a href="https://www.linkedin.com/in/trung-toam-nguyen-b09812139/" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg></a>
         </div>
       </div>
       <div class="form-box" style="background:var(--gray-50)">
@@ -695,6 +715,11 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300)}
 </section>
 
 <footer>
+  <div class="socials">
+    <a href="https://www.facebook.com/proprietespriveescomJonage/" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.09 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.7 4.53-4.7 1.31 0 2.69.24 2.69.24v2.97h-1.52c-1.49 0-1.95.93-1.95 1.89v2.26h3.33l-.53 3.49h-2.8V24C19.61 23.09 24 18.1 24 12.07z"/></svg></a>
+    <a href="https://www.instagram.com/trungtoan.immobilier/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="4.3" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="17.6" cy="6.4" r="1.4"/></svg></a>
+    <a href="https://www.linkedin.com/in/trung-toam-nguyen-b09812139/" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg></a>
+  </div>
   <strong style="color:var(--navy)">Toan Immo Lyon</strong> · NGUYEN Trung Toan · Conseiller immobilier indépendant · Réseau Propriétés-Privées<br/>
   SIRET 889 789 186 00018 · Carte T n°CPI 4401 2016 000 010 388 délivrée par la CCI Nantes – Saint-Nazaire<br/>
   <span style="margin-top:6px;display:inline-block">Estimation fournie à titre indicatif · <a href="/mentions-legales.html" style="color:var(--gray-300)">Mentions légales</a> · <a href="/confidentialite.html" style="color:var(--gray-300)">Politique de confidentialité</a></span>
