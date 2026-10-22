@@ -820,7 +820,7 @@ async function genererArticle() {
 
   const communeShort = commune.split(' (')[0];
 
-  const prompt = `Tu es Toan Nguyen, mandataire immobilier expert du Grand Lyon (réseau Propriétés-Privées).
+  const prompt = `Tu es Toam Nguyen, mandataire immobilier expert du Grand Lyon (réseau Propriétés-Privées).
 
 Site : www.toanimmo-lyon.fr · Tél : 06 60 02 27 25
 
@@ -924,7 +924,7 @@ Réponds UNIQUEMENT en JSON valide (sans markdown, sans backticks) :
     datePublished: new Date().toISOString().slice(0, 10), inLanguage: 'fr-FR',
     mainEntityOfPage: 'https://www.toanimmo-lyon.fr/blog/' + filename + '.html',
     image: articlePhotoUrl || 'https://www.toanimmo-lyon.fr/og-image.png',
-    author: { '@type': 'Person', name: 'Toan Nguyen', url: 'https://www.toanimmo-lyon.fr/' },
+    author: { '@type': 'Person', name: 'Toam Nguyen', url: 'https://www.toanimmo-lyon.fr/' },
     publisher: { '@type': 'Organization', name: 'Toan Immo Lyon', logo: { '@type': 'ImageObject', url: 'https://www.toanimmo-lyon.fr/icon-512.png' } }
   }).replace(/</g, '\\u003c')}<\/script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -980,7 +980,7 @@ Réponds UNIQUEMENT en JSON valide (sans markdown, sans backticks) :
     <div class="breadcrumb"><a href="/">Accueil</a> › <a href="/blog/">Blog</a> › Article</div>
     <div class="hero-tags">${tags}</div>
     <h1>${article.titre}</h1>
-    <div class="hero-meta"><span>📅 ${dateStr}</span><span>⏱ 4 min de lecture</span><span>✍️ Toan Nguyen</span></div>
+    <div class="hero-meta"><span>📅 ${dateStr}</span><span>⏱ 4 min de lecture</span><span>✍️ Toam Nguyen</span></div>
   </div>
 </section>
 ${photoBlockHtml}
@@ -989,7 +989,7 @@ ${photoBlockHtml}
     ${article.contenu}
     <div class="author-box">
       <div class="author-avatar">TN</div>
-      <div><div class="author-name">Toan Nguyen</div><div class="author-sub">Mandataire immobilier · Réseau Propriétés-Privées · Expert Grand Lyon</div></div>
+      <div><div class="author-name">Toam Nguyen</div><div class="author-sub">Mandataire immobilier · Réseau Propriétés-Privées · Expert Grand Lyon</div></div>
     </div>
   </div>
   <div class="cta-block">
@@ -1002,7 +1002,7 @@ ${photoBlockHtml}
   </div>
 </main>
 <footer>
-  <strong style="color:var(--navy)">Toan Immo Lyon</strong> · NGUYEN Trung Toan · Conseiller immobilier indépendant · Réseau Propriétés-Privées<br/>
+  <strong style="color:var(--navy)">Toan Immo Lyon</strong> · NGUYEN Trung Toam · Conseiller immobilier indépendant · Réseau Propriétés-Privées<br/>
   <a href="/" style="color:var(--gray-300)">Accueil</a> · <a href="/blog/" style="color:var(--gray-300)">Blog</a> · <a href="/mentions-legales.html" style="color:var(--gray-300)">Mentions légales</a>
 </footer>
 </body>
