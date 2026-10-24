@@ -44,6 +44,7 @@ function buildEmailHtml({ token, commune, sujet, saison, content, images, google
       ${imgUrl ? `<img src="${imgUrl}" style="width:100%;max-height:280px;object-fit:cover;" alt="Visuel ${label.name}" />` : ''}
       <div style="padding:16px 20px;background:#fafafa;">
         <p style="font-size:13px;color:#374151;line-height:1.7;white-space:pre-wrap;margin:0 0 16px;">${truncate(text)}</p>
+        ${p === 'google' ? `<p style="font-size:12px;color:#6b7280;margin:0 0 16px;">Bouton sous le post : <strong>${googleBouton === 'CALL' ? '📞 Appeler' : '🌐 En savoir plus (site)'}</strong></p>` : ''}
         <div style="display:flex;gap:10px;">
           <a href="${approveUrl}" style="display:inline-block;padding:10px 22px;background:#1A2E4A;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">✅ Approuver</a>
           <a href="${rejectUrl}" style="display:inline-block;padding:10px 22px;background:#f3f4f6;color:#6b7280;border-radius:8px;text-decoration:none;font-size:14px;">❌ Rejeter</a>
@@ -79,6 +80,8 @@ export default async function handler(req, res) {
 
   const { commune, sujet, saison, content, images } = req.body;
   if (!content || !commune) return res.status(400).json({ error: 'Missing data' });
+  // Bouton du post Google : « Appeler » (numéro de la fiche Google) ou « En savoir plus » (site)
+  const googleBouton = req.body.googleBouton === 'CALL' ? 'CALL' : 'LEARN_MORE';
 
   const token = crypto.randomUUID();
 
