@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex, nofollow"/>
+<title>Tableau de bord – Toan Immo Lyon</title>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--navy:#1A2E4A;--navy-deep:#0F1E33;--gold:#C9A84C;--gold-pale:#FBF8F0;--white:#fff;--gray-50:#F8F7F5;--gray-100:#EEECE8;--gray-300:#B8B4AC;--gray-500:#7A7670;--gray-700:#3D3B38;--success:#1D9E75;--danger:#c0392b;--radius:12px;--radius-sm:8px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--gray-700);min-height:100vh}
+#pin-screen{position:fixed;inset:0;background:var(--navy-deep);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px}
+.pin-box{background:var(--navy);border-radius:var(--radius);border:1px solid rgba(201,168,76,.2);padding:2.5rem 2rem;text-align:center;width:100%;max-width:320px}
+.pin-logo{width:52px;height:52px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:var(--navy-deep);margin:0 auto 1.25rem}
+.pin-title{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--white);margin-bottom:.4rem}
+.pin-sub{font-size:12px;color:rgba(255,255,255,.4);margin-bottom:1.5rem}
+.pin-input,.pin-btn{width:100%;padding:13px;border-radius:var(--radius-sm);font-family:inherit;font-size:15px}
+.pin-input{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--white);text-align:center;margin-bottom:10px}
+.pin-btn{background:var(--gold);border:none;color:var(--navy-deep);font-weight:500;cursor:pointer}
+.pin-error{font-size:12px;color:#e74c3c;margin-top:1rem;min-height:18px}
+#app{display:none}
+header{background:var(--navy-deep);padding:0 1.25rem;border-bottom:1px solid rgba(201,168,76,.2)}
+.header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px}
+.logo{display:flex;align-items:center;gap:10px;color:var(--white);font-family:'Playfair Display',serif;font-size:16px}
+.logo-mark{width:34px;height:34px;border-radius:50%;background:var(--gold);color:var(--navy-deep);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+.header-actions{display:flex;gap:8px}
+.btn-sm{font-family:inherit;font-size:12px;padding:7px 12px;border-radius:99px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.8);cursor:pointer;text-decoration:none}
+main{max-width:1100px;margin:0 auto;padding:1.5rem 1.25rem 3rem}
+h1{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--navy);font-weight:500;margin-bottom:.25rem}
+.sous-titre{font-size:13px;color:var(--gray-500);margin-bottom:1.5rem}
+h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-500);font-weight:500;margin:1.75rem 0 .75rem}
+.tuiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.tuile{background:var(--white);border:1px solid var(--gray-100);border-radius:var(--radius);padding:14px 16px}
+.tuile .val{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--navy);line-height:1.1}
+.tuile .lbl{font-size:12px;color:var(--gray-500);margin-top:4px}
+.tuile .cmp{font-size:11px;color:var(--gray-300);margin-top:6px}
+.tuile.or{background:var(--navy);border-color:var(--navy)}.tuile.or .val{color:var(--gold)}.tuile.or .lbl{color:rgba(255,255,255,.7)}.tuile.or .cmp{color:rgba(255,255,255,.4)}
+.entonnoir{background:var(--white);border:1px solid var(--gray-100);border-radius:var(--radius);padding:16px}
+.etape-ligne{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:13px}
+.etape-ligne .nom{width:170px;flex-shrink:0;color:var(--gray-700)}
+.etape-ligne .barre{flex:1;height:10px;background:var(--gray-100);border-radius:99px;overflow:hidden}
+.etape-ligne .rempli{height:100%;background:var(--gold);border-radius:99px}
+.etape-ligne .nb{width:44px;text-align:right;color:var(--navy);font-weight:500}
+.filtres{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.filtres input,.filtres select{font-family:inherit;font-size:13px;padding:8px 12px;border:1px solid var(--gray-100);border-radius:var(--radius-sm);background:var(--white)}
+.filtres input{flex:1;min-width:180px}
+.lead{background:var(--white);border:1px solid var(--gray-100);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;display:grid;grid-template-columns:1fr auto;gap:6px 14px}
+.lead.nouveau{border-left:4px solid var(--gold)}
+.lead-haut{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.lead-nom{font-weight:500;color:var(--navy);font-size:15px}
+.badge{font-size:11px;padding:2px 9px;border-radius:99px;background:var(--gray-50);border:1px solid var(--gray-100);color:var(--gray-500)}
+.badge.estimation{background:var(--gold-pale);border-color:rgba(201,168,76,.4);color:#8a6d1f}
+.lead-meta{font-size:12px;color:var(--gray-300)}
+.lead-resume{grid-column:1/-1;font-size:13px;color:var(--gray-700);line-height:1.5}
+.lead-liens{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.lead-liens a{font-size:13px;color:var(--navy);text-decoration:none;padding:6px 12px;border-radius:99px;background:var(--gray-50);border:1px solid var(--gray-100)}
+.lead-liens a.tel{background:var(--gold);border-color:var(--gold);color:var(--navy-deep);font-weight:500}
+.lead select{font-family:inherit;font-size:12px;padding:6px 8px;border-radius:var(--radius-sm);border:1px solid var(--gray-100);background:var(--white);align-self:start}
+details{grid-column:1/-1;font-size:12px;color:var(--gray-500)}
+details summary{cursor:pointer;color:var(--navy)}
+details table{margin-top:6px;border-collapse:collapse}
+details td{padding:3px 12px 3px 0;vertical-align:top}
+.vide,.erreur{background:var(--white);border:1px dashed var(--gray-300);border-radius:var(--radius);padding:24px;text-align:center;font-size:14px;color:var(--gray-500)}
+.erreur{border-color:var(--danger);color:var(--danger)}
+@media(max-width:600px){.lead{grid-template-columns:1fr}.etape-ligne .nom{width:120px}}
+</style>
+</head>
+<body>
+
+<div id="pin-screen">
+  <div class="pin-box" id="pin-box">
+    <div class="pin-logo">TI</div>
+    <div class="pin-title">Tableau de bord</div>
+    <div class="pin-sub">Leads et statistiques · Toan Immo Lyon</div>
+    <form onsubmit="connexion(event)">
+      <input type="password" id="admin-pass" class="pin-input" placeholder="Mot de passe" autocomplete="current-password" autofocus/>
+      <button type="submit" class="pin-btn">Entrer</button>
+    </form>
+    <div class="pin-error" id="pin-error"></div>
+  </div>
+</div>
+
+<div id="app">
+  <header>
+    <div class="header-inner">
+      <div class="logo"><div class="logo-mark">TI</div>Tableau de bord</div>
+      <div class="header-actions">
+        <button class="btn-sm" onclick="charger()">↻ Actualiser</button>
+        <button class="btn-sm" onclick="verrouiller()">🔒 Verrouiller</button>
+      </div>
+    </div>
+  </header>
+  <main>
+    <h1>Vos leads</h1>
+    <p class="sous-titre" id="sous-titre">Chargement…</p>
+
+    <h2>Ce mois-ci</h2>
+    <div class="tuiles" id="tuiles"></div>
+
+    <h2>Parcours de l'estimation en ligne (ce mois-ci)</h2>
+    <div class="entonnoir" id="entonnoir"></div>
+
+    <h2>Tous les leads</h2>
+    <div class="filtres">
+      <input type="search" id="recherche" placeholder="Rechercher un nom, une commune, un téléphone…" oninput="afficherLeads()"/>
+      <select id="filtre-statut" onchange="afficherLeads()">
+        <option value="">Tous les statuts</option>
+        <option value="nouveau">🆕 Nouveau</option>
+        <option value="rappelé">📞 Rappelé</option>
+        <option value="rdv">📅 RDV fixé</option>
+        <option value="mandat">✍️ Mandat signé</option>
+        <option value="perdu">✖️ Perdu</option>
+      </select>
+      <select id="filtre-type" onchange="afficherLeads()">
+        <option value="">Tous les types</option>
+        <option value="estimation">Estimation en ligne</option>
+        <option value="contact">Message de contact</option>
+        <option value="vendre">Bien à vendre</option>
+        <option value="recherche">Recherche de bien</option>
+      </select>
+    </div>
+    <div id="leads"></div>
+  </main>
+</div>
+
+<script>
+// Le mot de passe est vérifié par le serveur (variable ADMIN_PASSWORD sur Vercel)
+// et envoyé avec chaque appel /api/ via l'en-tête x-admin-key.
+let adminKey = sessionStorage.getItem('toan_admin_key') || '';
+const _fetch = window.fetch.bind(window);
+window.fetch = (url, opts = {}) => {
+  if (typeof url === 'string' && url.startsWith('/api/')) opts.headers = { ...(opts.headers || {}), 'x-admin-key': adminKey };
+  return _fetch(url, opts);
+};
+function ouvrirApp() {
+  document.getElementById('pin-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  charger();
+}
+async function connexion(e) {
+  e.preventDefault();
+  adminKey = document.getElementById('admin-pass').value;
+  const r = await fetch('/api/admin-check', { method: 'POST' }).catch(() => null);
+  if (r && r.ok) { sessionStorage.setItem('toan_admin_key', adminKey); ouvrirApp(); }
+  else { document.getElementById('pin-error').textContent = 'Mot de passe incorrect.'; document.getElementById('admin-pass').value = ''; }
+}
+function verrouiller() { sessionStorage.removeItem('toan_admin_key'); location.reload(); }
+if (adminKey) ouvrirApp();
+
+const TYPES = { estimation: 'Estimation en ligne', contact: 'Message de contact', vendre: 'Bien à vendre', recherche: 'Recherche de bien' };
+const STATUTS = { nouveau: '🆕 Nouveau', 'rappelé': '📞 Rappelé', rdv: '📅 RDV fixé', mandat: '✍️ Mandat signé', perdu: '✖️ Perdu' };
+let donnees = { leads: [], stats: { mois: {}, precedent: {} } };
+
+// Toutes les données des leads viennent de formulaires publics : elles sont systématiquement échappées
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const n = (o, k) => Number((o || {})[k] || 0);
+
+async function charger() {
+  document.getElementById('sous-titre').textContent = 'Chargement…';
+  try {
+    const r = await fetch('/api/leads');
+    if (r.status === 401) { verrouiller(); return; }
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erreur ' + r.status);
+    donnees = d;
+    const nouveaux = d.leads.filter(l => l.statut === 'nouveau').length;
+    document.getElementById('sous-titre').textContent = `${d.leads.length} lead(s) enregistré(s) · ${nouveaux} à traiter · mis à jour à ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+    afficherStats();
+    afficherLeads();
+  } catch (e) {
+    document.getElementById('sous-titre').textContent = '';
+    document.getElementById('leads').innerHTML = `<div class="erreur">Impossible de charger les leads : ${esc(e.message)}</div>`;
+  }
+}
+
+function afficherStats() {
+  const m = donnees.stats.mois || {}, p = donnees.stats.precedent || {};
+  const total = o => ['estimation', 'contact', 'vendre', 'recherche'].reduce((s, t) => s + n(o, 'lead_' + t), 0);
+  const tuiles = [
+    ['Leads reçus', total(m), total(p), true],
+    ['Estimations en ligne', n(m, 'lead_estimation'), n(p, 'lead_estimation')],
+    ['Contacts, ventes, recherches', n(m, 'lead_contact') + n(m, 'lead_vendre') + n(m, 'lead_recherche'), n(p, 'lead_contact') + n(p, 'lead_vendre') + n(p, 'lead_recherche')],
+    ['Clics « Appeler »', n(m, 'clic_tel'), n(p, 'clic_tel')],
+    ['Clics WhatsApp', n(m, 'clic_whatsapp'), n(p, 'clic_whatsapp')],
+    ['Clics « Prendre RDV »', n(m, 'clic_rdv'), n(p, 'clic_rdv')],
+  ];
+  document.getElementById('tuiles').innerHTML = tuiles.map(([lbl, v, avant, or]) =>
+    `<div class="tuile${or ? ' or' : ''}"><div class="val">${v}</div><div class="lbl">${lbl}</div><div class="cmp">Mois précédent : ${avant}</div></div>`).join('');
+
+  const etapes = [
+    ['Étape 1 → 2 (le bien)', n(m, 'estim_etape2')],
+    ['Étape 2 → 3 (ses atouts)', n(m, 'estim_etape3')],
+    ['Demandes envoyées', n(m, 'lead_estimation')],
+    ['Estimations affichées', n(m, 'estim_resultat')],
+  ];
+  const max = Math.max(1, ...etapes.map(e => e[1]));
+  document.getElementById('entonnoir').innerHTML = etapes.map(([nom, v]) =>
+    `<div class="etape-ligne"><div class="nom">${nom}</div><div class="barre"><div class="rempli" style="width:${Math.round(v * 100 / max)}%"></div></div><div class="nb">${v}</div></div>`).join('') +
+    '<p style="font-size:12px;color:var(--gray-300);margin-top:8px">Un écart important entre deux lignes indique l\'étape où les visiteurs abandonnent.</p>';
+}
+
+function afficherLeads() {
+  const q = document.getElementById('recherche').value.trim().toLowerCase();
+  const fs = document.getElementById('filtre-statut').value;
+  const ft = document.getElementById('filtre-type').value;
+  const liste = donnees.leads.filter(l =>
+    (!fs || l.statut === fs) && (!ft || l.type === ft) &&
+    (!q || [l.prenom, l.nom, l.commune, l.tel, l.email, l.resume].join(' ').toLowerCase().includes(q)));
+  const zone = document.getElementById('leads');
+  if (!liste.length) {
+    zone.innerHTML = `<div class="vide">${donnees.leads.length ? 'Aucun lead ne correspond à ces filtres.' : 'Aucun lead enregistré pour l\'instant. Les prochains apparaîtront ici automatiquement.'}</div>`;
+    return;
+  }
+  zone.innerHTML = liste.map(l => {
+    const date = new Date(l.date).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' });
+    const tel = String(l.tel || '').replace(/[^\d+]/g, '');
+    const details = Object.entries(l.details || {}).filter(([, v]) => v).map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('');
+    const options = Object.entries(STATUTS).map(([v, t]) => `<option value="${v}"${l.statut === v ? ' selected' : ''}>${t}</option>`).join('');
+    return `<div class="lead ${esc(l.statut)}">
+      <div>
+        <div class="lead-haut"><span class="lead-nom">${esc(`${l.prenom || ''} ${l.nom || ''}`.trim() || 'Sans nom')}</span><span class="badge ${esc(l.type)}">${esc(TYPES[l.type] || l.type)}</span></div>
+        <div class="lead-meta">${esc(date)}${l.commune ? ' · ' + esc(l.commune) : ''}${l.source ? ' · Provenance : ' + esc(l.source) : ''}</div>
+      </div>
+      <select onchange="changerStatut('${esc(l.id)}', this)">${options}</select>
+      ${l.resume ? `<div class="lead-resume">${esc(l.resume)}</div>` : ''}
+      <div class="lead-liens">
+        ${tel ? `<a class="tel" href="tel:${esc(tel)}">📞 ${esc(l.tel)}</a>` : ''}
+        ${l.email ? `<a href="mailto:${esc(l.email)}">✉️ ${esc(l.email)}</a>` : ''}
+      </div>
+      ${details ? `<details><summary>Voir le détail</summary><table>${details}</table></details>` : ''}
+    </div>`;
+  }).join('');
+}
+
+async function changerStatut(id, select) {
+  const ancien = donnees.leads.find(l => l.id === id);
+  select.disabled = true;
+  try {
+    const r = await fetch('/api/leads', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, statut: select.value }) });
+    if (!r.ok) throw new Error();
+    if (ancien) ancien.statut = select.value;
+    afficherLeads();
+  } catch (e) {
+    alert('Le statut n\'a pas pu être enregistré. Réessayez.');
+    if (ancien) select.value = ancien.statut;
+  } finally { select.disabled = false; }
+}
+</script>
+</body>
+</html>

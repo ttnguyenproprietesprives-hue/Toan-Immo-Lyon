@@ -745,6 +745,7 @@ function setProjet(p){
 }
 // Envoi des formulaires via /api/lead (Formspree côté serveur, variable FORMSPREE_ID sur Vercel)
 async function posterLead(formulaire,champs){
+  champs.source=window.TI?TI.source():''; // provenance du visiteur (Google, Facebook, accès direct…)
   try{const r=await fetch('/api/lead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({formulaire,champs})});return r.ok;}catch(e){return false;}
 }
 const ECHEC_ENVOI="L'envoi a échoué. Réessayez ou appelez-moi directement au 06 60 02 27 25.";
@@ -780,6 +781,7 @@ function allerEtape(n){
     const s=Number(document.getElementById('surface').value);
     if(!s||s<10){alert('Merci d\'indiquer la surface du bien (en m²).');document.getElementById('surface').focus();return;}
   }
+  if(window.TI&&n>etapeActuelle)TI.suivre('estim_etape'+n); // mesure des abandons entre les étapes
   etapeActuelle=n;
   [1,2,3].forEach(i=>document.getElementById('etape-'+i).classList.toggle('hidden',i!==n));
   document.getElementById('step-count').textContent='Étape '+n+' sur 3';
@@ -812,7 +814,7 @@ async function lancerEstimation(){
   const projetLabel=d.projet==='vente'?'vente':d.projet==='location'?'mise en location':'achat';
   const fmt=n=>Number(n).toLocaleString('fr-FR');
   try{
-    const res=await fetch('/api/estimate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...d,rgpd:true})});
+    const res=await fetch('/api/estimate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...d,rgpd:true,source:window.TI?TI.source():''})});
     clearInterval(iv);
     if(!res.ok)throw new Error('Erreur '+res.status);
     const rawText=await res.text();
@@ -836,6 +838,13 @@ async function lancerEstimation(){
       :'Une erreur est survenue. Vérifiez votre connexion et réessayez.';
   }
 }
+// Depuis une page commune, la commune arrive pré-sélectionnée : /?commune=Bron%20(69500)#estimation
+(function(){
+  const c=new URLSearchParams(location.search).get('commune');
+  const s=document.getElementById('commune');
+  if(c&&s&&[...s.options].some(o=>o.value===c))s.value=c;
+})();
 </script>
+<script src="/site.js" defer></script>
 </body>
 </html>

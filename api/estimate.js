@@ -1,11 +1,12 @@
 import { Resend } from 'resend';
-import { parseBody, esc, clip, envoyerLead, limiteAtteinte, erreurIA } from './_util.js';
+import { parseBody, esc, clip, limiteAtteinte, erreurIA } from './_util.js';
 import { PRIX, ANNEE_PRIX } from './_prix.js';
+import { traiterLead, compter } from './_leads.js';
 
 // Champs acceptés depuis le formulaire d'estimation (tout le reste est ignoré)
 const CHAMPS = ['projet', 'civilite', 'prenom', 'nom', 'tel', 'email', 'delai', 'financement', 'budget', 'apport',
   'adresse', 'commune', 'environnement', 'type_bien', 'pieces', 'surface', 'sdb', 'nb_etages', 'annee', 'etat', 'dpe',
-  'chauffage', 'etage', 'expo', 'vue', 'lumineux', 'parking', 'exterieur', 'ascenseur', 'cave', 'cuisine', 'clim', 'parquet'];
+  'chauffage', 'etage', 'expo', 'vue', 'lumineux', 'parking', 'exterieur', 'ascenseur', 'cave', 'cuisine', 'clim', 'parquet', 'source'];
 
 const fmt = n => Number(n).toLocaleString('fr-FR');
 
@@ -232,9 +233,25 @@ export default async function handler(req, res) {
     Prix_m2: est ? `${fmt(est.prix_m2)} €/m²` : '',
     Tendance: est ? clip(est.tendance) : '',
     Consentement_RGPD: 'OUI – Case cochée le ' + new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' }),
-    Source: 'Toan Immo Lyon – Outil estimation'
+    Source: 'Toan Immo Lyon – Outil estimation' + (d.source ? ' · ' + d.source : '')
   };
-  const envois = [envoyerLead(lead).catch(e => console.error('lead:', e))];
+  const envois = [
+    traiterLead({
+      type: 'estimation',
+      prenom: d.prenom, nom: d.nom, tel: d.tel, email: d.email, commune: d.commune, source: d.source,
+      resume: est
+        ? `${projetLabel.charAt(0).toUpperCase() + projetLabel.slice(1)} · ${d.type_bien} ${d.pieces} p. · ${d.surface} m² → estimé ${fmt(est.prix_estime)} ${unite} (${fmt(est.prix_min)} – ${fmt(est.prix_max)})`
+        : `${projetLabel} · ${d.type_bien} ${d.pieces} p. · ${d.surface} m² · estimation automatique échouée : ${erreur}`,
+      details: {
+        'Projet': projetLabel, 'Délai': d.delai, 'Adresse': d.adresse, 'Type de bien': d.type_bien, 'Pièces': d.pieces,
+        'Surface': d.surface + ' m²', 'Construction': d.annee, 'État': d.etat, 'DPE': d.dpe, 'Étage': d.etage,
+        'Extérieur': d.exterieur, 'Parking': d.parking,
+        ...(d.projet === 'achat' ? { 'Financement': d.financement, 'Budget': d.budget, 'Apport': d.apport } : {}),
+      },
+      formspree: lead,
+    }),
+  ];
+  if (est) envois.push(compter('estim_resultat').catch(() => {}));
 
   if (est && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email) && process.env.RESEND_API_KEY) {
     const resend = new Resend(process.env.RESEND_API_KEY);
