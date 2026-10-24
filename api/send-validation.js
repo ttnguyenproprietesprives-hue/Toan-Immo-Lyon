@@ -24,7 +24,7 @@ function truncate(str, max = 300) {
   return str.length > max ? str.slice(0, max) + '…' : str;
 }
 
-function buildEmailHtml({ token, commune, sujet, saison, content, images }) {
+function buildEmailHtml({ token, commune, sujet, saison, content, images, googleBouton }) {
   const communeName = commune.split(' (')[0];
   const platforms = ['facebook', 'instagram', 'linkedin', 'google'];
 
@@ -83,12 +83,12 @@ export default async function handler(req, res) {
   const token = crypto.randomUUID();
 
   await redis.set(`validation:${token}`, {
-    commune, sujet, saison, content, images,
+    commune, sujet, saison, content, images, googleBouton,
     status: { facebook: 'pending', instagram: 'pending', linkedin: 'pending', google: 'pending' },
     createdAt: Date.now(),
   }, { ex: 172800 });
 
-  const html = buildEmailHtml({ token, commune, sujet, saison, content, images });
+  const html = buildEmailHtml({ token, commune, sujet, saison, content, images, googleBouton });
 
   const { error } = await resend.emails.send({
     from: 'Toan Immo Lyon <contenu@toanimmo-lyon.fr>',

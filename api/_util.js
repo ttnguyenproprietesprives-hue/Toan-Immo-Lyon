@@ -51,3 +51,25 @@ export async function limiteAtteinte(req, cle, max) {
     return false;
   }
 }
+
+// Google Business Profile refuse les posts contenant un téléphone, un lien ou un email :
+// on retire les phrases qui en contiennent (le lien vers le site passe par le bouton du post).
+export function nettoyerPostGoogle(texte) {
+  const motifs = [
+    /(?:\+33\s?|\b0)[1-9](?:[\s.\-]?\d{2}){4}\b/g,
+    /\bhttps?:\/\/\S+/gi,
+    /\bwww\.\S+/gi,
+    /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g,
+    /\b[\w-]+\.(?:fr|com|net|org|immo)\b\/?\S*/gi
+  ];
+  const MARQUE = '\u0000';
+  return String(texte || '').split('\n').map(ligne => {
+    let l = ligne;
+    motifs.forEach(m => { l = l.replace(m, MARQUE); });
+    if (!l.includes(MARQUE)) return ligne;
+    // On retire la phrase entière qui contenait la coordonnée, pour ne pas laisser de phrase bancale
+    const phrases = l.match(/[^.!?]+(?:[.!?]+|$)\s*/g) || [];
+    const gardees = phrases.filter(p => !p.includes(MARQUE)).join('').trim();
+    return gardees ? gardees : null;
+  }).filter(l => l !== null).join('\n').replace(/\n{3,}/g, '\n\n').trim();
+}

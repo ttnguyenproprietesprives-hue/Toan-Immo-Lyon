@@ -421,7 +421,7 @@ input:checked + .slider:before { transform: translateX(20px); }
           <div class="content-header">
             <div class="content-header-left">
               <span class="platform-icon">🗺️</span>
-              <div><div class="platform-name">Google Business</div><div class="platform-note">Max 1500 caractères · avec appel à l'action</div></div>
+              <div><div class="platform-name">Google Business</div><div class="platform-note">Max 1500 caractères · sans téléphone ni lien</div></div>
             </div>
             <button class="copy-btn" onclick="copier('google-text', this)">Copier</button>
           </div>
@@ -431,7 +431,14 @@ input:checked + .slider:before { transform: translateX(20px); }
           <div class="content-body">
             <div class="content-text" id="google-text"></div>
             <div class="char-count" id="google-count"></div>
-            <div class="tip-box"><strong>💡 Conseil :</strong> Publie 1 post/semaine sur <strong>business.google.com</strong></div>
+            <div style="margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;">
+              <label for="google-bouton"><strong>Bouton sous le post :</strong></label>
+              <select id="google-bouton" onchange="changerBoutonGoogle()" style="padding:6px 10px;border-radius:8px;border:1px solid #ddd;font-family:inherit;font-size:13px;">
+                <option value="LEARN_MORE">🌐 En savoir plus (mène au site)</option>
+                <option value="CALL">📞 Appeler (numéro de votre fiche Google)</option>
+              </select>
+            </div>
+            <div class="tip-box"><strong>💡 Règle Google :</strong> pas de numéro de téléphone, de site web ni d'email dans le texte, sinon le post est refusé. Ils sont retirés automatiquement : choisissez plutôt le bouton « En savoir plus » (site) ou « Appeler » ci-dessus. Publie 1 post/semaine sur <strong>business.google.com</strong>.</div>
           </div>
         </div>
       </div>
@@ -553,14 +560,14 @@ async function generer() {
 Site : www.toanimmo-lyon.fr · Tél : 06 60 02 27 25
 Génère du contenu marketing immobilier sur : "${sujet}" à ${commune}, en ${saison}.
 Ton : ${ton}.
-Chiffres (taux, taxe foncière, frais de notaire, prix) : donne des ordres de grandeur prudents, n'invente jamais de chiffre précis, rappelle que chaque situation est différente et invite à appeler le 06 60 02 27 25 pour un calcul personnalisé.
+Chiffres (taux, taxe foncière, frais de notaire, prix) : donne des ordres de grandeur prudents, n'invente jamais de chiffre précis, rappelle que chaque situation est différente et invite à prendre contact pour un calcul personnalisé (au 06 60 02 27 25, SAUF dans le post Google : voir sa consigne).
 Réponds UNIQUEMENT en JSON valide (sans markdown, sans backticks) avec exactement ces 5 clés :
 {
   "blog": "Article complet (500-700 mots). Titre <h1></h1>, sous-titres <h2></h2>, paragraphes <p></p>. Données marché réalistes, conseils pratiques, appel à l'action vers www.toanimmo-lyon.fr ou le 06 60 02 27 25. Optimisé SEO.",
   "facebook": "Post Facebook (150-200 mots). Accroche avec emoji, contenu local utile, question finale pour engagement, appel à l'action.",
   "instagram": "Légende Instagram (80-120 mots). Accroche choc 1ère ligne, 2-3 points clés, appel à l'action (lien en bio). Ligne vide puis 15-20 hashtags pertinents.",
   "linkedin": "Post LinkedIn (180-250 mots). 1ère ligne = accroche forte. Expertise + données marché. Conseil actionnable. Question finale. 5-8 hashtags pro.",
-  "google": "Post Google Business (150 mots max). Direct, données locales concrètes, appel à l'action clair, lien www.toanimmo-lyon.fr."
+  "google": "Post Google Business Profile (150 mots max). Direct, utile, ancré dans la commune. RÈGLE GOOGLE STRICTE : AUCUN numéro de téléphone, AUCUNE adresse de site web ni lien, AUCUNE adresse email dans le texte, sinon Google refuse le post. Termine par une invitation à cliquer sur le bouton « En savoir plus » situé sous le post."
 }`;
 
   try {
@@ -571,13 +578,14 @@ Réponds UNIQUEMENT en JSON valide (sans markdown, sans backticks) avec exacteme
     const match = raw.match(/\{[\s\S]*\}/);
     if (!match) throw new Error('JSON invalide');
     const content = JSON.parse(match[0]);
-    currentContent = content;
+    content.google = nettoyerPostGoogle(content.google); // Google refuse téléphone, liens et emails dans le texte
 
     document.getElementById('blog-text').innerHTML = content.blog;
     document.getElementById('facebook-text').textContent = content.facebook;
     document.getElementById('instagram-text').textContent = content.instagram;
     document.getElementById('linkedin-text').textContent = content.linkedin;
     document.getElementById('google-text').textContent = content.google;
+    changerBoutonGoogle(); // adapte la dernière phrase au bouton choisi
 
     const communeName = commune.split(' (')[0];
     document.getElementById('blog-tags').textContent = `${communeName} · Immobilier · Marché`;
@@ -626,6 +634,36 @@ async function lireReponseIA(res) {
   if (!res.ok || !data.content) throw new Error(data.error || "Le service d'IA n'a pas répondu. Réessayez dans quelques minutes.");
   return data;
 }
+// Google Business Profile refuse les posts contenant un téléphone, un lien ou un email :
+// on retire les phrases qui en contiennent (le lien vers le site passe par le bouton « En savoir plus »).
+function nettoyerPostGoogle(texte) {
+  const motifs = [
+    /(?:\+33\s?|\b0)[1-9](?:[\s.\-]?\d{2}){4}\b/g,
+    /\bhttps?:\/\/\S+/gi,
+    /\bwww\.\S+/gi,
+    /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g,
+    /\b[\w-]+\.(?:fr|com|net|org|immo)\b\/?\S*/gi
+  ];
+  const MARQUE = '\u0000';
+  return String(texte || '').split('\n').map(ligne => {
+    let l = ligne;
+    motifs.forEach(m => { l = l.replace(m, MARQUE); });
+    if (!l.includes(MARQUE)) return ligne;
+    // On retire la phrase entière qui contenait la coordonnée, pour ne pas laisser de phrase bancale
+    const phrases = l.match(/[^.!?]+(?:[.!?]+|$)\s*/g) || [];
+    const gardees = phrases.filter(p => !p.includes(MARQUE)).join('').trim();
+    return gardees ? gardees : null;
+  }).filter(l => l !== null).join('\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+// Bouton du post Google : la phrase finale du texte suit le bouton choisi
+function changerBoutonGoogle() {
+  const v = document.getElementById('google-bouton').value;
+  if (!currentContent.google) return;
+  currentContent.google = currentContent.google.replace(/«\s*(?:En savoir plus|Appeler)\s*»/gi, v === 'CALL' ? '« Appeler »' : '« En savoir plus »');
+  document.getElementById('google-text').textContent = currentContent.google;
+  charCount('google-text', 'google-count', 1500);
+}
 async function envoyerValidation() {
   const btn = document.getElementById('validate-btn');
   const statusEl = document.getElementById('validate-status');
@@ -634,7 +672,7 @@ async function envoyerValidation() {
   btn.innerHTML = '<div class="spinner" style="border-color:rgba(0,0,0,.1);border-top-color:var(--navy-deep);"></div> Envoi…';
   statusEl.innerHTML = '';
   try {
-    const res = await fetch('/api/send-validation', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ commune: currentParams.commune, sujet: currentParams.sujet, saison: currentParams.saison, content: { facebook: currentContent.facebook, instagram: currentContent.instagram, linkedin: currentContent.linkedin, google: currentContent.google }, images: currentImages }) });
+    const res = await fetch('/api/send-validation', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ commune: currentParams.commune, sujet: currentParams.sujet, saison: currentParams.saison, content: { facebook: currentContent.facebook, instagram: currentContent.instagram, linkedin: currentContent.linkedin, google: currentContent.google }, images: currentImages, googleBouton: document.getElementById('google-bouton').value }) });
     const data = await res.json();
     if (data.success) { statusEl.innerHTML = '<p class="validate-success">✅ Email de validation envoyé ! Consulte ta boîte mail pour approuver chaque plateforme.</p>'; } else { throw new Error(data.error || 'Erreur'); }
   } catch (e) {

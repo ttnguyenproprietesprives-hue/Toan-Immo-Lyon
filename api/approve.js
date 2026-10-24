@@ -1,4 +1,5 @@
 import { Redis } from '@upstash/redis';
+import { nettoyerPostGoogle } from './_util.js';
 
 export const config = { runtime: 'nodejs' };
 
@@ -111,14 +112,15 @@ async function publishLinkedIn(content, imageUrl) {
   return { id: postData.id, platform: 'linkedin' };
 }
 
-async function publishGoogle(content, imageUrl) {
+async function publishGoogle(content, imageUrl, record = {}) {
   const locationId = process.env.GOOGLE_LOCATION_ID;
   const token = process.env.GOOGLE_ACCESS_TOKEN;
 
   const body = {
     languageCode: 'fr',
-    summary: content,
-    callToAction: { actionType: 'LEARN_MORE', url: 'https://www.toanimmo-lyon.fr' },
+    summary: nettoyerPostGoogle(content), // Google refuse téléphone, liens et emails dans le texte
+    // « Appeler » utilise le numéro de la fiche Google ; « En savoir plus » renvoie vers le site
+    callToAction: record.googleBouton === 'CALL' ? { actionType: 'CALL' } : { actionType: 'LEARN_MORE', url: 'https://www.toanimmo-lyon.fr' },
   };
   if (imageUrl) body.media = [{ mediaFormat: 'PHOTO', sourceUrl: imageUrl }];
 
@@ -165,7 +167,7 @@ export default async function handler(req, res) {
     if (!publisher) return res.status(400).send(page('⚠️', 'Erreur', 'Plateforme inconnue.'));
 
     try {
-      await publisher(record.content[platform], record.images[platform]);
+      await publisher(record.content[platform], record.images[platform], record);
       record.status[platform] = 'published';
       await redis.set(`validation:${token}`, record, { ex: 172800 });
       return res.status(200).send(page('✅', 'Publié avec succès', `Le contenu ${platform} a été publié.`));
