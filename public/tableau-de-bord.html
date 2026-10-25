@@ -112,6 +112,7 @@ details td{padding:3px 12px 3px 0;vertical-align:top}
         <option value="rappelé">📞 Rappelé</option>
         <option value="rdv">📅 RDV fixé</option>
         <option value="mandat">✍️ Mandat signé</option>
+        <option value="vendu">🏁 Vente conclue</option>
         <option value="perdu">✖️ Perdu</option>
       </select>
       <select id="filtre-type" onchange="afficherLeads()">
@@ -151,7 +152,7 @@ function verrouiller() { sessionStorage.removeItem('toan_admin_key'); location.r
 if (adminKey) ouvrirApp();
 
 const TYPES = { estimation: 'Estimation en ligne', contact: 'Message de contact', vendre: 'Bien à vendre', recherche: 'Recherche de bien' };
-const STATUTS = { nouveau: '🆕 Nouveau', 'rappelé': '📞 Rappelé', rdv: '📅 RDV fixé', mandat: '✍️ Mandat signé', perdu: '✖️ Perdu' };
+const STATUTS = { nouveau: '🆕 Nouveau', 'rappelé': '📞 Rappelé', rdv: '📅 RDV fixé', mandat: '✍️ Mandat signé', vendu: '🏁 Vente conclue', perdu: '✖️ Perdu' };
 let donnees = { leads: [], stats: { mois: {}, precedent: {} } };
 
 // Toutes les données des leads viennent de formulaires publics : elles sont systématiquement échappées
@@ -187,6 +188,7 @@ function afficherStats() {
     ['Clics WhatsApp', n(m, 'clic_whatsapp'), n(p, 'clic_whatsapp')],
     ['Clics « Prendre RDV »', n(m, 'clic_rdv'), n(p, 'clic_rdv')],
     ['Emails de relance envoyés', n(m, 'relance_envoyee'), n(p, 'relance_envoyee')],
+    ['Demandes d\'avis envoyées', n(m, 'avis_demande'), n(p, 'avis_demande')],
   ];
   document.getElementById('tuiles').innerHTML = tuiles.map(([lbl, v, avant, or]) =>
     `<div class="tuile${or ? ' or' : ''}"><div class="val">${v}</div><div class="lbl">${lbl}</div><div class="cmp">Mois précédent : ${avant}</div></div>`).join('');
@@ -224,6 +226,7 @@ function afficherLeads() {
       <div>
         <div class="lead-haut"><span class="lead-nom">${esc(`${l.prenom || ''} ${l.nom || ''}`.trim() || 'Sans nom')}</span><span class="badge ${esc(l.type)}">${esc(TYPES[l.type] || l.type)}</span></div>
         <div class="lead-meta">${esc(date)}${l.commune ? ' · ' + esc(l.commune) : ''}${l.source ? ' · Provenance : ' + esc(l.source) : ''}</div>
+        ${l.avisDemande ? `<div class="lead-meta">⭐ Avis Google demandé le ${new Date(l.avisDemande).toLocaleDateString('fr-FR')}</div>` : ''}
         ${l.relance ? `<div class="lead-meta">✉️ Relances : ${l.relance.desinscrit ? 'désinscrit(e)' : l.relance.active ? `${l.relance.etape}/4 envoyée(s), prochaine le ${new Date(l.relance.prochaine).toLocaleDateString('fr-FR')}` : `terminées (${l.relance.etape}/4)${l.relance.arret ? ' · arrêtées : ' + esc(l.relance.arret) : ''}`}</div>` : ''}
       </div>
       <select onchange="changerStatut('${esc(l.id)}', this)">${options}</select>
@@ -239,11 +242,21 @@ function afficherLeads() {
 
 async function changerStatut(id, select) {
   const ancien = donnees.leads.find(l => l.id === id);
+  // « Vente conclue » envoie un email de demande d'avis : on demande confirmation
+  if (select.value === 'vendu' && ancien && !ancien.avisDemande) {
+    const message = ancien.email
+      ? `Passer ce lead en « Vente conclue » enverra un email de remerciement avec une demande d'avis Google à ${ancien.email}. Continuer ?`
+      : 'Ce lead n\'a pas d\'email : aucune demande d\'avis ne sera envoyée. Pensez à lui envoyer le lien par SMS ou WhatsApp. Continuer ?';
+    if (!confirm(message)) { select.value = ancien.statut; return; }
+  }
   select.disabled = true;
   try {
     const r = await fetch('/api/leads', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, statut: select.value }) });
     if (!r.ok) throw new Error();
+    const d = await r.json().catch(() => ({}));
     if (ancien) ancien.statut = select.value;
+    if (d.avis === 'envoyé' && ancien) { ancien.avisDemande = new Date().toISOString(); alert('✅ Email de demande d\'avis envoyé.'); }
+    if (d.avis === 'erreur') alert('Le statut est enregistré, mais l\'email de demande d\'avis n\'a pas pu partir. Envoyez le lien par SMS ou WhatsApp.');
     afficherLeads();
   } catch (e) {
     alert('Le statut n\'a pas pu être enregistré. Réessayez.');

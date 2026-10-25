@@ -16,7 +16,7 @@ const CALENDLY = 'https://calendly.com/tt-nguyen-proprietesprivees/rendez-vous-e
 const TEL = '06 60 02 27 25';
 const JOUR = 864e5;
 // Statuts du tableau de bord qui arrêtent les relances (le contact est déjà engagé ou terminé)
-const STOP = ['rdv', 'mandat', 'perdu'];
+const STOP = ['rdv', 'mandat', 'vendu', 'perdu'];
 
 const fmt = n => Number(n).toLocaleString('fr-FR');
 
