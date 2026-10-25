@@ -66,6 +66,18 @@ footer .socials{justify-content:center;margin:0 0 1rem}
 .section-eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:6px;display:block}
 .section-heading{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,3vw,2rem);color:var(--navy);font-weight:400;margin-bottom:1rem}
 .section-sub{font-size:14px;color:var(--gray-500);line-height:1.7;max-width:560px;font-weight:300;margin-bottom:2rem}
+/* À propos */
+.apropos-grid{display:grid;grid-template-columns:280px 1fr;gap:3rem;align-items:start}
+.apropos-photo{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:var(--radius);border:3px solid var(--gold);box-shadow:0 12px 30px rgba(15,30,51,0.15)}
+.apropos-reperes{display:flex;flex-wrap:wrap;gap:8px;margin-top:1rem}
+.apropos-repere{font-size:12px;padding:6px 12px;border-radius:99px;background:var(--gold-pale);border:1px solid rgba(201,168,76,0.35);color:var(--navy)}
+.apropos-texte p{font-size:15px;color:var(--gray-700);line-height:1.8;margin-bottom:1rem;font-weight:300}
+.apropos-texte p.apropos-accroche{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--navy);font-style:italic;font-weight:400}
+.apropos-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:1.5rem}
+.apropos-actions a{padding:12px 22px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;text-decoration:none}
+.apropos-actions .principal{background:var(--navy);color:var(--white)}
+.apropos-actions .secondaire{border:1px solid var(--gray-100);color:var(--navy);background:var(--white)}
+@media(max-width:700px){.apropos-grid{grid-template-columns:1fr;gap:1.5rem}.apropos-photo{max-width:220px;margin:0 auto;display:block}.apropos-reperes{justify-content:center}}
 #services{background:var(--navy)}
 #services .section-heading{color:var(--white)}
 .services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
@@ -236,6 +248,7 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300)}
     </a>
     <div class="nav-links">
       <a href="#services">Services</a>
+      <a href="#a-propos">À propos</a>
       <a href="#vendre">Vendre</a>
       <a href="#rechercher">Rechercher</a>
       <a href="#estimation">Estimation</a>
@@ -251,7 +264,7 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300)}
     <div class="hero-tag">Estimation indicative gratuite</div>
     <h1>Quelle est la valeur<br/>de votre bien <em>aujourd'hui</em> ?</h1>
     <p>Une première fourchette de prix en ligne, calculée par intelligence artificielle à partir des caractéristiques de votre bien, puis un avis de valeur précis réalisé par Toam, conseiller sur le Grand Lyon.</p>
-    <a href="#contact" class="hero-agent" style="text-decoration:none">
+    <a href="#a-propos" class="hero-agent" style="text-decoration:none">
       <img src="/toan-nguyen.jpg" alt="Toam Nguyen, conseiller immobilier Propriétés-Privées sur le Grand Lyon" width="52" height="52">
       <div><strong>Toam Nguyen</strong><span>Votre conseiller sur le Grand Lyon</span></div>
     </a>
@@ -289,6 +302,33 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300)}
         <div class="service-card-icon">✍️</div>
         <h3>Jusqu'à la signature</h3>
         <p>Négociation, compromis, suivi des conditions suspensives et accompagnement chez le notaire.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- À PROPOS -->
+<section id="a-propos" class="section-wrap" style="background:var(--white)">
+  <div class="section-inner apropos-grid">
+    <div>
+      <img src="/toan-nguyen.jpg" alt="Toam Nguyen, conseiller immobilier Propriétés-Privées dans l'Est lyonnais" class="apropos-photo" width="280" height="280" loading="lazy">
+      <div class="apropos-reperes">
+        <span class="apropos-repere">7 ans d'expérience</span>
+        <span class="apropos-repere">Secteur Est lyonnais</span>
+        <span class="apropos-repere">★ 4,8/5 · 37 avis</span>
+      </div>
+    </div>
+    <div class="apropos-texte">
+      <span class="section-eyebrow">Qui suis-je ?</span>
+      <h2 class="section-heading">Toam Nguyen, conseiller immobilier — Secteur Est lyonnais</h2>
+      <p>Pendant 15 ans, j'ai été comptable. Un métier sérieux, mais qui m'a fait comprendre une chose : j'avais besoin de bouger, de rencontrer des gens, d'être sur le terrain plutôt que derrière un bureau.</p>
+      <p>Le déclic est venu d'une expérience toute simple : j'ai vendu mon propre bien. Cette rencontre avec un agent immobilier m'a ouvert les yeux sur un métier que je ne connaissais pas vraiment, et qui correspondait pourtant exactement à ce que je cherchais.</p>
+      <p>Ça fait maintenant 7 ans que j'exerce ce métier avec la même énergie qu'au premier jour. J'ai eu la chance d'accompagner de nombreux clients dans la vente de leur bien, de tisser un vrai réseau sur l'Est lyonnais, et de construire une méthode qui me ressemble : claire, honnête, sans jargon inutile.</p>
+      <p class="apropos-accroche">Ce que j'aime dans ce métier, c'est transformer un projet parfois stressant en une démarche sereine et maîtrisée, du premier rendez-vous jusqu'à la signature.</p>
+      <p>Si vous avez un bien à vendre, je serais ravi d'en discuter avec vous.</p>
+      <div class="apropos-actions">
+        <a href="#contact" class="principal">Discutons de votre projet</a>
+        <a href="https://calendly.com/tt-nguyen-proprietesprivees/rendez-vous-estimation-vente-achat" target="_blank" rel="noopener" class="secondaire">📅 Prendre rendez-vous</a>
       </div>
     </div>
   </div>
