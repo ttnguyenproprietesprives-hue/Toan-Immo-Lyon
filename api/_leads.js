@@ -1,9 +1,13 @@
 // Enregistrement, notification et statistiques des leads (non exposé comme route : préfixe "_").
 // Chaque lead passe par 3 canaux indépendants : la base Upstash (tableau de bord), un email
 // de notification immédiat (Resend) et Formspree. Si l'un tombe en panne, les autres prennent le relais.
+import { randomBytes } from 'crypto';
 import { Redis } from '@upstash/redis';
 import { Resend } from 'resend';
 import { esc, clip, envoyerLead } from './_util.js';
+
+// Relances par email (uniquement si la personne l'a accepté) : nombre de jours après la demande
+export const CALENDRIER_RELANCES = [2, 10, 30, 90];
 
 const SITE = 'https://www.toanimmo-lyon.fr';
 const TROIS_ANS = 3 * 365 * 24 * 3600; // durée de conservation annoncée dans la politique de confidentialité
@@ -38,6 +42,7 @@ async function enregistrer(fiche) {
   await r.lpush('leads:ids', fiche.id);
   await r.ltrim('leads:ids', 0, 1999);
   await r.hincrby(`stats:${moisCle()}`, `lead_${fiche.type}`, 1);
+  if (fiche.relance) await r.sadd('relances:actives', fiche.id);
 }
 
 async function notifier(fiche) {
@@ -99,7 +104,19 @@ export async function traiterLead(lead) {
     source: clip(lead.source, 200),
     resume: clip(lead.resume, 300),
     details: lead.details || {},
+    // Estimation chiffrée, réutilisée dans les emails de relance
+    ...(lead.estimation ? { estimation: lead.estimation } : {}),
   };
+  // Programme de relances : seulement avec un email valide ET le consentement explicite de la personne
+  if (lead.relances && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fiche.email)) {
+    fiche.relance = {
+      active: true,
+      etape: 0,
+      prochaine: Date.now() + CALENDRIER_RELANCES[0] * 864e5,
+      jeton: randomBytes(12).toString('hex'), // sert au lien de désinscription
+    };
+    fiche.details['Relances email'] = 'acceptées';
+  }
   const canaux = { base: enregistrer(fiche), email: notifier(fiche) };
   if (lead.formspree && process.env.FORMSPREE_ID) canaux.formspree = envoyerLead(lead.formspree);
   const noms = Object.keys(canaux);

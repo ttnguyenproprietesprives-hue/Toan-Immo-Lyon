@@ -526,6 +526,11 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300)}
           <span style="font-size:12px;color:var(--gray-500);line-height:1.6">J'accepte que mes données personnelles soient utilisées par <strong style="color:var(--gray-700)">Toan Immo Lyon (NGUYEN Trung Toam)</strong> pour me recontacter dans le cadre de mon projet immobilier, conformément à la <a href="/confidentialite.html" target="_blank" style="color:var(--navy)">politique de confidentialité</a>. *</span>
         </label>
         <div id="rgpd-error" style="display:none;color:#c0392b;font-size:12px;margin-top:8px;margin-left:26px">Veuillez accepter la politique de confidentialité pour continuer.</div>
+        <!-- Consentement facultatif aux relances par email (obligatoire en France pour la prospection par email) -->
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-top:12px">
+          <input type="checkbox" id="optin-relances" style="margin-top:3px;flex-shrink:0;accent-color:var(--navy);width:16px;height:16px"/>
+          <span style="font-size:12px;color:var(--gray-500);line-height:1.6">Facultatif : j'accepte de recevoir par email des conseils pour vendre et l'évolution du marché dans ma commune (4 emails maximum sur 3 mois, désinscription en un clic). Nécessite de renseigner votre email.</span>
+        </label>
       </div>
       <div class="step-nav"><button type="button" class="step-back" onclick="allerEtape(2)">← Retour</button><button class="submit-btn" onclick="lancerEstimation()">Obtenir mon estimation gratuite →</button></div>
       <p style="font-size:12px;color:var(--gray-300);text-align:center;margin-top:10px">Sans engagement · Estimation indicative, à confirmer par un avis de valeur gratuit</p>
@@ -854,7 +859,7 @@ async function lancerEstimation(){
   const projetLabel=d.projet==='vente'?'vente':d.projet==='location'?'mise en location':'achat';
   const fmt=n=>Number(n).toLocaleString('fr-FR');
   try{
-    const res=await fetch('/api/estimate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...d,rgpd:true,source:window.TI?TI.source():''})});
+    const res=await fetch('/api/estimate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...d,rgpd:true,source:window.TI?TI.source():'',relances:document.getElementById('optin-relances').checked})});
     clearInterval(iv);
     if(!res.ok)throw new Error('Erreur '+res.status);
     const rawText=await res.text();

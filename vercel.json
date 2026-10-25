@@ -3,5 +3,8 @@
     { "source": "/lyon-8e.html", "destination": "/lyon8e.html", "permanent": true },
     { "source": "/Décines-Charpieu.html", "destination": "/decines-charpieu.html", "permanent": true },
     { "source": "/D%C3%A9cines-Charpieu.html", "destination": "/decines-charpieu.html", "permanent": true }
+  ],
+  "crons": [
+    { "path": "/api/relances", "schedule": "0 8 * * *" }
   ]
 }

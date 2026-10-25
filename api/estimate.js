@@ -249,6 +249,9 @@ export default async function handler(req, res) {
         ...(d.projet === 'achat' ? { 'Financement': d.financement, 'Budget': d.budget, 'Apport': d.apport } : {}),
       },
       formspree: lead,
+      // Relances email : uniquement pour un projet de vente, et si la case facultative a été cochée
+      relances: body.relances === true && d.projet === 'vente',
+      estimation: est ? { prix: est.prix_estime, min: est.prix_min, max: est.prix_max, m2: est.prix_m2, type_bien: d.type_bien, pieces: d.pieces, surface: d.surface } : null,
     }),
   ];
   if (est) envois.push(compter('estim_resultat').catch(() => {}));

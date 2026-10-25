@@ -186,6 +186,7 @@ function afficherStats() {
     ['Clics « Appeler »', n(m, 'clic_tel'), n(p, 'clic_tel')],
     ['Clics WhatsApp', n(m, 'clic_whatsapp'), n(p, 'clic_whatsapp')],
     ['Clics « Prendre RDV »', n(m, 'clic_rdv'), n(p, 'clic_rdv')],
+    ['Emails de relance envoyés', n(m, 'relance_envoyee'), n(p, 'relance_envoyee')],
   ];
   document.getElementById('tuiles').innerHTML = tuiles.map(([lbl, v, avant, or]) =>
     `<div class="tuile${or ? ' or' : ''}"><div class="val">${v}</div><div class="lbl">${lbl}</div><div class="cmp">Mois précédent : ${avant}</div></div>`).join('');
@@ -223,6 +224,7 @@ function afficherLeads() {
       <div>
         <div class="lead-haut"><span class="lead-nom">${esc(`${l.prenom || ''} ${l.nom || ''}`.trim() || 'Sans nom')}</span><span class="badge ${esc(l.type)}">${esc(TYPES[l.type] || l.type)}</span></div>
         <div class="lead-meta">${esc(date)}${l.commune ? ' · ' + esc(l.commune) : ''}${l.source ? ' · Provenance : ' + esc(l.source) : ''}</div>
+        ${l.relance ? `<div class="lead-meta">✉️ Relances : ${l.relance.desinscrit ? 'désinscrit(e)' : l.relance.active ? `${l.relance.etape}/4 envoyée(s), prochaine le ${new Date(l.relance.prochaine).toLocaleDateString('fr-FR')}` : `terminées (${l.relance.etape}/4)${l.relance.arret ? ' · arrêtées : ' + esc(l.relance.arret) : ''}`}</div>` : ''}
       </div>
       <select onchange="changerStatut('${esc(l.id)}', this)">${options}</select>
       ${l.resume ? `<div class="lead-resume">${esc(l.resume)}</div>` : ''}
