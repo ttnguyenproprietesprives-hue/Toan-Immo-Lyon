@@ -38,7 +38,7 @@ header{background:var(--navy-deep);position:sticky;top:0;z-index:100;border-bott
 .logo-text{font-family:'Playfair Display',serif;font-size:17px;color:var(--white);font-weight:500}
 .logo-sub{font-size:11px;color:rgba(255,255,255,0.45);margin-top:1px}
 .nav-links{display:flex;align-items:center;gap:1.5rem}
-.nav-links a{color:rgba(255,255,255,0.75);text-decoration:none;font-size:13px;transition:color 0.2s}
+.nav-links a{color:rgba(255,255,255,0.75);text-decoration:none;font-size:13px;transition:color 0.2s;white-space:nowrap}
 .nav-links a:hover{color:var(--gold)}
 .btn-rdv-nav{background:var(--gold);color:var(--navy-deep)!important;font-weight:500;padding:8px 18px;border-radius:6px;font-size:13px!important}
 .hero{background:var(--navy);padding:4rem 2rem 3rem;text-align:center;position:relative;overflow:hidden}
@@ -891,6 +891,12 @@ async function lancerEstimation(){
   const c=new URLSearchParams(location.search).get('commune');
   const s=document.getElementById('commune');
   if(c&&s&&[...s.options].some(o=>o.value===c))s.value=c;
+  // Arrivée depuis un lien « #estimation » (pages communes, posts Facebook…) : on descend au formulaire
+  // une fois la page entièrement chargée, car certains navigateurs (dont celui de Facebook) le font trop tôt.
+  if(location.hash==='#estimation'){
+    const descendre=()=>{const e=document.getElementById('estimation');if(e&&Math.abs(e.getBoundingClientRect().top)>150)window.scrollTo({top:e.getBoundingClientRect().top+window.scrollY-70,behavior:'instant'});};
+    if(document.readyState==='complete')setTimeout(descendre,100);else window.addEventListener('load',()=>setTimeout(descendre,100));
+  }
 })();
 </script>
 <script src="/site.js" defer></script>
