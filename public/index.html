@@ -896,6 +896,8 @@ async function lancerEstimation(){
   if(location.hash==='#estimation'){
     const descendre=()=>{const e=document.getElementById('estimation');if(e&&Math.abs(e.getBoundingClientRect().top)>150)window.scrollTo({top:e.getBoundingClientRect().top+window.scrollY-70,behavior:'instant'});};
     if(document.readyState==='complete')setTimeout(descendre,100);else window.addEventListener('load',()=>setTimeout(descendre,100));
+    // Second passage : le chargement des polices et des images peut encore décaler la page
+    setTimeout(descendre,1500);
   }
 })();
 </script>
