@@ -144,38 +144,68 @@ const page = (emoji, title, msg) => `<!DOCTYPE html><html lang="fr"><head><meta 
 h1{color:#1A2E4A;font-size:22px;margin:0 0 8px;} p{color:#6b7280;font-size:14px;}</style>
 </head><body><div class="box"><div style="font-size:48px;margin-bottom:16px">${emoji}</div><h1>${title}</h1><p>${msg}</p></div></body></html>`;
 
+// Page de confirmation : le lien de l'e-mail (GET) n'agit jamais directement.
+// Les scanners de liens des messageries (Gmail, Outlook Safe Links…) ouvrent les liens
+// en GET ; seul le clic sur le bouton (POST) publie ou rejette.
+const confirmPage = (token, platform, action) => {
+  const approve = action === 'approve';
+  const qs = new URLSearchParams({ token, platform, action }).toString();
+  const label = approve ? '✅ Confirmer la publication' : '❌ Confirmer le rejet';
+  const msg = approve ? `Publier le contenu ${platform} maintenant ?` : `Rejeter le contenu ${platform} ?`;
+  return page(approve ? '📤' : '🗑️', 'Confirmation', `${msg}</p>
+<form method="POST" action="/api/approve?${qs}" onsubmit="this.querySelector('button').disabled=true;this.querySelector('button').textContent='Traitement…';">
+<button type="submit" style="margin-top:16px;padding:12px 26px;background:#1A2E4A;color:#fff;border:0;border-radius:8px;font-weight:600;font-size:15px;cursor:pointer;">${label}</button>
+</form><p>`);
+};
+
+const TTL = 172800; // 48h, comme l'enregistrement de validation
+
 // ── Handler ──────────────────────────────────────────────────────────────────
 
 export default async function handler(req, res) {
   const { token, platform, action } = req.query;
 
   if (!token || !platform || !action) return res.status(400).send(page('⚠️', 'Erreur', 'Paramètres manquants.'));
+  if (action !== 'approve' && action !== 'reject') return res.status(400).send(page('⚠️', 'Erreur', 'Action inconnue.'));
+  if (!PUBLISHERS[platform]) return res.status(400).send(page('⚠️', 'Erreur', 'Plateforme inconnue.'));
 
   const record = await redis.get(`validation:${token}`);
   if (!record) return res.status(404).send(page('⚠️', 'Erreur', 'Lien expiré ou invalide (48h max).'));
 
-  if (record.status[platform] !== 'pending') return res.status(200).send(page('⚠️', 'Déjà traité', `Ce post ${platform} a déjà été traité.`));
+  const lockKey = `validation-lock:${token}:${platform}`;
+  const dejaTraite = () => res.status(200).send(page('⚠️', 'Déjà traité', `Ce post ${platform} a déjà été traité.`));
+
+  if (record.status?.[platform] !== 'pending' || await redis.get(lockKey)) return dejaTraite();
+
+  if (req.method === 'GET') return res.status(200).send(confirmPage(token, platform, action));
+  if (req.method !== 'POST') return res.status(405).send(page('⚠️', 'Erreur', 'Méthode non autorisée.'));
+
+  // Verrou atomique : une seule requête peut traiter ce post, même en cas de double clic.
+  // Le verrou n'est jamais retiré après un succès, donc aucune republication possible.
+  const acquired = await redis.set(lockKey, 'processing', { nx: true, ex: TTL });
+  if (!acquired) return dejaTraite();
+
+  const saveStatus = async (status) => {
+    // Relire l'enregistrement pour ne pas écraser le statut des autres plateformes
+    const fresh = (await redis.get(`validation:${token}`)) || record;
+    fresh.status = { ...fresh.status, [platform]: status };
+    await redis.set(`validation:${token}`, fresh, { ex: TTL });
+    await redis.set(lockKey, status, { ex: TTL });
+  };
 
   if (action === 'reject') {
-    record.status[platform] = 'rejected';
-    await redis.set(`validation:${token}`, record, { ex: 172800 });
+    await saveStatus('rejected');
     return res.status(200).send(page('❌', 'Contenu rejeté', `Le post ${platform} ne sera pas publié.`));
   }
 
-  if (action === 'approve') {
-    const publisher = PUBLISHERS[platform];
-    if (!publisher) return res.status(400).send(page('⚠️', 'Erreur', 'Plateforme inconnue.'));
-
-    try {
-      await publisher(record.content[platform], record.images[platform], record);
-      record.status[platform] = 'published';
-      await redis.set(`validation:${token}`, record, { ex: 172800 });
-      return res.status(200).send(page('✅', 'Publié avec succès', `Le contenu ${platform} a été publié.`));
-    } catch (err) {
-      console.error(`publish ${platform} error:`, err);
-      return res.status(500).send(page('⚠️', 'Erreur de publication', `${platform} : ${err.message}`));
-    }
+  try {
+    await PUBLISHERS[platform](record.content[platform], record.images[platform], record);
+  } catch (err) {
+    console.error(`publish ${platform} error:`, err);
+    await redis.del(lockKey); // échec : on autorise une nouvelle tentative
+    return res.status(500).send(page('⚠️', 'Erreur de publication', `${platform} : ${err.message}`));
   }
 
-  return res.status(400).send(page('⚠️', 'Erreur', 'Action inconnue.'));
+  await saveStatus('published');
+  return res.status(200).send(page('✅', 'Publié avec succès', `Le contenu ${platform} a été publié.`));
 }
