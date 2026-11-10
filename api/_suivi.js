@@ -650,9 +650,10 @@ export async function suiviAdmin(req, res, r) {
     case 'clients_import': {
       const existants = new Set((await tous(r, 'client', 1000)).map(c => c.email));
       const bilan = { ajoutes: 0, doublons: 0, ignores: [] };
-      const lignes = String(d.lignes || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean).slice(0, 300);
+      const lignes = String(d.lignes || '').split(/\r?\n/).filter(l => l.trim()).slice(0, 300);
       for (const [i, ligne] of lignes.entries()) {
-        const [prenom, nom, email, tel, role, commune, dateSignature] = ligne.split(/\s*[;\t]\s*/);
+        // Un séparateur = une colonne, même vide (collage depuis Excel : une case vide ne doit pas décaler les suivantes)
+        const [prenom, nom, email, tel, role, commune, dateSignature] = ligne.split(/[;\t]/).map(c => c.trim());
         const mail = clip(email, 120).toLowerCase();
         if (!emailValide(mail) || !lireDate(dateSignature)) {
           // La première ligne peut être une ligne de titres (« Prénom ; Nom ; Email… ») : on la saute sans la signaler
