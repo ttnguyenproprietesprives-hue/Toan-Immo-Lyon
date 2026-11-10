@@ -236,6 +236,8 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300)}
 </style>
 </head>
 <body>
+<!-- Anti-spam : champ invisible pour les humains, rempli par les robots -->
+<div aria-hidden="true" style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;"><label for="hp-site">Site web</label><input type="text" id="hp-site" name="site_web" tabindex="-1" autocomplete="off"></div>
 
 <header>
   <div class="header-inner">
@@ -792,8 +794,11 @@ function setProjet(p){
   document.getElementById('bloc-financement').classList.toggle('hidden',p!=='achat');
 }
 // Envoi des formulaires via /api/lead (Formspree côté serveur, variable FORMSPREE_ID sur Vercel)
+const PAGE_CHARGEE=Date.now(); // anti-spam : un robot remplit le formulaire en moins de 3 s
 async function posterLead(formulaire,champs){
   champs.source=window.TI?TI.source():''; // provenance du visiteur (Google, Facebook, accès direct…)
+  champs._hp=(document.getElementById('hp-site')||{}).value||''; // champ piège invisible
+  champs._t=Date.now()-PAGE_CHARGEE;
   try{const r=await fetch('/api/lead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({formulaire,champs})});return r.ok;}catch(e){return false;}
 }
 const ECHEC_ENVOI="L'envoi a échoué. Réessayez ou appelez-moi directement au 06 60 02 27 25.";
