@@ -10,6 +10,7 @@ import { isAdmin } from './_auth.js';
 import { esc } from './_util.js';
 import { redis, compter, CALENDRIER_RELANCES } from './_leads.js';
 import { PRIX, ANNEE_PRIX } from './_prix.js';
+import { suiviPublic, tachesQuotidiennes } from './_suivi.js';
 
 const SITE = 'https://www.toanimmo-lyon.fr';
 const CALENDLY = 'https://calendly.com/tt-nguyen-proprietesprivees/rendez-vous-estimation-vente-achat';
@@ -135,6 +136,16 @@ export default async function handler(req, res) {
   if (!r) return res.status(500).json({ error: 'Base Upstash non configurée' });
   const { desinscription, jeton, test, etape } = req.query;
 
+  // 0. Liens publics du suivi des visites (bon de visite, avis) et désinscription des messages de fidélisation
+  if (req.query.visite || req.query.desabo) {
+    try {
+      return await suiviPublic(req, res, r);
+    } catch (e) {
+      console.error('suivi public :', e);
+      return res.status(500).json({ error: 'Une erreur est survenue. Réessayez dans un instant.' });
+    }
+  }
+
   // 1. Désinscription en un clic (lien public présent dans chaque email)
   if (desinscription) {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -200,6 +211,13 @@ export default async function handler(req, res) {
       console.error('relance', id, e.message);
       bilan.erreurs++;
     }
+  }
+  // 4. Visites (rappels de la veille, demandes d'avis) et fidélisation (anniversaires de signature, vœux)
+  try {
+    bilan.suivi = await tachesQuotidiennes(r);
+  } catch (e) {
+    console.error('suivi quotidien :', e);
+    bilan.suivi = { erreur: e.message };
   }
   console.log('relances :', bilan);
   res.status(200).json(bilan);

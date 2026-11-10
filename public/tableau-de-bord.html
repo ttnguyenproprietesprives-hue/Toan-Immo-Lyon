@@ -88,6 +88,7 @@ details td{padding:3px 12px 3px 0;vertical-align:top}
     <div class="header-inner">
       <div class="logo"><div class="logo-mark">TI</div>Tableau de bord</div>
       <div class="header-actions">
+        <a class="btn-sm" href="/suivi.html">📅 Visites &amp; clients</a>
         <button class="btn-sm" onclick="charger()">↻ Actualiser</button>
         <button class="btn-sm" onclick="verrouiller()">🔒 Verrouiller</button>
       </div>
@@ -245,7 +246,7 @@ async function changerStatut(id, select) {
   // « Vente conclue » envoie un email de demande d'avis : on demande confirmation
   if (select.value === 'vendu' && ancien && !ancien.avisDemande) {
     const message = ancien.email
-      ? `Passer ce lead en « Vente conclue » enverra un email de remerciement avec une demande d'avis Google à ${ancien.email}. Continuer ?`
+      ? `Passer ce lead en « Vente conclue » enverra un email de remerciement avec une demande d'avis Google à ${ancien.email}, et l'ajoutera à vos clients à fidéliser (messages d'anniversaire de signature). Continuer ?`
       : 'Ce lead n\'a pas d\'email : aucune demande d\'avis ne sera envoyée. Pensez à lui envoyer le lien par SMS ou WhatsApp. Continuer ?';
     if (!confirm(message)) { select.value = ancien.statut; return; }
   }

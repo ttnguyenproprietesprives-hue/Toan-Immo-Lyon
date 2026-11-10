@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex, nofollow"/>
+<title>Visites & clients – Toan Immo Lyon</title>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--navy:#1A2E4A;--navy-deep:#0F1E33;--gold:#C9A84C;--gold-pale:#FBF8F0;--white:#fff;--gray-50:#F8F7F5;--gray-100:#EEECE8;--gray-300:#B8B4AC;--gray-500:#7A7670;--gray-700:#3D3B38;--success:#1D9E75;--danger:#c0392b;--radius:12px;--radius-sm:8px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--gray-700);min-height:100vh}
+#pin-screen{position:fixed;inset:0;background:var(--navy-deep);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px}
+.pin-box{background:var(--navy);border-radius:var(--radius);border:1px solid rgba(201,168,76,.2);padding:2.5rem 2rem;text-align:center;width:100%;max-width:320px}
+.pin-logo{width:52px;height:52px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:var(--navy-deep);margin:0 auto 1.25rem}
+.pin-title{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--white);margin-bottom:.4rem}
+.pin-sub{font-size:12px;color:rgba(255,255,255,.4);margin-bottom:1.5rem}
+.pin-input,.pin-btn{width:100%;padding:13px;border-radius:var(--radius-sm);font-family:inherit;font-size:15px}
+.pin-input{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--white);text-align:center;margin-bottom:10px}
+.pin-btn{background:var(--gold);border:none;color:var(--navy-deep);font-weight:500;cursor:pointer}
+.pin-error{font-size:12px;color:#e74c3c;margin-top:1rem;min-height:18px}
+#app{display:none}
+header{background:var(--navy-deep);padding:0 1.25rem;border-bottom:1px solid rgba(201,168,76,.2)}
+.header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;min-height:60px;gap:12px;flex-wrap:wrap;padding:8px 0}
+.logo{display:flex;align-items:center;gap:10px;color:var(--white);font-family:'Playfair Display',serif;font-size:16px}
+.logo-mark{width:34px;height:34px;border-radius:50%;background:var(--gold);color:var(--navy-deep);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+.header-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn-sm{font-family:inherit;font-size:12px;padding:7px 12px;border-radius:99px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.8);cursor:pointer;text-decoration:none}
+main{max-width:1100px;margin:0 auto;padding:1.25rem 1.25rem 3rem}
+.onglets{display:flex;gap:6px;margin-bottom:1.25rem;flex-wrap:wrap}
+.onglets button{font-family:inherit;font-size:14px;padding:10px 16px;border-radius:99px;border:1px solid var(--gray-100);background:var(--white);color:var(--gray-500);cursor:pointer}
+.onglets button.actif{background:var(--navy);border-color:var(--navy);color:var(--white)}
+.panneau{display:none}.panneau.actif{display:block}
+h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-500);font-weight:500;margin:1.5rem 0 .75rem}
+.aide{font-size:13px;color:var(--gray-500);line-height:1.6;margin-bottom:1rem}
+.tuiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:1rem}
+.tuile{background:var(--white);border:1px solid var(--gray-100);border-radius:var(--radius);padding:12px 14px}
+.tuile .val{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--navy);line-height:1.1}
+.tuile .lbl{font-size:12px;color:var(--gray-500);margin-top:4px}
+.boite{background:var(--white);border:1px solid var(--gray-100);border-radius:var(--radius);padding:16px;margin-bottom:10px}
+details.boite>summary{cursor:pointer;color:var(--navy);font-weight:500;font-size:15px}
+.grille{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:12px}
+.grille label{font-size:12px;color:var(--gray-500);display:block}
+.grille .large{grid-column:1/-1}
+input,select,textarea{font-family:inherit;font-size:14px;padding:9px 11px;border:1px solid var(--gray-100);border-radius:var(--radius-sm);background:var(--white);color:var(--gray-700);width:100%;margin-top:4px}
+input[type=checkbox]{width:auto;margin:0 6px 0 0}
+textarea{min-height:70px;resize:vertical;line-height:1.5}
+.btn{font-family:inherit;font-size:14px;font-weight:500;padding:10px 18px;border-radius:var(--radius-sm);border:none;background:var(--gold);color:var(--navy-deep);cursor:pointer;margin-top:12px}
+.btn:disabled{opacity:.6}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.actions button,.actions a{font-family:inherit;font-size:13px;color:var(--navy);text-decoration:none;padding:6px 12px;border-radius:99px;background:var(--gray-50);border:1px solid var(--gray-100);cursor:pointer}
+.actions .or{background:var(--gold);border-color:var(--gold);color:var(--navy-deep);font-weight:500}
+.actions .rouge{color:var(--danger)}
+.actions select{width:auto;margin:0;font-size:13px;padding:6px 8px}
+.fiche-haut{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nom{font-weight:500;color:var(--navy);font-size:15px}
+.badge{font-size:11px;padding:2px 9px;border-radius:99px;background:var(--gray-50);border:1px solid var(--gray-100);color:var(--gray-500)}
+.badge.vert{background:#EAF7F2;border-color:#bfe6d8;color:#14745a}
+.badge.or{background:var(--gold-pale);border-color:rgba(201,168,76,.4);color:#8a6d1f}
+.badge.rouge{background:#fdecea;border-color:#f5c6c0;color:var(--danger)}
+.meta{font-size:12px;color:var(--gray-500);margin-top:3px;line-height:1.5}
+.avis{background:var(--gold-pale);border-left:3px solid var(--gold);padding:10px 12px;font-size:13px;line-height:1.6;margin-top:10px}
+.boite.passee{opacity:.92}.boite.annulee{opacity:.55}
+.boite.prochaine{border-left:4px solid var(--gold)}
+.vide{background:var(--white);border:1px dashed var(--gray-300);border-radius:var(--radius);padding:24px;text-align:center;font-size:14px;color:var(--gray-500)}
+#bandeau{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--navy-deep);color:var(--white);padding:12px 18px;border-radius:var(--radius-sm);font-size:14px;max-width:92vw;display:none;z-index:99;box-shadow:0 4px 18px rgba(0,0,0,.25)}
+#bandeau.erreur{background:var(--danger)}
+</style>
+</head>
+<body>
+
+<div id="pin-screen">
+  <div class="pin-box">
+    <div class="pin-logo">TI</div>
+    <div class="pin-title">Visites & clients</div>
+    <div class="pin-sub">Suivi des visites et fidélisation · Toan Immo Lyon</div>
+    <form onsubmit="connexion(event)">
+      <input type="password" id="admin-pass" class="pin-input" placeholder="Mot de passe" autocomplete="current-password" autofocus/>
+      <button type="submit" class="pin-btn">Entrer</button>
+    </form>
+    <div class="pin-error" id="pin-error"></div>
+  </div>
+</div>
+
+<div id="app">
+  <header>
+    <div class="header-inner">
+      <div class="logo"><div class="logo-mark">TI</div>Visites & clients</div>
+      <div class="header-actions">
+        <a class="btn-sm" href="/tableau-de-bord.html">📊 Leads</a>
+        <button class="btn-sm" onclick="charger()">↻ Actualiser</button>
+        <button class="btn-sm" onclick="verrouiller()">🔒 Verrouiller</button>
+      </div>
+    </div>
+  </header>
+  <main>
+    <div class="tuiles" id="tuiles"></div>
+    <div class="onglets">
+      <button data-onglet="visites" class="actif" onclick="onglet('visites')">📅 Visites</button>
+      <button data-onglet="biens" onclick="onglet('biens')">🏠 Biens & comptes rendus</button>
+      <button data-onglet="clients" onclick="onglet('clients')">🤝 Clients à fidéliser</button>
+    </div>
+
+    <!-- ───────── Visites ───────── -->
+    <section class="panneau actif" id="p-visites">
+      <details class="boite" id="bloc-visite">
+        <summary>➕ Programmer une visite</summary>
+        <form onsubmit="creerVisite(event)">
+          <div class="grille">
+            <label class="large">Bien visité<select id="v-bien" required></select></label>
+            <label>Prénom du visiteur<input id="v-prenom" required maxlength="80"/></label>
+            <label>Nom<input id="v-nom" required maxlength="80"/></label>
+            <label>Email (pour la confirmation)<input id="v-email" type="email" maxlength="120"/></label>
+            <label>Téléphone<input id="v-tel" type="tel" maxlength="40"/></label>
+            <label>Date et heure<input id="v-quand" type="datetime-local" required/></label>
+            <label>Lieu de rendez-vous (vide = adresse du bien)<input id="v-lieu" maxlength="200"/></label>
+            <label class="large"><input type="checkbox" id="v-vendeur" checked/>Prévenir aussi le vendeur par email</label>
+          </div>
+          <button class="btn" type="submit">Enregistrer et envoyer la confirmation</button>
+        </form>
+      </details>
+      <p class="aide">Automatique : confirmation à l'enregistrement, rappel la veille au matin, puis demande d'avis le lendemain matin de la visite. Si le visiteur n'est pas venu, passez la visite en « Annulée » le jour même pour qu'il ne reçoive pas la demande d'avis.</p>
+      <div id="liste-visites"></div>
+    </section>
+
+    <!-- ───────── Biens ───────── -->
+    <section class="panneau" id="p-biens">
+      <details class="boite" id="bloc-bien">
+        <summary id="titre-bien">➕ Ajouter un bien en vente</summary>
+        <form onsubmit="enregistrerBien(event)">
+          <input type="hidden" id="b-id"/>
+          <div class="grille">
+            <label>Titre (ex. « T3 avec balcon »)<input id="b-titre" required maxlength="120"/></label>
+            <label>Adresse<input id="b-adresse" maxlength="200"/></label>
+            <label>Commune<input id="b-commune" maxlength="80"/></label>
+            <label>Prix affiché (€)<input id="b-prix" type="number" min="0" step="1000"/></label>
+            <label>N° de mandat<input id="b-mandat" maxlength="40"/></label>
+            <label>Prénom du vendeur<input id="b-vprenom" maxlength="80"/></label>
+            <label>Nom du vendeur<input id="b-vnom" maxlength="80"/></label>
+            <label>Email du vendeur<input id="b-vemail" type="email" maxlength="120"/></label>
+          </div>
+          <button class="btn" type="submit">Enregistrer le bien</button>
+        </form>
+      </details>
+      <div id="liste-biens"></div>
+    </section>
+
+    <!-- ───────── Clients ───────── -->
+    <section class="panneau" id="p-clients">
+      <details class="boite" id="bloc-client">
+        <summary id="titre-client">➕ Ajouter un ancien client</summary>
+        <form onsubmit="enregistrerClient(event)">
+          <input type="hidden" id="c-id"/>
+          <div class="grille">
+            <label>Prénom<input id="c-prenom" maxlength="80"/></label>
+            <label>Nom<input id="c-nom" maxlength="80"/></label>
+            <label>Email<input id="c-email" type="email" required maxlength="120"/></label>
+            <label>Téléphone<input id="c-tel" type="tel" maxlength="40"/></label>
+            <label>Il ou elle a…<select id="c-role"><option value="acheteur">acheté un bien</option><option value="vendeur">vendu un bien</option></select></label>
+            <label>Commune du bien<input id="c-commune" maxlength="80"/></label>
+            <label>Date de signature chez le notaire<input id="c-date" type="date" required/></label>
+            <label>Note (le bien, le contexte…)<input id="c-bien" maxlength="200"/></label>
+            <label class="large"><input type="checkbox" id="c-accord" checked/>Ce client est d'accord pour recevoir mes messages</label>
+          </div>
+          <button class="btn" type="submit">Enregistrer le client</button>
+        </form>
+      </details>
+      <details class="boite">
+        <summary>📋 Importer plusieurs anciens clients d'un coup</summary>
+        <p class="aide" style="margin-top:10px">Une ligne par client, champs séparés par un point-virgule (copier-coller depuis Excel possible) :<br/><code>Prénom ; Nom ; Email ; Téléphone ; acheteur ou vendeur ; Commune ; Date de signature (JJ/MM/AAAA)</code></p>
+        <textarea id="import" placeholder="Marie ; Dupont ; marie.dupont@exemple.fr ; 06 00 00 00 00 ; acheteur ; Bron ; 14/03/2023"></textarea>
+        <button class="btn" onclick="importerClients(this)">Importer</button>
+      </details>
+      <p class="aide">Automatique pour chaque client : un message un mois après la signature, un message à chaque anniversaire de la signature (pendant 10 ans) et les vœux début janvier. Chaque email contient un lien de désinscription. Le bouton « Prendre des nouvelles » envoie tout de suite un message de reprise de contact.</p>
+      <div id="liste-clients"></div>
+    </section>
+  </main>
+</div>
+<div id="bandeau"></div>
+
+<script>
+// Même protection que le tableau de bord : mot de passe vérifié par le serveur, envoyé dans l'en-tête x-admin-key
+let adminKey = sessionStorage.getItem('toan_admin_key') || '';
+const _fetch = window.fetch.bind(window);
+window.fetch = (url, opts = {}) => {
+  if (typeof url === 'string' && url.startsWith('/api/')) opts.headers = { ...(opts.headers || {}), 'x-admin-key': adminKey };
+  return _fetch(url, opts);
+};
+function ouvrirApp() {
+  document.getElementById('pin-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  charger();
+}
+async function connexion(e) {
+  e.preventDefault();
+  adminKey = document.getElementById('admin-pass').value;
+  const r = await fetch('/api/admin-check', { method: 'POST' }).catch(() => null);
+  if (r && r.ok) { sessionStorage.setItem('toan_admin_key', adminKey); ouvrirApp(); }
+  else { document.getElementById('pin-error').textContent = 'Mot de passe incorrect.'; document.getElementById('admin-pass').value = ''; }
+}
+function verrouiller() { sessionStorage.removeItem('toan_admin_key'); location.reload(); }
+
+const ROUTE = '/api/leads?module=suivi';
+const PRIX_PERCU = { trop_eleve: 'trop élevé', coherent: 'cohérent', attractif: 'attractif' };
+const INTENTIONS = { offre: 'souhaite faire une offre', revisite: 'souhaite une seconde visite', reflexion: 'réfléchit encore', non: 'ne donne pas suite' };
+let donnees = { biens: [], visites: [], clients: [], stats: {}, maintenant: '' };
+let brouillons = {}; // bienId → { texte, visiteIds } en cours de rédaction
+
+// Toutes les données affichées viennent de saisies : elles sont systématiquement échappées
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const $ = id => document.getElementById(id);
+const jour = d => d ? new Date(d.slice(0, 10) + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+const quandTexte = q => new Date(q).toLocaleString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+
+let minuterie;
+function bandeau(texte, erreur = false) {
+  const b = $('bandeau');
+  b.textContent = texte; b.className = erreur ? 'erreur' : ''; b.style.display = 'block';
+  clearTimeout(minuterie); minuterie = setTimeout(() => { b.style.display = 'none'; }, erreur ? 7000 : 4000);
+}
+function onglet(nom) {
+  document.querySelectorAll('.onglets button').forEach(b => b.classList.toggle('actif', b.dataset.onglet === nom));
+  document.querySelectorAll('.panneau').forEach(p => p.classList.toggle('actif', p.id === 'p-' + nom));
+}
+
+// Appel d'une action ; renvoie la réponse, ou null après avoir affiché l'erreur
+async function action(nom, data = {}, bouton) {
+  if (bouton) bouton.disabled = true;
+  try {
+    const r = await fetch(ROUTE, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: nom, ...data }) });
+    if (r.status === 401) { verrouiller(); return null; }
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'Erreur ' + r.status);
+    return d;
+  } catch (e) {
+    bandeau(e.message || 'Une erreur est survenue.', true); return null;
+  } finally { if (bouton) bouton.disabled = false; }
+}
+
+async function charger() {
+  try {
+    const r = await fetch(ROUTE);
+    if (r.status === 401) { verrouiller(); return; }
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erreur ' + r.status);
+    donnees = d;
+    afficher();
+  } catch (e) { bandeau('Impossible de charger les données : ' + e.message, true); }
+}
+
+function afficher() {
+  const s = donnees.stats, n = k => Number(s[k] || 0);
+  $('tuiles').innerHTML = [
+    ['Visites confirmées', n('visite_confirmee')], ['Bons de visite signés', n('bon_signe')], ['Avis de visiteurs', n('avis_visite')],
+    ['Comptes rendus envoyés', n('cr_envoye')], ['Messages de fidélisation', n('fidelite_envoyee')],
+  ].map(([l, v]) => `<div class="tuile"><div class="val">${v}</div><div class="lbl">${l} ce mois-ci</div></div>`).join('');
+  afficherVisites(); afficherBiens(); afficherClients();
+}
+
+// ───────── Visites ─────────
+function lienPublic(v, vue) { return `${location.origin}/visite.html?id=${v.id}&jeton=${v.jeton}&vue=${vue}`; }
+
+function afficherVisites() {
+  const actifs = donnees.biens.filter(b => !b.archive);
+  $('v-bien').innerHTML = actifs.length
+    ? '<option value="">Choisir…</option>' + actifs.map(b => `<option value="${esc(b.id)}">${esc(b.titre)}${b.commune ? ' – ' + esc(b.commune) : ''}</option>`).join('')
+    : '<option value="">Ajoutez d\'abord un bien dans l\'onglet « Biens »</option>';
+  const zone = $('liste-visites');
+  if (!donnees.visites.length) { zone.innerHTML = '<div class="vide">Aucune visite pour l\'instant. Ajoutez un bien, puis programmez votre première visite.</div>'; return; }
+  const m = donnees.maintenant;
+  const aVenir = donnees.visites.filter(v => v.quand >= m && v.statut !== 'annulee').sort((a, b) => a.quand.localeCompare(b.quand));
+  const autres = donnees.visites.filter(v => !aVenir.includes(v)).sort((a, b) => b.quand.localeCompare(a.quand));
+  zone.innerHTML = (aVenir.length ? '<h2>À venir</h2>' + aVenir.map(v => carteVisite(v, true)).join('') : '') +
+    (autres.length ? '<h2>Passées ou annulées</h2>' + autres.map(v => carteVisite(v, false)).join('') : '');
+}
+
+function carteVisite(v, aVenir) {
+  const a = v.avis, tel = String(v.visiteur.tel || '').replace(/[^\d+]/g, '');
+  const badges = [
+    v.statut === 'annulee' ? '<span class="badge rouge">Annulée</span>' : '',
+    v.bon ? '<span class="badge vert">✍️ Bon signé</span>' : (v.statut !== 'annulee' ? '<span class="badge">Bon non signé</span>' : ''),
+    a ? `<span class="badge or">⭐ ${a.note}/5</span>` : (v.avisDemandeLe ? '<span class="badge">Avis demandé</span>' : ''),
+    v.crLe ? '<span class="badge vert">Dans un compte rendu</span>' : '',
+  ].join('');
+  const suivi = [
+    v.confirmeLe ? 'confirmation envoyée' : (v.visiteur.email ? 'confirmation non partie' : 'pas d\'email : prévenez-le par SMS'),
+    v.rappelLe ? 'rappel envoyé' : '',
+    v.bon ? `bon signé par ${esc(v.bon.nom)}` : '',
+  ].filter(Boolean).join(' · ');
+  const statuts = { planifiee: '📅 Planifiée', effectuee: '✅ Effectuée', annulee: '✖️ Annulée / non venu' };
+  return `<div class="boite ${aVenir ? 'prochaine' : 'passee'} ${v.statut === 'annulee' ? 'annulee' : ''}">
+    <div class="fiche-haut"><span class="nom">${esc(v.visiteur.prenom)} ${esc(v.visiteur.nom)}</span>${badges}</div>
+    <div class="meta"><strong>${esc(quandTexte(v.quand))}</strong> · ${esc(v.bien.titre)}${v.bien.commune ? ' – ' + esc(v.bien.commune) : ''}</div>
+    <div class="meta">${suivi}</div>
+    ${a ? `<div class="avis"><strong>Avis du visiteur : ${a.note}/5</strong>${a.plus ? '<br/>👍 ' + esc(a.plus) : ''}${a.moins ? '<br/>👎 ' + esc(a.moins) : ''}${a.prix ? '<br/>Prix jugé ' + esc(PRIX_PERCU[a.prix]) : ''}${a.intention ? '<br/>Suite : ' + esc(INTENTIONS[a.intention]) : ''}${a.commentaire ? '<br/>💬 ' + esc(a.commentaire) : ''}</div>` : ''}
+    <label class="meta" style="display:block;margin-top:10px">Mes observations (reprises dans le compte rendu au vendeur)
+      <textarea onchange="majVisite('${esc(v.id)}', { notes: this.value })">${esc(v.notes || '')}</textarea></label>
+    <div class="actions">
+      ${tel ? `<a href="tel:${esc(tel)}">📞 ${esc(v.visiteur.tel)}</a>` : ''}
+      ${!v.bon && v.statut !== 'annulee' ? `<a class="or" href="${esc(lienPublic(v, 'bon'))}" target="_blank" rel="noopener">✍️ Faire signer le bon</a><button onclick="copier('${esc(v.id)}','bon')">Copier le lien du bon</button>` : ''}
+      ${!a && v.statut !== 'annulee' ? `<button onclick="copier('${esc(v.id)}','avis')">Copier le lien d'avis</button>${!aVenir && v.visiteur.email ? `<button onclick="demanderAvis('${esc(v.id)}', this)">${v.avisDemandeLe ? 'Redemander' : 'Demander'} l'avis par email</button>` : ''}` : ''}
+      <select onchange="changerStatutVisite('${esc(v.id)}', this)">${Object.entries(statuts).map(([k, t]) => `<option value="${k}"${v.statut === k ? ' selected' : ''}>${t}</option>`).join('')}</select>
+      ${aVenir && !v.bon ? `<button onclick="reporter('${esc(v.id)}')">Changer l'horaire</button>` : ''}
+      <button class="rouge" onclick="supprimerVisite('${esc(v.id)}')">Supprimer</button>
+    </div>
+  </div>`;
+}
+
+async function creerVisite(e) {
+  e.preventDefault();
+  const d = await action('visite', {
+    bienId: $('v-bien').value, prenom: $('v-prenom').value, nom: $('v-nom').value, email: $('v-email').value, tel: $('v-tel').value,
+    quand: $('v-quand').value, lieu: $('v-lieu').value, informerVendeur: $('v-vendeur').checked,
+  }, e.target.querySelector('.btn'));
+  if (!d) return;
+  const m = { 'envoyé': 'Confirmation envoyée au visiteur.', 'erreur': 'Visite enregistrée, mais l\'email de confirmation n\'est pas parti.', 'pas d\'email': 'Visite enregistrée (pas d\'email : pensez à confirmer par SMS).' }[d.emails.visiteur];
+  bandeau(m + (d.emails.vendeur === 'envoyé' ? ' Vendeur prévenu.' : ''), d.emails.visiteur === 'erreur');
+  e.target.reset(); $('bloc-visite').open = false;
+  charger();
+}
+async function majVisite(id, champs) {
+  const d = await action('visite_maj', { id, ...champs });
+  if (d) { const v = donnees.visites.find(x => x.id === id); if (v) Object.assign(v, champs); bandeau('Enregistré.'); }
+  return d;
+}
+async function changerStatutVisite(id, select) {
+  const v = donnees.visites.find(x => x.id === id);
+  let prevenir = false;
+  if (select.value === 'annulee' && v.visiteur.email && v.quand >= donnees.maintenant) {
+    prevenir = confirm(`Prévenir ${v.visiteur.prenom} par email que la visite est annulée ?\n\nOK = envoyer l'email · Annuler = ne rien envoyer`);
+  }
+  const d = await action('visite_maj', { id, statut: select.value, prevenir });
+  if (d && d.email === 'envoyé') bandeau('Email d\'annulation envoyé.');
+  charger();
+}
+async function reporter(id) {
+  const v = donnees.visites.find(x => x.id === id);
+  const saisie = prompt('Nouvelle date et heure (JJ/MM/AAAA HH:MM) :', `${v.quand.slice(8, 10)}/${v.quand.slice(5, 7)}/${v.quand.slice(0, 4)} ${v.quand.slice(11, 16)}`);
+  if (!saisie) return;
+  const m = saisie.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2})[:h](\d{2})$/);
+  if (!m) { bandeau('Format attendu : 14/11/2026 15:30', true); return; }
+  const quand = `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}T${m[4].padStart(2, '0')}:${m[5]}`;
+  const d = await action('visite_maj', { id, quand });
+  if (d) { bandeau(d.email === 'envoyé' ? 'Horaire modifié, le visiteur est prévenu par email.' : 'Horaire modifié.'); charger(); }
+}
+async function demanderAvis(id, bouton) {
+  if (await action('visite_avis_demander', { id }, bouton)) { bandeau('Demande d\'avis envoyée.'); charger(); }
+}
+async function supprimerVisite(id) {
+  if (!confirm('Supprimer définitivement cette visite (bon de visite et avis compris) ?')) return;
+  if (await action('visite_suppr', { id })) charger();
+}
+async function copier(id, vue) {
+  const lien = lienPublic(donnees.visites.find(x => x.id === id), vue);
+  try { await navigator.clipboard.writeText(lien); bandeau('Lien copié : collez-le dans un SMS ou un message WhatsApp.'); }
+  catch (e) { prompt('Copiez ce lien :', lien); }
+}
+
+// ───────── Biens et comptes rendus ─────────
+function afficherBiens() {
+  const zone = $('liste-biens');
+  if (!donnees.biens.length) { zone.innerHTML = '<div class="vide">Aucun bien enregistré. Ajoutez les biens que vous avez en vente pour suivre leurs visites.</div>'; return; }
+  const tri = [...donnees.biens].sort((a, b) => Number(a.archive) - Number(b.archive));
+  zone.innerHTML = tri.map(b => {
+    const visites = donnees.visites.filter(v => v.bien.id === b.id && v.statut !== 'annulee');
+    const passees = visites.filter(v => v.quand < donnees.maintenant);
+    const nouvelles = passees.filter(v => !v.crLe).length;
+    const notes = passees.filter(v => v.avis).map(v => v.avis.note);
+    const moyenne = notes.length ? (notes.reduce((s, x) => s + x, 0) / notes.length).toFixed(1).replace('.', ',') : null;
+    const dernier = (b.crs || [])[0];
+    const br = brouillons[b.id];
+    return `<div class="boite" style="${b.archive ? 'opacity:.55' : ''}">
+      <div class="fiche-haut"><span class="nom">${esc(b.titre)}</span>${b.archive ? '<span class="badge">Archivé</span>' : ''}${nouvelles ? `<span class="badge or">${nouvelles} visite(s) à raconter au vendeur</span>` : ''}</div>
+      <div class="meta">${esc([b.adresse, b.commune].filter(Boolean).join(', '))}${b.prix ? ' · ' + Number(b.prix).toLocaleString('fr-FR') + ' €' : ''}${b.mandat ? ' · mandat n° ' + esc(b.mandat) : ''}</div>
+      <div class="meta">Vendeur : ${esc(`${b.vendeur.prenom} ${b.vendeur.nom}`.trim() || 'non renseigné')}${b.vendeur.email ? ' · ' + esc(b.vendeur.email) : ' · <strong>pas d\'email</strong>'}</div>
+      <div class="meta">${passees.length} visite(s) effectuée(s), ${visites.length - passees.length} à venir${moyenne ? ` · note moyenne ${moyenne}/5` : ''}${dernier ? ` · dernier compte rendu le ${esc(jour(dernier.date))}` : ''}</div>
+      ${br ? `<label class="meta" style="display:block;margin-top:12px">Compte rendu à relire avant envoi${br.ia ? ' (rédigé par l\'IA à partir des avis et de vos observations)' : ''}${br.sansAvis ? ` · ⚠️ ${br.sansAvis} visite(s) sans avis du visiteur` : ''}
+          <textarea id="cr-${esc(b.id)}" style="min-height:260px" oninput="brouillons['${esc(b.id)}'].texte = this.value">${esc(br.texte)}</textarea></label>` : ''}
+      <div class="actions">
+        ${br
+          ? `<button class="or" onclick="envoyerCR('${esc(b.id)}', this)">📨 Envoyer au vendeur</button><button onclick="delete brouillons['${esc(b.id)}']; afficherBiens()">Abandonner</button>`
+          : `<button class="or" onclick="redigerCR('${esc(b.id)}', this)">📝 Rédiger le compte rendu</button>`}
+        <button onclick="modifierBien('${esc(b.id)}')">Modifier</button>
+        <button onclick="archiverBien('${esc(b.id)}')">${b.archive ? 'Remettre en vente' : 'Archiver'}</button>
+      </div>
+      ${dernier ? `<details style="margin-top:10px;font-size:13px"><summary style="cursor:pointer;color:var(--navy)">Voir le dernier compte rendu envoyé</summary><p style="white-space:pre-wrap;margin-top:8px;line-height:1.6">${esc(dernier.texte)}</p></details>` : ''}
+    </div>`;
+  }).join('');
+}
+async function enregistrerBien(e) {
+  e.preventDefault();
+  const d = await action('bien', {
+    id: $('b-id').value || undefined, titre: $('b-titre').value, adresse: $('b-adresse').value, commune: $('b-commune').value, prix: $('b-prix').value,
+    mandat: $('b-mandat').value, vendeurPrenom: $('b-vprenom').value, vendeurNom: $('b-vnom').value, vendeurEmail: $('b-vemail').value,
+  }, e.target.querySelector('.btn'));
+  if (!d) return;
+  bandeau('Bien enregistré.');
+  e.target.reset(); $('b-id').value = ''; $('titre-bien').textContent = '➕ Ajouter un bien en vente'; $('bloc-bien').open = false;
+  charger();
+}
+function modifierBien(id) {
+  const b = donnees.biens.find(x => x.id === id);
+  $('b-id').value = b.id; $('b-titre').value = b.titre; $('b-adresse').value = b.adresse; $('b-commune').value = b.commune; $('b-prix').value = b.prix || '';
+  $('b-mandat').value = b.mandat; $('b-vprenom').value = b.vendeur.prenom; $('b-vnom').value = b.vendeur.nom; $('b-vemail').value = b.vendeur.email;
+  $('titre-bien').textContent = '✏️ Modifier : ' + b.titre; $('bloc-bien').open = true; $('bloc-bien').scrollIntoView({ behavior: 'smooth' });
+}
+async function archiverBien(id) { if (await action('bien_archiver', { id })) charger(); }
+async function redigerCR(id, bouton) {
+  bouton.textContent = 'Rédaction en cours…';
+  const d = await action('cr_brouillon', { bienId: id }, bouton);
+  if (d) brouillons[id] = d;
+  afficherBiens();
+}
+async function envoyerCR(id, bouton) {
+  const b = donnees.biens.find(x => x.id === id), br = brouillons[id];
+  if (!confirm(`Envoyer ce compte rendu à ${b.vendeur.email || '(pas d\'email)'} ?`)) return;
+  if (await action('cr_envoyer', { bienId: id, texte: br.texte, visiteIds: br.visiteIds }, bouton)) {
+    delete brouillons[id]; bandeau('Compte rendu envoyé au vendeur.'); charger();
+  }
+}
+
+// ───────── Clients à fidéliser ─────────
+function afficherClients() {
+  const zone = $('liste-clients');
+  if (!donnees.clients.length) { zone.innerHTML = '<div class="vide">Aucun client pour l\'instant. Ajoutez vos anciens acheteurs et vendeurs : ils recevront vos messages automatiquement.</div>'; return; }
+  zone.innerHTML = donnees.clients.map(c => {
+    const envois = Object.entries(c.envois || {}).sort((a, b) => b[1].localeCompare(a[1]));
+    const libelle = k => k === 'j30' ? 'message à 1 mois' : k.startsWith('an') ? `anniversaire ${k.slice(2)} an(s)` : k.startsWith('voeux') ? 'vœux ' + k.slice(5) : 'prise de nouvelles';
+    const etat = c.desinscrit ? '<span class="badge rouge">Désinscrit(e)</span>' : !c.accord ? '<span class="badge">Messages désactivés</span>' : '<span class="badge vert">Messages actifs</span>';
+    return `<div class="boite">
+      <div class="fiche-haut"><span class="nom">${esc(`${c.prenom} ${c.nom}`.trim())}</span><span class="badge or">${c.role === 'vendeur' ? 'Vendeur' : 'Acheteur'}</span>${etat}</div>
+      <div class="meta">Signature le ${esc(jour(c.dateSignature))}${c.commune ? ' · ' + esc(c.commune) : ''}${c.bien ? ' · ' + esc(c.bien) : ''}</div>
+      <div class="meta">${c.prochain ? `Prochain message automatique : <strong>${esc(c.prochain.libelle)}</strong>, le ${esc(jour(c.prochain.date))}` : 'Aucun message automatique prévu'}${envois.length ? ` · Dernier envoi : ${esc(libelle(envois[0][0]))} le ${esc(jour(envois[0][1]))}` : ''}</div>
+      <div class="actions">
+        ${c.tel ? `<a href="tel:${esc(String(c.tel).replace(/[^\d+]/g, ''))}">📞 ${esc(c.tel)}</a>` : ''}
+        <a href="mailto:${esc(c.email)}">✉️ ${esc(c.email)}</a>
+        ${c.accord && !c.desinscrit ? `<button class="or" onclick="relancer('${esc(c.id)}', this)">👋 Prendre des nouvelles</button>` : ''}
+        <button onclick="modifierClient('${esc(c.id)}')">Modifier</button>
+        <button class="rouge" onclick="supprimerClient('${esc(c.id)}')">Supprimer</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+async function enregistrerClient(e) {
+  e.preventDefault();
+  const d = await action('client', {
+    id: $('c-id').value || undefined, prenom: $('c-prenom').value, nom: $('c-nom').value, email: $('c-email').value, tel: $('c-tel').value,
+    role: $('c-role').value, commune: $('c-commune').value, dateSignature: $('c-date').value, bien: $('c-bien').value, accord: $('c-accord').checked,
+  }, e.target.querySelector('.btn'));
+  if (!d) return;
+  bandeau('Client enregistré.');
+  e.target.reset(); $('c-id').value = ''; $('titre-client').textContent = '➕ Ajouter un ancien client'; $('bloc-client').open = false;
+  charger();
+}
+function modifierClient(id) {
+  const c = donnees.clients.find(x => x.id === id);
+  $('c-id').value = c.id; $('c-prenom').value = c.prenom; $('c-nom').value = c.nom; $('c-email').value = c.email; $('c-tel').value = c.tel;
+  $('c-role').value = c.role; $('c-commune').value = c.commune; $('c-date').value = c.dateSignature; $('c-bien').value = c.bien || ''; $('c-accord').checked = !!c.accord;
+  $('titre-client').textContent = '✏️ Modifier : ' + `${c.prenom} ${c.nom}`.trim(); $('bloc-client').open = true; $('bloc-client').scrollIntoView({ behavior: 'smooth' });
+}
+async function relancer(id, bouton) {
+  const c = donnees.clients.find(x => x.id === id);
+  if (!confirm(`Envoyer maintenant un message de prise de nouvelles à ${c.email} ?`)) return;
+  if (await action('client_relancer', { id }, bouton)) { bandeau('Message envoyé.'); charger(); }
+}
+async function supprimerClient(id) {
+  if (!confirm('Supprimer définitivement ce client de votre fichier ?')) return;
+  if (await action('client_suppr', { id })) charger();
+}
+async function importerClients(bouton) {
+  const d = await action('clients_import', { lignes: $('import').value }, bouton);
+  if (!d) return;
+  bandeau(`${d.ajoutes} client(s) ajouté(s)${d.doublons ? `, ${d.doublons} déjà présent(s)` : ''}${d.ignores.length ? `, ${d.ignores.length} ligne(s) ignorée(s) (email ou date invalide)` : ''}.`, !d.ajoutes);
+  if (d.ajoutes) $('import').value = '';
+  charger();
+}
+
+// Session déjà ouverte (mot de passe saisi sur cette page ou sur le tableau de bord) : on entre directement
+if (adminKey) ouvrirApp();
+</script>
+</body>
+</html>

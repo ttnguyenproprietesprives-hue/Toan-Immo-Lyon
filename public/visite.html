@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex, nofollow"/>
+<title>Votre visite – Toan Immo Lyon</title>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--navy:#1A2E4A;--navy-deep:#0F1E33;--gold:#C9A84C;--gold-pale:#FBF8F0;--white:#fff;--gray-50:#F8F7F5;--gray-100:#EEECE8;--gray-300:#B8B4AC;--gray-500:#7A7670;--gray-700:#3D3B38;--success:#1D9E75;--danger:#c0392b;--radius:12px;--radius-sm:8px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--gray-700);min-height:100vh;padding:16px}
+.carte{max-width:600px;margin:0 auto;background:var(--white);border:1px solid var(--gray-100);border-radius:var(--radius);overflow:hidden}
+.entete{background:var(--navy);padding:20px 24px}
+.entete small{color:var(--gold);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+.entete h1{font-family:'Playfair Display',serif;color:var(--white);font-size:1.4rem;font-weight:500;margin-top:6px}
+.corps{padding:22px 24px;font-size:15px;line-height:1.65}
+.corps p{margin-bottom:12px}
+.encart{background:var(--gold-pale);border-left:3px solid var(--gold);padding:12px 14px;margin-bottom:18px;font-size:14px}
+.bon p{font-size:14px}
+label{display:block;font-size:13px;color:var(--gray-500);margin:14px 0 6px}
+input[type=text],textarea,select{width:100%;font-family:inherit;font-size:15px;padding:11px 12px;border:1px solid var(--gray-100);border-radius:var(--radius-sm);background:var(--white);color:var(--gray-700)}
+textarea{min-height:70px;resize:vertical}
+.case{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--gray-700);margin-top:16px}
+.case input{margin-top:4px;width:18px;height:18px;flex-shrink:0}
+canvas{width:100%;height:150px;border:1px dashed var(--gray-300);border-radius:var(--radius-sm);background:var(--white);touch-action:none;display:block}
+.lien{background:none;border:none;color:var(--navy);font-family:inherit;font-size:12px;text-decoration:underline;cursor:pointer;margin-top:4px}
+.btn{width:100%;margin-top:20px;padding:14px;border:none;border-radius:var(--radius-sm);background:var(--gold);color:var(--navy-deep);font-family:inherit;font-size:16px;font-weight:500;cursor:pointer}
+.btn:disabled{opacity:.6;cursor:default}
+.erreur{color:var(--danger);font-size:13px;margin-top:12px;min-height:18px}
+.ok{background:#EAF7F2;border-left:3px solid var(--success);padding:14px;font-size:15px}
+.etoiles{display:flex;gap:6px}
+.etoiles button{font-size:34px;line-height:1;background:none;border:none;cursor:pointer;color:var(--gray-100);padding:2px}
+.etoiles button.on{color:var(--gold)}
+.pied{font-size:11px;color:var(--gray-300);text-align:center;max-width:600px;margin:14px auto 0;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="carte">
+  <div class="entete"><small>Toan Immo Lyon · Est lyonnais</small><h1 id="titre">Votre visite</h1></div>
+  <div class="corps" id="corps"><p>Chargement…</p></div>
+</div>
+<p class="pied">Toan Immo Lyon · NGUYEN Trung Toam · Conseiller immobilier indépendant · Réseau Propriétés-Privées · 06 60 02 27 25<br/>Vos réponses sont utilisées uniquement pour le suivi de cette visite. <a href="/mentions-legales.html" style="color:inherit">Mentions légales</a></p>
+
+<script>
+const params = new URLSearchParams(location.search);
+const API = `/api/relances?visite=${encodeURIComponent(params.get('id') || '')}&jeton=${encodeURIComponent(params.get('jeton') || '')}`;
+const vue = params.get('vue') === 'avis' ? 'avis' : 'bon';
+const corps = document.getElementById('corps');
+let visite = null, note = 0, aSigne = false;
+
+// Crée un élément avec du texte (jamais de HTML venant des données)
+function el(balise, texte, classe) {
+  const e = document.createElement(balise);
+  if (texte) e.textContent = texte;
+  if (classe) e.className = classe;
+  return e;
+}
+function message(texte, classe = '') { corps.replaceChildren(el('p', texte, classe)); }
+
+async function envoyer(donnees, bouton, zoneErreur) {
+  bouton.disabled = true; zoneErreur.textContent = '';
+  try {
+    const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(donnees) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'Une erreur est survenue. Réessayez.');
+    return d;
+  } catch (e) {
+    zoneErreur.textContent = e.message; bouton.disabled = false; return null;
+  }
+}
+
+function encart() {
+  const e = el('div', '', 'encart');
+  e.append(el('strong', visite.bien + (visite.commune ? ' · ' + visite.commune : '')), document.createElement('br'), el('span', visite.quand));
+  return e;
+}
+
+// ───── Bon de visite ─────
+function afficherBon() {
+  document.getElementById('titre').textContent = 'Bon de visite';
+  corps.replaceChildren();
+  const bon = el('div', '', 'bon');
+  visite.texteBon.forEach(p => bon.append(el('p', p)));
+  corps.append(bon);
+  if (visite.bon) {
+    corps.append(el('p', `✅ Signé électroniquement par ${visite.bon.nom} le ${visite.bon.signeLe}. Une copie a été envoyée par email.`, 'ok'));
+    return;
+  }
+  const form = document.createElement('form');
+  form.innerHTML = `
+    <label for="nom">Votre prénom et votre nom</label>
+    <input type="text" id="nom" autocomplete="name" required/>
+    <label>Votre signature (au doigt ou à la souris)</label>
+    <canvas id="signature" width="1100" height="300"></canvas>
+    <button type="button" class="lien" id="effacer">Effacer la signature</button>
+    <div class="case"><input type="checkbox" id="accepte" required/><label for="accepte" style="margin:0;font-size:14px;color:inherit">J'ai lu le bon de visite ci-dessus et je l'accepte. Ma signature électronique vaut signature manuscrite.</label></div>
+    <button type="submit" class="btn">✍️ Signer le bon de visite</button>
+    <div class="erreur" id="erreur"></div>`;
+  corps.append(form);
+  document.getElementById('nom').value = `${visite.prenom} ${visite.nom}`.trim();
+
+  const canvas = document.getElementById('signature'), ctx = canvas.getContext('2d');
+  ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#0F1E33';
+  let trace = false;
+  const point = e => { const b = canvas.getBoundingClientRect(); return [(e.clientX - b.left) * canvas.width / b.width, (e.clientY - b.top) * canvas.height / b.height]; };
+  canvas.addEventListener('pointerdown', e => { trace = true; aSigne = true; canvas.setPointerCapture(e.pointerId); ctx.beginPath(); ctx.moveTo(...point(e)); });
+  canvas.addEventListener('pointermove', e => { if (!trace) return; ctx.lineTo(...point(e)); ctx.stroke(); });
+  ['pointerup', 'pointercancel'].forEach(t => canvas.addEventListener(t, () => { trace = false; }));
+  document.getElementById('effacer').onclick = () => { ctx.clearRect(0, 0, canvas.width, canvas.height); aSigne = false; };
+
+  form.onsubmit = async e => {
+    e.preventDefault();
+    const zone = document.getElementById('erreur');
+    if (!aSigne) { zone.textContent = 'Merci de tracer votre signature dans le cadre.'; return; }
+    const d = await envoyer({ action: 'signer', nom: document.getElementById('nom').value, accepte: document.getElementById('accepte').checked, signature: canvas.toDataURL('image/png') }, form.querySelector('.btn'), zone);
+    if (d) { visite.bon = { nom: document.getElementById('nom').value, signeLe: d.signeLe }; afficherBon(); }
+  };
+}
+
+// ───── Avis après la visite ─────
+function afficherAvis() {
+  document.getElementById('titre').textContent = 'Votre avis sur la visite';
+  if (visite.avisDonne) { corps.replaceChildren(el('p', '✅ Merci, votre avis est bien enregistré. Je reviens vers vous très vite.', 'ok')); return; }
+  corps.replaceChildren(el('p', `Bonjour ${visite.prenom}, merci pour votre visite. Votre retour sincère m'aide beaucoup, même s'il est négatif.`), encart());
+  const form = document.createElement('form');
+  form.innerHTML = `
+    <label>Votre impression générale</label>
+    <div class="etoiles" id="etoiles">${[1, 2, 3, 4, 5].map(i => `<button type="button" data-n="${i}" aria-label="${i} sur 5">★</button>`).join('')}</div>
+    <label for="plus">Ce qui vous a plu</label>
+    <textarea id="plus" maxlength="600"></textarea>
+    <label for="moins">Ce qui vous a moins plu</label>
+    <textarea id="moins" maxlength="600"></textarea>
+    <label for="prix">Le prix vous semble…</label>
+    <select id="prix"><option value="">Sans avis</option><option value="trop_eleve">Trop élevé</option><option value="coherent">Cohérent</option><option value="attractif">Attractif</option></select>
+    <label for="intention">Et pour la suite ?</label>
+    <select id="intention"><option value="">Je ne sais pas encore</option><option value="offre">Je souhaite faire une offre</option><option value="revisite">J'aimerais une seconde visite</option><option value="reflexion">Je réfléchis</option><option value="non">Ce bien ne me correspond pas</option></select>
+    <label for="commentaire">Un commentaire, une question ? (facultatif)</label>
+    <textarea id="commentaire" maxlength="800"></textarea>
+    <button type="submit" class="btn">Envoyer mon avis</button>
+    <div class="erreur" id="erreur"></div>`;
+  corps.append(form);
+  const etoiles = [...form.querySelectorAll('#etoiles button')];
+  etoiles.forEach(b => b.onclick = () => { note = Number(b.dataset.n); etoiles.forEach(x => x.classList.toggle('on', Number(x.dataset.n) <= note)); });
+  form.onsubmit = async e => {
+    e.preventDefault();
+    const zone = document.getElementById('erreur');
+    if (!note) { zone.textContent = 'Choisissez une note en touchant les étoiles.'; return; }
+    const v = id => document.getElementById(id).value;
+    const d = await envoyer({ action: 'avis', note, plus: v('plus'), moins: v('moins'), prix: v('prix'), intention: v('intention'), commentaire: v('commentaire') }, form.querySelector('.btn'), zone);
+    if (d) { visite.avisDonne = true; afficherAvis(); }
+  };
+}
+
+(async () => {
+  try {
+    const r = await fetch(API);
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'Ce lien n\'est pas valide.');
+    visite = d;
+    if (d.annulee) return message('Cette visite a été annulée. Pour convenir d\'une autre date, appelez-moi au 06 60 02 27 25.');
+    vue === 'avis' ? afficherAvis() : afficherBon();
+  } catch (e) { message(e.message, 'erreur'); }
+})();
+</script>
+</body>
+</html>

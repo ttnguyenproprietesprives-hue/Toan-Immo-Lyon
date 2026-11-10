@@ -2,6 +2,7 @@ import { Resend } from 'resend';
 import { isAdmin } from './_auth.js';
 import { parseBody, esc } from './_util.js';
 import { redis, moisCle, compter } from './_leads.js';
+import { suiviAdmin, clientDepuisLead } from './_suivi.js';
 
 const STATUTS = ['nouveau', 'rappelé', 'rdv', 'mandat', 'vendu', 'perdu'];
 const LIEN_AVIS_GOOGLE = 'https://g.page/r/CWXo7roLQ-gZEAE/review';
@@ -47,6 +48,9 @@ export default async function handler(req, res) {
   if (!r) return res.status(500).json({ error: 'Base Upstash non configurée (STORAGE_URL / STORAGE_TOKEN).' });
 
   try {
+    // Suivi des visites et fidélisation (page /suivi.html) : même route, pour ne pas multiplier les fonctions Vercel
+    if (req.query.module === 'suivi') return await suiviAdmin(req, res, r);
+
     if (req.method === 'GET') {
       const ids = await r.lrange('leads:ids', 0, 299);
       const fiches = ids.length ? await r.mget(...ids.map(id => `lead:${id}`)) : [];
@@ -80,6 +84,15 @@ export default async function handler(req, res) {
         } catch (e) {
           console.error('demande d\'avis :', e.message);
           avis = 'erreur';
+        }
+      }
+      // Vente conclue : le client entre aussi dans le programme de fidélisation (anniversaires de signature, vœux…)
+      if (statut === 'vendu' && !fiche.clientId) {
+        try {
+          const clientId = await clientDepuisLead(r, fiche);
+          if (clientId) fiche.clientId = clientId;
+        } catch (e) {
+          console.error('fidélisation :', e.message);
         }
       }
       await r.set(`lead:${id}`, fiche, { keepTtl: true });
