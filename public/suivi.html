@@ -112,16 +112,16 @@ textarea{min-height:70px;resize:vertical;line-height:1.5}
             <label class="large">Bien visité<select id="v-bien" required></select></label>
             <label>Prénom du visiteur<input id="v-prenom" required maxlength="80"/></label>
             <label>Nom<input id="v-nom" required maxlength="80"/></label>
-            <label>Email (pour la confirmation)<input id="v-email" type="email" maxlength="120"/></label>
+            <label>Email<input id="v-email" type="email" maxlength="120"/></label>
             <label>Téléphone<input id="v-tel" type="tel" maxlength="40"/></label>
             <label>Date et heure<input id="v-quand" type="datetime-local" required/></label>
             <label>Lieu de rendez-vous (vide = adresse du bien)<input id="v-lieu" maxlength="200"/></label>
-            <label class="large"><input type="checkbox" id="v-vendeur" checked/>Prévenir aussi le vendeur par email</label>
+            <label class="large"><input type="checkbox" id="v-vendeur" checked/>Préparer aussi un message pour prévenir le vendeur</label>
           </div>
-          <button class="btn" type="submit">Enregistrer et envoyer la confirmation</button>
+          <button class="btn" type="submit">Enregistrer la visite</button>
         </form>
       </details>
-      <p class="aide">Automatique : confirmation à l'enregistrement, rappel la veille au matin, puis demande d'avis le lendemain matin de la visite. Si le visiteur n'est pas venu, passez la visite en « Annulée » le jour même pour qu'il ne reçoive pas la demande d'avis.</p>
+      <p class="aide">Le site n'écrit ni aux visiteurs ni aux vendeurs : il prépare les textes et vous les envoyez vous-même (email, SMS ou WhatsApp). Sous chaque visite apparaît le message du moment : confirmation à l'enregistrement, rappel la veille, demande d'avis après la visite. Copiez-le, envoyez-le, puis cliquez sur « Marquer comme envoyé ». Vous recevez un email le matin où de nouveaux messages sont à envoyer.</p>
       <div id="liste-visites"></div>
     </section>
 
@@ -162,7 +162,7 @@ textarea{min-height:70px;resize:vertical;line-height:1.5}
             <label>Commune du bien<input id="c-commune" maxlength="80"/></label>
             <label>Date de signature chez le notaire<input id="c-date" type="date" required/></label>
             <label>Note (le bien, le contexte…)<input id="c-bien" maxlength="200"/></label>
-            <label class="large"><input type="checkbox" id="c-accord" checked/>Ce client est d'accord pour recevoir mes messages</label>
+            <label class="large"><input type="checkbox" id="c-accord" checked/>Ce client est d'accord pour recevoir mes messages (décochez la case s'il vous demande d'arrêter)</label>
           </div>
           <button class="btn" type="submit">Enregistrer le client</button>
         </form>
@@ -173,7 +173,7 @@ textarea{min-height:70px;resize:vertical;line-height:1.5}
         <textarea id="import" placeholder="Marie ; Dupont ; marie.dupont@exemple.fr ; 06 00 00 00 00 ; acheteur ; Bron ; 14/03/2023"></textarea>
         <button class="btn" onclick="importerClients(this)">Importer</button>
       </details>
-      <p class="aide">Automatique pour chaque client : un message un mois après la signature, un message à chaque anniversaire de la signature (pendant 10 ans) et les vœux début janvier. Chaque email contient un lien de désinscription. Le bouton « Prendre des nouvelles » envoie tout de suite un message de reprise de contact.</p>
+      <p class="aide">Rien n'est envoyé à vos clients par le site : il prépare les textes, et vous les envoyez vous-même depuis votre messagerie professionnelle. Un message vous est proposé un mois après la signature, à chaque anniversaire de la signature (pendant 3 ans) et pour les vœux début janvier ; vous êtes prévenu par email le matin où il y en a de nouveaux. Copiez le texte, envoyez-le, puis cliquez sur « Marquer comme envoyé ». Le bouton « Prendre des nouvelles » affiche à tout moment un message de reprise de contact.</p>
       <div id="liste-clients"></div>
     </section>
   </main>
@@ -207,6 +207,8 @@ const PRIX_PERCU = { trop_eleve: 'trop élevé', coherent: 'cohérent', attracti
 const INTENTIONS = { offre: 'souhaite faire une offre', revisite: 'souhaite une seconde visite', reflexion: 'réfléchit encore', non: 'ne donne pas suite' };
 let donnees = { biens: [], visites: [], clients: [], stats: {}, maintenant: '' };
 let brouillons = {}; // bienId → { texte, visiteIds } en cours de rédaction
+let nouvellesOuvertes = {}; // clientId → true quand le message « prise de nouvelles » est affiché
+let blocs = {}; // blocs « texte à copier » affichés : identifiant → options (voir blocTexte)
 
 // Toutes les données affichées viennent de saisies : elles sont systématiquement échappées
 const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -253,9 +255,13 @@ async function charger() {
 function afficher() {
   const s = donnees.stats, n = k => Number(s[k] || 0);
   $('tuiles').innerHTML = [
-    ['Visites confirmées', n('visite_confirmee')], ['Bons de visite signés', n('bon_signe')], ['Avis de visiteurs', n('avis_visite')],
+    ['Confirmations de visite', n('visite_confirmee')], ['Bons de visite signés', n('bon_signe')], ['Avis de visiteurs', n('avis_visite')],
     ['Comptes rendus envoyés', n('cr_envoye')], ['Messages de fidélisation', n('fidelite_envoyee')],
   ].map(([l, v]) => `<div class="tuile"><div class="val">${v}</div><div class="lbl">${l} ce mois-ci</div></div>`).join('');
+  const aEnvoyer = donnees.clients.filter(c => c.aEnvoyer).length;
+  document.querySelector('[data-onglet="clients"]').textContent = '🤝 Clients à fidéliser' + (aEnvoyer ? ` (${aEnvoyer} à envoyer)` : '');
+  const messagesVisites = donnees.visites.reduce((s, v) => s + (v.messages || []).length, 0);
+  document.querySelector('[data-onglet="visites"]').textContent = '📅 Visites' + (messagesVisites ? ` (${messagesVisites} à envoyer)` : '');
   afficherVisites(); afficherBiens(); afficherClients();
 }
 
@@ -285,8 +291,9 @@ function carteVisite(v, aVenir) {
     v.crLe ? '<span class="badge vert">Dans un compte rendu</span>' : '',
   ].join('');
   const suivi = [
-    v.confirmeLe ? 'confirmation envoyée' : (v.visiteur.email ? 'confirmation non partie' : 'pas d\'email : prévenez-le par SMS'),
+    v.confirmeLe ? 'confirmation envoyée' : (v.statut === 'planifiee' ? 'confirmation à envoyer' : ''),
     v.rappelLe ? 'rappel envoyé' : '',
+    v.visiteur.email ? '' : 'pas d\'email : envoyez les messages par SMS ou WhatsApp',
     v.bon ? `bon signé par ${esc(v.bon.nom)}` : '',
   ].filter(Boolean).join(' · ');
   const statuts = { planifiee: '📅 Planifiée', effectuee: '✅ Effectuée', annulee: '✖️ Annulée / non venu' };
@@ -300,11 +307,15 @@ function carteVisite(v, aVenir) {
     <div class="actions">
       ${tel ? `<a href="tel:${esc(tel)}">📞 ${esc(v.visiteur.tel)}</a>` : ''}
       ${!v.bon && v.statut !== 'annulee' ? `<a class="or" href="${esc(lienPublic(v, 'bon'))}" target="_blank" rel="noopener">✍️ Faire signer le bon</a><button onclick="copier('${esc(v.id)}','bon')">Copier le lien du bon</button>` : ''}
-      ${!a && v.statut !== 'annulee' ? `<button onclick="copier('${esc(v.id)}','avis')">Copier le lien d'avis</button>${!aVenir && v.visiteur.email ? `<button onclick="demanderAvis('${esc(v.id)}', this)">${v.avisDemandeLe ? 'Redemander' : 'Demander'} l'avis par email</button>` : ''}` : ''}
+      ${!a && v.statut !== 'annulee' ? `<button onclick="copier('${esc(v.id)}','avis')">Copier le lien d'avis</button>` : ''}
       <select onchange="changerStatutVisite('${esc(v.id)}', this)">${Object.entries(statuts).map(([k, t]) => `<option value="${k}"${v.statut === k ? ' selected' : ''}>${t}</option>`).join('')}</select>
       ${aVenir && !v.bon ? `<button onclick="reporter('${esc(v.id)}')">Changer l'horaire</button>` : ''}
       <button class="rouge" onclick="supprimerVisite('${esc(v.id)}')">Supprimer</button>
     </div>
+    ${(v.messages || []).map(m => blocTexte(`v-${esc(v.id)}-${esc(m.cle)}`, {
+      titre: 'À envoyer : ' + m.libelle, a: m.a, sujet: m.sujet, texte: m.texte, hauteur: 200,
+      action: 'visite_envoye', data: { id: v.id, cle: m.cle },
+    })).join('')}
   </div>`;
 }
 
@@ -315,8 +326,7 @@ async function creerVisite(e) {
     quand: $('v-quand').value, lieu: $('v-lieu').value, informerVendeur: $('v-vendeur').checked,
   }, e.target.querySelector('.btn'));
   if (!d) return;
-  const m = { 'envoyé': 'Confirmation envoyée au visiteur.', 'erreur': 'Visite enregistrée, mais l\'email de confirmation n\'est pas parti.', 'pas d\'email': 'Visite enregistrée (pas d\'email : pensez à confirmer par SMS).' }[d.emails.visiteur];
-  bandeau(m + (d.emails.vendeur === 'envoyé' ? ' Vendeur prévenu.' : ''), d.emails.visiteur === 'erreur');
+  bandeau('Visite enregistrée : le message de confirmation est prêt à copier ci-dessous.');
   e.target.reset(); $('bloc-visite').open = false;
   charger();
 }
@@ -326,13 +336,7 @@ async function majVisite(id, champs) {
   return d;
 }
 async function changerStatutVisite(id, select) {
-  const v = donnees.visites.find(x => x.id === id);
-  let prevenir = false;
-  if (select.value === 'annulee' && v.visiteur.email && v.quand >= donnees.maintenant) {
-    prevenir = confirm(`Prévenir ${v.visiteur.prenom} par email que la visite est annulée ?\n\nOK = envoyer l'email · Annuler = ne rien envoyer`);
-  }
-  const d = await action('visite_maj', { id, statut: select.value, prevenir });
-  if (d && d.email === 'envoyé') bandeau('Email d\'annulation envoyé.');
+  await action('visite_maj', { id, statut: select.value });
   charger();
 }
 async function reporter(id) {
@@ -343,10 +347,7 @@ async function reporter(id) {
   if (!m) { bandeau('Format attendu : 14/11/2026 15:30', true); return; }
   const quand = `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}T${m[4].padStart(2, '0')}:${m[5]}`;
   const d = await action('visite_maj', { id, quand });
-  if (d) { bandeau(d.email === 'envoyé' ? 'Horaire modifié, le visiteur est prévenu par email.' : 'Horaire modifié.'); charger(); }
-}
-async function demanderAvis(id, bouton) {
-  if (await action('visite_avis_demander', { id }, bouton)) { bandeau('Demande d\'avis envoyée.'); charger(); }
+  if (d) { bandeau('Horaire modifié : le message « nouvel horaire » est prêt à copier.'); charger(); }
 }
 async function supprimerVisite(id) {
   if (!confirm('Supprimer définitivement cette visite (bon de visite et avis compris) ?')) return;
@@ -376,15 +377,20 @@ function afficherBiens() {
       <div class="meta">${esc([b.adresse, b.commune].filter(Boolean).join(', '))}${b.prix ? ' · ' + Number(b.prix).toLocaleString('fr-FR') + ' €' : ''}${b.mandat ? ' · mandat n° ' + esc(b.mandat) : ''}</div>
       <div class="meta">Vendeur : ${esc(`${b.vendeur.prenom} ${b.vendeur.nom}`.trim() || 'non renseigné')}${b.vendeur.email ? ' · ' + esc(b.vendeur.email) : ' · <strong>pas d\'email</strong>'}</div>
       <div class="meta">${passees.length} visite(s) effectuée(s), ${visites.length - passees.length} à venir${moyenne ? ` · note moyenne ${moyenne}/5` : ''}${dernier ? ` · dernier compte rendu le ${esc(jour(dernier.date))}` : ''}</div>
-      ${br ? `<label class="meta" style="display:block;margin-top:12px">Compte rendu à relire avant envoi${br.ia ? ' (rédigé par l\'IA à partir des avis et de vos observations)' : ''}${br.sansAvis ? ` · ⚠️ ${br.sansAvis} visite(s) sans avis du visiteur` : ''}
-          <textarea id="cr-${esc(b.id)}" style="min-height:260px" oninput="brouillons['${esc(b.id)}'].texte = this.value">${esc(br.texte)}</textarea></label>` : ''}
       <div class="actions">
         ${br
-          ? `<button class="or" onclick="envoyerCR('${esc(b.id)}', this)">📨 Envoyer au vendeur</button><button onclick="delete brouillons['${esc(b.id)}']; afficherBiens()">Abandonner</button>`
+          ? `<button onclick="delete brouillons['${esc(b.id)}']; afficherBiens()">Abandonner le compte rendu</button>`
           : `<button class="or" onclick="redigerCR('${esc(b.id)}', this)">📝 Rédiger le compte rendu</button>`}
         <button onclick="modifierBien('${esc(b.id)}')">Modifier</button>
         <button onclick="archiverBien('${esc(b.id)}')">${b.archive ? 'Remettre en vente' : 'Archiver'}</button>
       </div>
+      ${br ? blocTexte('b-' + esc(b.id), {
+        titre: `Compte rendu à relire puis à envoyer au vendeur${br.ia ? ' (rédigé par l\'IA à partir des avis et de vos observations)' : ''}${br.sansAvis ? ` · ⚠️ ${br.sansAvis} visite(s) sans avis du visiteur` : ''}`,
+        a: b.vendeur.email, sujet: br.sujet, texte: br.texte, hauteur: 300,
+        surSaisie: valeur => { br.texte = valeur; },
+        action: 'cr_envoye', data: () => ({ bienId: b.id, texte: br.texte, visiteIds: br.visiteIds }),
+        apres: () => { delete brouillons[b.id]; },
+      }) : ''}
       ${dernier ? `<details style="margin-top:10px;font-size:13px"><summary style="cursor:pointer;color:var(--navy)">Voir le dernier compte rendu envoyé</summary><p style="white-space:pre-wrap;margin-top:8px;line-height:1.6">${esc(dernier.texte)}</p></details>` : ''}
     </div>`;
   }).join('');
@@ -413,33 +419,29 @@ async function redigerCR(id, bouton) {
   if (d) brouillons[id] = d;
   afficherBiens();
 }
-async function envoyerCR(id, bouton) {
-  const b = donnees.biens.find(x => x.id === id), br = brouillons[id];
-  if (!confirm(`Envoyer ce compte rendu à ${b.vendeur.email || '(pas d\'email)'} ?`)) return;
-  if (await action('cr_envoyer', { bienId: id, texte: br.texte, visiteIds: br.visiteIds }, bouton)) {
-    delete brouillons[id]; bandeau('Compte rendu envoyé au vendeur.'); charger();
-  }
-}
 
 // ───────── Clients à fidéliser ─────────
 function afficherClients() {
   const zone = $('liste-clients');
   if (!donnees.clients.length) { zone.innerHTML = '<div class="vide">Aucun client pour l\'instant. Ajoutez vos anciens acheteurs et vendeurs : ils recevront vos messages automatiquement.</div>'; return; }
-  zone.innerHTML = donnees.clients.map(c => {
+  // Les clients qui ont un message à envoyer passent en tête de liste
+  const tri = [...donnees.clients].sort((a, b) => Number(!!b.aEnvoyer) - Number(!!a.aEnvoyer));
+  zone.innerHTML = tri.map(c => {
     const envois = Object.entries(c.envois || {}).sort((a, b) => b[1].localeCompare(a[1]));
     const libelle = k => k === 'j30' ? 'message à 1 mois' : k.startsWith('an') ? `anniversaire ${k.slice(2)} an(s)` : k.startsWith('voeux') ? 'vœux ' + k.slice(5) : 'prise de nouvelles';
-    const etat = c.desinscrit ? '<span class="badge rouge">Désinscrit(e)</span>' : !c.accord ? '<span class="badge">Messages désactivés</span>' : '<span class="badge vert">Messages actifs</span>';
+    const etat = c.desinscrit ? '<span class="badge rouge">Désinscrit(e)</span>' : !c.accord ? '<span class="badge">Ne souhaite plus de messages</span>' : c.aEnvoyer ? '<span class="badge or">✉️ Message à envoyer</span>' : '<span class="badge vert">Suivi actif</span>';
     return `<div class="boite">
       <div class="fiche-haut"><span class="nom">${esc(`${c.prenom} ${c.nom}`.trim())}</span><span class="badge or">${c.role === 'vendeur' ? 'Vendeur' : 'Acheteur'}</span>${etat}</div>
       <div class="meta">Signature le ${esc(jour(c.dateSignature))}${c.commune ? ' · ' + esc(c.commune) : ''}${c.bien ? ' · ' + esc(c.bien) : ''}</div>
-      <div class="meta">${c.prochain ? `Prochain message automatique : <strong>${esc(c.prochain.libelle)}</strong>, le ${esc(jour(c.prochain.date))}` : 'Aucun message automatique prévu'}${envois.length ? ` · Dernier envoi : ${esc(libelle(envois[0][0]))} le ${esc(jour(envois[0][1]))}` : ''}</div>
+      <div class="meta">${c.aEnvoyer ? '<strong>Un message est à envoyer (voir ci-dessous)</strong>' : c.prochain ? `Prochain message à envoyer : <strong>${esc(c.prochain.libelle)}</strong>, le ${esc(jour(c.prochain.date))}` : 'Aucun message prévu'}${envois.length ? ` · Dernier envoi : ${esc(libelle(envois[0][0]))} le ${esc(jour(envois[0][1]))}` : ''}</div>
       <div class="actions">
         ${c.tel ? `<a href="tel:${esc(String(c.tel).replace(/[^\d+]/g, ''))}">📞 ${esc(c.tel)}</a>` : ''}
         <a href="mailto:${esc(c.email)}">✉️ ${esc(c.email)}</a>
-        ${c.accord && !c.desinscrit ? `<button class="or" onclick="relancer('${esc(c.id)}', this)">👋 Prendre des nouvelles</button>` : ''}
+        ${c.nouvelles && !c.aEnvoyer ? `<button class="or" onclick="basculerNouvelles('${esc(c.id)}')">👋 Prendre des nouvelles</button>` : ''}
         <button onclick="modifierClient('${esc(c.id)}')">Modifier</button>
         <button class="rouge" onclick="supprimerClient('${esc(c.id)}')">Supprimer</button>
       </div>
+      ${messageClient(c)}
     </div>`;
   }).join('');
 }
@@ -460,10 +462,53 @@ function modifierClient(id) {
   $('c-role').value = c.role; $('c-commune').value = c.commune; $('c-date').value = c.dateSignature; $('c-bien').value = c.bien || ''; $('c-accord').checked = !!c.accord;
   $('titre-client').textContent = '✏️ Modifier : ' + `${c.prenom} ${c.nom}`.trim(); $('bloc-client').open = true; $('bloc-client').scrollIntoView({ behavior: 'smooth' });
 }
-async function relancer(id, bouton) {
-  const c = donnees.clients.find(x => x.id === id);
-  if (!confirm(`Envoyer maintenant un message de prise de nouvelles à ${c.email} ?`)) return;
-  if (await action('client_relancer', { id }, bouton)) { bandeau('Message envoyé.'); charger(); }
+// Message du client : celui arrivé à échéance, ou la prise de nouvelles si elle a été demandée
+function messageClient(c) {
+  const m = c.aEnvoyer || (nouvellesOuvertes[c.id] && c.nouvelles ? { cle: 'nouvelles', libelle: 'prise de nouvelles', ...c.nouvelles } : null);
+  if (!m) return '';
+  return blocTexte('c-' + esc(c.id), {
+    titre: (c.aEnvoyer ? 'À envoyer maintenant : ' : 'Message : ') + m.libelle, a: c.email, sujet: m.sujet, texte: m.texte, hauteur: 260,
+    action: 'client_envoye', data: { id: c.id, cle: m.cle }, apres: () => { delete nouvellesOuvertes[c.id]; },
+  });
+}
+function basculerNouvelles(id) { nouvellesOuvertes[id] = !nouvellesOuvertes[id]; afficherClients(); }
+
+// ───────── Bloc « texte à copier », commun aux visites, aux comptes rendus et aux clients ─────────
+// Le site n'envoie rien : on copie l'objet et le texte (ou on ouvre sa messagerie), puis on marque comme envoyé.
+// idc = identifiant du bloc ; o = { titre, a (adresse), sujet, texte, hauteur, action, data, surSaisie, apres }
+function blocTexte(idc, o) {
+  blocs[idc] = o;
+  return `<div class="avis">
+    <strong>✉️ ${esc(o.titre)}</strong>${o.a ? `<div class="meta">Destinataire : ${esc(o.a)}</div>` : ''}
+    <label class="meta" style="display:block;margin-top:8px">Objet<input id="obj-${idc}" value="${esc(o.sujet)}"/></label>
+    <label class="meta" style="display:block;margin-top:8px">Texte (vous pouvez le personnaliser avant de le copier)
+      <textarea id="txt-${idc}" style="min-height:${Number(o.hauteur) || 220}px" oninput="saisieBloc('${idc}', this.value)">${esc(o.texte)}</textarea></label>
+    <div class="actions">
+      <button class="or" onclick="copierChamp('txt-${idc}', 'Texte')">📋 Copier le texte</button>
+      <button onclick="copierChamp('obj-${idc}', 'Objet')">Copier l'objet</button>
+      ${o.a ? `<button onclick="copierTexte(blocs['${idc}'].a, 'Adresse')">Copier l'adresse email</button>
+      <button onclick="ouvrirMessagerie('${idc}')">Ouvrir dans ma messagerie</button>` : ''}
+      <button onclick="marquerEnvoye('${idc}', this)">✅ Marquer comme envoyé</button>
+    </div>
+  </div>`;
+}
+function saisieBloc(idc, valeur) { if (blocs[idc] && blocs[idc].surSaisie) blocs[idc].surSaisie(valeur); }
+async function copierTexte(texte, quoi) {
+  try { await navigator.clipboard.writeText(texte); bandeau(`${quoi} copié : collez-le dans votre messagerie.`); }
+  catch (e) { prompt('Copiez ce texte :', texte); }
+}
+function copierChamp(idChamp, quoi) { copierTexte($(idChamp).value, quoi); }
+// Ouvre le logiciel de messagerie par défaut de l'appareil avec le message déjà rempli
+function ouvrirMessagerie(idc) {
+  location.href = `mailto:${encodeURIComponent(blocs[idc].a).replace('%40', '@')}?subject=${encodeURIComponent($('obj-' + idc).value)}&body=${encodeURIComponent($('txt-' + idc).value)}`;
+}
+async function marquerEnvoye(idc, bouton) {
+  const o = blocs[idc];
+  const data = typeof o.data === 'function' ? o.data() : o.data;
+  if (!(await action(o.action, data, bouton))) return;
+  if (o.apres) o.apres();
+  bandeau('C\'est noté : message marqué comme envoyé.');
+  charger();
 }
 async function supprimerClient(id) {
   if (!confirm('Supprimer définitivement ce client de votre fichier ?')) return;

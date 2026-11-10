@@ -42,7 +42,7 @@ canvas{width:100%;height:150px;border:1px dashed var(--gray-300);border-radius:v
   <div class="entete"><small>Toan Immo Lyon · Est lyonnais</small><h1 id="titre">Votre visite</h1></div>
   <div class="corps" id="corps"><p>Chargement…</p></div>
 </div>
-<p class="pied">Toan Immo Lyon · NGUYEN Trung Toam · Conseiller immobilier indépendant · Réseau Propriétés-Privées · 06 60 02 27 25<br/>Vos réponses sont utilisées uniquement pour le suivi de cette visite. <a href="/mentions-legales.html" style="color:inherit">Mentions légales</a></p>
+<p class="pied">Toan Immo Lyon · NGUYEN Trung Toam · Conseiller immobilier indépendant · Réseau Propriétés-Privées · 06 60 02 27 25<br/>Vos réponses sont utilisées uniquement pour le suivi de cette visite. <a href="/confidentialite.html" style="color:inherit">Politique de confidentialité</a></p>
 
 <script>
 const params = new URLSearchParams(location.search);
@@ -86,7 +86,7 @@ function afficherBon() {
   visite.texteBon.forEach(p => bon.append(el('p', p)));
   corps.append(bon);
   if (visite.bon) {
-    corps.append(el('p', `✅ Signé électroniquement par ${visite.bon.nom} le ${visite.bon.signeLe}. Une copie a été envoyée par email.`, 'ok'));
+    corps.append(el('p', `✅ Signé électroniquement par ${visite.bon.nom} le ${visite.bon.signeLe}. Conservez le lien de cette page : il vous permet de retrouver votre bon de visite signé à tout moment.`, 'ok'));
     return;
   }
   const form = document.createElement('form');

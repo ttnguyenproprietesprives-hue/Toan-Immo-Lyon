@@ -1,5 +1,7 @@
 // Suivi des visites (confirmations, bons de visite électroniques, avis des visiteurs, comptes rendus
-// aux vendeurs) et fidélisation des anciens clients (messages automatiques, relances).
+// aux vendeurs) et fidélisation des anciens clients.
+// Principe : le site n'envoie d'emails qu'au conseiller. Tous les messages destinés aux visiteurs, vendeurs
+// et clients sont préparés sous forme de textes qu'il copie et envoie lui-même depuis sa messagerie.
 // Non exposé comme route (préfixe "_") : branché sur /api/leads (admin) et /api/relances (public + cron).
 import { randomBytes } from 'crypto';
 import { Resend } from 'resend';
@@ -12,10 +14,9 @@ const EXPEDITEUR = 'Toam Nguyen – Toan Immo Lyon <tt.nguyen@toanimmo-lyon.fr>'
 const REPONSE = 'tt-nguyen@proprietes-privees.com';
 const LIEN_AVIS_GOOGLE = 'https://g.page/r/CWXo7roLQ-gZEAE/review';
 const MENTIONS = 'Toan Immo Lyon · NGUYEN Trung Toam · Conseiller immobilier indépendant · Réseau Propriétés-Privées · SIRET 889 789 186 00018';
-const JOUR = 864e5;
 const TROIS_ANS = 3 * 365 * 24 * 3600;
 // Nombre d'anniversaires de signature fêtés avant l'arrêt automatique des messages
-export const ANNEES_SUIVI = 10;
+export const ANNEES_SUIVI = 3;
 const DUREE_CLIENT = (ANNEES_SUIVI + 1) * 365 * 24 * 3600;
 
 const ID = /^[a-z0-9]+$/;
@@ -68,22 +69,6 @@ function lireDate(v) {
   const iso = `${m[1]}-${m[2]}-${m[3]}`;
   const d = new Date(iso + 'T00:00:00Z');
   return !isNaN(d) && d.toISOString().slice(0, 10) === iso ? iso : '';
-}
-function lienAgenda(v) {
-  const [jour, heure] = v.quand.split('T');
-  const [a, m, j] = jour.split('-').map(Number);
-  const [h, mn] = heure.split(':').map(Number);
-  const f = d => d.toISOString().replace(/[-:]/g, '').slice(0, 15);
-  const debut = new Date(Date.UTC(a, m - 1, j, h, mn));
-  const p = new URLSearchParams({
-    action: 'TEMPLATE',
-    text: `Visite – ${v.bien.titre}`,
-    dates: `${f(debut)}/${f(new Date(debut.getTime() + 45 * 6e4))}`,
-    ctz: 'Europe/Paris',
-    location: v.lieu || '',
-    details: `Visite avec Toam Nguyen (Toan Immo Lyon) – ${TEL}`,
-  });
-  return 'https://calendar.google.com/calendar/render?' + p;
 }
 
 // ───────────── Base (Upstash) ─────────────
@@ -138,88 +123,67 @@ async function envoyer({ to, sujet, html, desabo, pj }) {
   if (error) throw new Error(error.message || 'Resend');
 }
 const emailAgent = () => process.env.LEAD_EMAIL || process.env.VALIDATION_EMAIL;
-const texteEnHtml = t => String(t).split(/\n{2,}/).map(p => `<p>${esc(p.trim()).replace(/\n/g, '<br/>')}</p>`).join('');
 
-// ───────────── Visites : emails ─────────────
+// ───────────── Visites : textes des messages ─────────────
+// Le site n'écrit ni aux visiteurs ni aux vendeurs : il prépare les textes, que le conseiller copie
+// (ou ouvre dans sa messagerie) pour les envoyer lui-même depuis son adresse professionnelle.
+// Les seuls emails envoyés par le site sont destinés au conseiller (bon signé, avis reçu, récapitulatif du matin).
 const lienVisite = (v, vue) => `${SITE}/visite.html?id=${v.id}&jeton=${v.jeton}&vue=${vue}`;
+const SIGNATURE = `Bien à vous,\nToam Nguyen\n${TEL}`;
+// Champ de la visite qui note qu'un message a été envoyé par le conseiller
+const CHAMPS_ENVOI = { confirmation: 'confirmeLe', rappel: 'rappelLe', avis: 'avisDemandeLe', annulation: 'annulationLe', vendeur: 'vendeurLe' };
 
-function encartVisite(v) {
-  return `<table style="border-collapse:collapse;width:100%;background:#FBF8F0;border-left:3px solid #C9A84C;margin:6px 0 18px;">
-    <tr><td style="padding:10px 14px 2px;font-size:13px;color:#7A7670;">Bien</td><td style="padding:10px 14px 2px;"><strong>${esc(v.bien.titre)}</strong>${v.bien.commune ? ' · ' + esc(v.bien.commune) : ''}</td></tr>
-    <tr><td style="padding:2px 14px;font-size:13px;color:#7A7670;">Date</td><td style="padding:2px 14px;"><strong>${esc(dateTexte(v.quand))}</strong></td></tr>
-    <tr><td style="padding:2px 14px 10px;font-size:13px;color:#7A7670;white-space:nowrap;">Rendez-vous</td><td style="padding:2px 14px 10px;">${esc(v.lieu || 'Je vous communiquerai le lieu précis par téléphone')}</td></tr>
-  </table>`;
+function resumeVisite(v) {
+  return `Bien : ${v.bien.titre}${v.bien.commune ? ' · ' + v.bien.commune : ''}\nDate : ${dateTexte(v.quand)}\nRendez-vous : ${v.lieu || 'je vous communiquerai le lieu précis par téléphone'}`;
 }
-const blocBon = v => (v.bon ? '' : `<p>Pour gagner du temps sur place, vous pouvez dès maintenant <strong>signer votre bon de visite en ligne</strong> (1 minute) :</p><div style="margin:14px 0;">${bouton(lienVisite(v, 'bon'), '✍️ Signer le bon de visite')}</div>`);
+const ligneBon = v => (v.bon ? null : `Pour gagner du temps sur place, vous pouvez dès maintenant signer votre bon de visite en ligne (1 minute) :\n${lienVisite(v, 'bon')}`);
 
-async function mailConfirmation(v, modifie = false) {
-  await envoyer({
-    to: v.visiteur.email,
-    sujet: `${modifie ? 'Nouvel horaire de' : 'Confirmation de'} votre visite – ${dateTexte(v.quand)}`,
-    html: gabarit(modifie ? 'Votre visite est déplacée' : 'Votre visite est confirmée', `
-      <p>Bonjour ${esc(v.visiteur.prenom)},</p>
-      <p>${modifie ? 'Notre rendez-vous a été déplacé. Voici le nouvel horaire :' : 'Je vous confirme notre rendez-vous pour la visite suivante :'}</p>
-      ${encartVisite(v)}
-      ${blocBon(v)}
-      <p><a href="${lienAgenda(v)}" style="color:#1A2E4A;">📅 Ajouter à mon agenda Google</a></p>
-      <p>En cas d'empêchement ou de retard, merci de me prévenir au <a href="tel:${TEL.replace(/\s/g, '')}" style="color:#1A2E4A;">${TEL}</a>.</p>`),
-  });
+// Messages à envoyer pour cette visite, selon où elle en est. b = fiche du bien (pour l'email du vendeur), facultative.
+function messagesVisite(v, b, maintenant) {
+  const a = emailValide(v.visiteur.email) ? v.visiteur.email : '';
+  const auj = maintenant.slice(0, 10), jour = v.quand.slice(0, 10), futur = v.quand >= maintenant;
+  const texte = (...paragraphes) => [`Bonjour ${v.visiteur.prenom},`, ...paragraphes.filter(Boolean), SIGNATURE].join('\n\n');
+  const empechement = `En cas d'empêchement ou de retard, merci de me prévenir au ${TEL}.`;
+  const liste = [];
+
+  if (v.statut === 'annulee') {
+    if (futur && v.confirmeLe && !v.annulationLe) {
+      liste.push({ cle: 'annulation', libelle: 'annulation de la visite', a, sujet: `Visite annulée – ${dateTexte(v.quand)}`,
+        texte: texte(`La visite prévue ${dateTexte(v.quand)} (${v.bien.titre}) est annulée.`, 'Je reste à votre disposition pour convenir d\'une autre date ou vous présenter d\'autres biens : il suffit de me répondre ou de m\'appeler.') });
+    }
+    return liste;
+  }
+  if (futur && !v.confirmeLe) {
+    liste.push({ cle: 'confirmation', libelle: v.reporte ? 'nouvel horaire de la visite' : 'confirmation du rendez-vous', a,
+      sujet: `${v.reporte ? 'Nouvel horaire de' : 'Confirmation de'} votre visite – ${dateTexte(v.quand)}`,
+      texte: texte(v.reporte ? 'Notre rendez-vous a été déplacé. Voici le nouvel horaire :' : 'Je vous confirme notre rendez-vous pour la visite suivante :', resumeVisite(v), ligneBon(v), empechement) });
+  }
+  // Rappel : la veille ou le jour même, sauf si la confirmation vient juste de partir
+  if (futur && v.confirmeLe && !v.rappelLe && jour <= decalerJour(auj, 1) && String(v.confirmeLe).slice(0, 10) < auj) {
+    const quand = jour === auj ? 'd\'aujourd\'hui' : 'de demain';
+    liste.push({ cle: 'rappel', libelle: `rappel de la visite ${quand}`, a, sujet: `Rappel : votre visite ${quand} à ${v.quand.slice(11, 16).replace(':', 'h')}`,
+      texte: texte(`Un petit rappel de notre rendez-vous ${quand} :`, resumeVisite(v), ligneBon(v), empechement) });
+  }
+  if (!futur && !v.avis && !v.avisDemandeLe && jour >= decalerJour(auj, -7)) {
+    liste.push({ cle: 'avis', libelle: 'demande d\'avis après la visite', a, sujet: 'Votre avis sur la visite : 1 minute',
+      texte: texte(`Merci d'avoir visité le bien « ${v.bien.titre} » ${dateTexte(v.quand).split(' à ')[0]}.`,
+        `Votre ressenti m'est précieux, qu'il soit positif ou non : il m'aide à mieux cibler ce que je vous propose et à faire un retour honnête au propriétaire. Cela prend une minute :\n${lienVisite(v, 'avis')}`) });
+  }
+  if (futur && v.prevenirVendeur && !v.vendeurLe && b && emailValide(b.vendeur.email)) {
+    liste.push({ cle: 'vendeur', libelle: 'information du vendeur', a: b.vendeur.email, sujet: `Une visite de votre bien est programmée – ${dateTexte(v.quand)}`,
+      texte: [`Bonjour ${b.vendeur.prenom},`, `Une visite de votre bien (${b.titre}) est programmée ${dateTexte(v.quand)}.`, 'Je vous ferai un retour après la visite, avec l\'avis du visiteur.', SIGNATURE].join('\n\n') });
+  }
+  return liste;
 }
-async function mailVendeurVisite(v, b) {
-  await envoyer({
-    to: b.vendeur.email,
-    sujet: `Une visite de votre bien est programmée – ${dateTexte(v.quand)}`,
-    html: gabarit('Une visite est programmée', `
-      <p>Bonjour ${esc(b.vendeur.prenom)},</p>
-      <p>Une visite de votre bien (${esc(b.titre)}) est programmée <strong>${esc(dateTexte(v.quand))}</strong>.</p>
-      <p>Je vous ferai un retour après la visite, avec l'avis du visiteur.</p>`),
-  });
-}
-async function mailRappel(v) {
-  await envoyer({
-    to: v.visiteur.email,
-    sujet: `Rappel : votre visite de demain à ${v.quand.slice(11, 16).replace(':', 'h')}`,
-    html: gabarit('À demain pour votre visite', `
-      <p>Bonjour ${esc(v.visiteur.prenom)},</p>
-      <p>Un petit rappel de notre rendez-vous de demain :</p>
-      ${encartVisite(v)}
-      ${blocBon(v)}
-      <p>En cas d'empêchement, merci de me prévenir au <a href="tel:${TEL.replace(/\s/g, '')}" style="color:#1A2E4A;">${TEL}</a>.</p>`),
-  });
-}
-async function mailAnnulation(v) {
-  await envoyer({
-    to: v.visiteur.email,
-    sujet: `Visite annulée – ${dateTexte(v.quand)}`,
-    html: gabarit('Votre visite est annulée', `
-      <p>Bonjour ${esc(v.visiteur.prenom)},</p>
-      <p>La visite prévue <strong>${esc(dateTexte(v.quand))}</strong> (${esc(v.bien.titre)}) est annulée.</p>
-      <p>Je reste à votre disposition pour convenir d'une autre date ou vous présenter d'autres biens : il suffit de répondre à cet email ou de m'appeler.</p>`),
-  });
-}
-async function mailDemandeAvis(v) {
-  await envoyer({
-    to: v.visiteur.email,
-    sujet: 'Votre avis sur la visite : 1 minute',
-    html: gabarit('Qu\'avez-vous pensé du bien ?', `
-      <p>Bonjour ${esc(v.visiteur.prenom)},</p>
-      <p>Merci d'avoir visité le bien « ${esc(v.bien.titre)} » ${esc(dateTexte(v.quand).split(' à ')[0])}.</p>
-      <p>Votre ressenti m'est précieux, qu'il soit positif ou non : il m'aide à mieux cibler ce que je vous propose et à faire un retour honnête au propriétaire. Cela prend une minute.</p>
-      <div style="margin:18px 0;">${bouton(lienVisite(v, 'avis'), '💬 Donner mon avis')}</div>`),
-  });
-}
-async function mailsBonSigne(v) {
+
+// Emails au conseiller
+async function mailAgentBonSigne(v) {
+  if (!emailAgent()) return;
   const corps = texteBon(v).map(p => `<p>${esc(p)}</p>`).join('') +
-    `<p style="background:#FBF8F0;border-left:3px solid #C9A84C;padding:10px 14px;font-size:13px;">Signé électroniquement par <strong>${esc(v.bon.nom)}</strong> le ${esc(dateTexte(v.bon.signeLe))} (heure de Paris).<br/>Référence : ${esc(v.id)} · Adresse IP : ${esc(v.bon.ip)}</p>`;
+    `<p style="background:#FBF8F0;border-left:3px solid #C9A84C;padding:10px 14px;font-size:13px;">Signé électroniquement par <strong>${esc(v.bon.nom)}</strong> le ${esc(dateTexte(v.bon.signeLe))} (heure de Paris).<br/>Référence : ${esc(v.id)} · Adresse IP : ${esc(v.bon.ip)}</p>
+    <p style="font-size:13px;color:#7A7670;">Pour en remettre une copie au visiteur, transférez-lui simplement cet email depuis votre messagerie.</p>`;
   const pj = v.bon.signature ? [{ filename: 'signature.png', content: v.bon.signature.split(',')[1] }] : undefined;
-  const envois = [];
-  if (emailValide(v.visiteur.email)) {
-    envois.push(envoyer({ to: v.visiteur.email, sujet: 'Votre bon de visite signé', pj, html: gabarit('Votre bon de visite', `<p>Bonjour ${esc(v.visiteur.prenom)},</p><p>Voici la copie du bon de visite que vous venez de signer.</p>${corps}`) }));
-  }
-  if (emailAgent()) {
-    envois.push(envoyer({ to: emailAgent(), sujet: `✍️ Bon de visite signé – ${v.visiteur.prenom} ${v.visiteur.nom} – ${v.bien.titre}`, pj, html: gabarit('Bon de visite signé', corps) }));
-  }
-  (await Promise.allSettled(envois)).forEach(x => { if (x.status === 'rejected') console.error('bon de visite – email :', x.reason?.message); });
+  await envoyer({ to: emailAgent(), sujet: `✍️ Bon de visite signé – ${v.visiteur.prenom} ${v.visiteur.nom} – ${v.bien.titre}`, pj, html: gabarit('Bon de visite signé', corps) });
 }
 async function mailAgentAvis(v) {
   if (!emailAgent()) return;
@@ -295,40 +259,58 @@ Consignes : français, vouvoiement, ton professionnel, chaleureux et honnête. C
   }
 }
 
-// ───────────── Fidélisation : contenu des messages ─────────────
-const lienDesabo = c => `${SITE}/api/relances?desabo=${c.id}&jeton=${c.jeton}`;
-
+// ───────────── Fidélisation : textes des messages ─────────────
+// Ces messages ne sont PAS envoyés par le site : ils sont proposés dans la page de suivi, où le conseiller
+// les copie (ou les ouvre dans sa messagerie) pour les envoyer lui-même depuis son adresse professionnelle.
+function libelleEcheance(cle) {
+  if (cle === 'j30') return 'un mois après la signature';
+  if (cle.startsWith('voeux')) return `vœux ${cle.slice(5)}`;
+  if (cle.startsWith('an')) return `anniversaire de signature (${cle.slice(2)} an${Number(cle.slice(2)) > 1 ? 's' : ''})`;
+  return 'prise de nouvelles';
+}
 function messageFidelite(c, cle) {
-  const p = esc(c.prenom);
   const achat = c.role !== 'vendeur';
-  const ville = c.commune ? ` à ${esc(c.commune.split(' (')[0])}` : '';
-  const reco = '<p>Et si un proche a un projet de vente ou d\'achat dans l\'Est lyonnais, n\'hésitez pas à lui transmettre mes coordonnées : je l\'accompagnerai avec le même soin.</p>';
-  const estimation = `<p>Si vous êtes curieux de connaître la valeur actuelle de votre bien, je vous offre une <strong>estimation actualisée, gratuite et sans engagement</strong> : il suffit de répondre à cet email.</p>`;
+  const ville = c.commune ? ` à ${c.commune.split(' (')[0]}` : '';
+  const reco = 'Et si un proche a un projet de vente ou d\'achat dans l\'Est lyonnais, n\'hésitez pas à lui transmettre mes coordonnées : je l\'accompagnerai avec le même soin.';
+  const estimation = 'Si vous êtes curieux de connaître la valeur actuelle de votre bien, je vous offre une estimation actualisée, gratuite et sans engagement : il suffit de répondre à ce message.';
+  let sujet, corps;
   if (cle === 'j30') {
-    return achat
-      ? { sujet: 'Bien installé(e) dans votre nouveau logement ?', titre: 'Déjà un mois !', corps: `<p>Bonjour ${p},</p><p>Cela fait un mois que vous avez signé pour votre logement${ville}. J'espère que l'installation se passe bien et que vous commencez à vous sentir chez vous.</p><p>Si une question se pose (travaux, artisans, démarches, copropriété), je reste disponible : mon accompagnement ne s'arrête pas à la signature.</p>${reco}` }
-      : { sujet: 'Un mois après la vente : tout s\'est bien passé ?', titre: 'Un mois après votre vente', corps: `<p>Bonjour ${p},</p><p>Cela fait un mois que la vente de votre bien${ville} est signée. J'espère que tout s'est bien déroulé depuis et que votre nouveau projet avance comme vous le souhaitez.</p><p>Si une question se pose, ou si vous avez un nouveau projet immobilier, je reste à votre écoute.</p>${reco}` };
-  }
-  if (cle.startsWith('voeux')) {
-    return { sujet: `Très belle année ${cle.slice(5)} !`, titre: `Belle année ${cle.slice(5)}`, corps: `<p>Bonjour ${p},</p><p>Je vous souhaite, ainsi qu'à vos proches, une très belle année ${cle.slice(5)} : qu'elle vous apporte santé, sérénité et de beaux projets.</p><p>Merci encore pour votre confiance. Je reste à votre disposition pour toute question immobilière, même par simple curiosité.</p>${reco}` };
-  }
-  if (cle.startsWith('an')) {
+    if (achat) {
+      sujet = 'Bien installé(e) dans votre nouveau logement ?';
+      corps = [`Cela fait un mois que vous avez signé pour votre logement${ville}. J'espère que l'installation se passe bien et que vous commencez à vous sentir chez vous.`,
+        'Si une question se pose (travaux, artisans, démarches, copropriété), je reste disponible : mon accompagnement ne s\'arrête pas à la signature.', reco];
+    } else {
+      sujet = 'Un mois après la vente : tout s\'est bien passé ?';
+      corps = [`Cela fait un mois que la vente de votre bien${ville} est signée. J'espère que tout s'est bien déroulé depuis et que votre nouveau projet avance comme vous le souhaitez.`,
+        'Si une question se pose, ou si vous avez un nouveau projet immobilier, je reste à votre écoute.', reco];
+    }
+  } else if (cle.startsWith('voeux')) {
+    const annee = cle.slice(5);
+    sujet = `Très belle année ${annee} !`;
+    corps = [`Je vous souhaite, ainsi qu'à vos proches, une très belle année ${annee} : qu'elle vous apporte santé, sérénité et de beaux projets.`,
+      'Merci encore pour votre confiance. Je reste à votre disposition pour toute question immobilière, même par simple curiosité.', reco];
+  } else if (cle.startsWith('an')) {
     const k = Number(cle.slice(2));
     const duree = k === 1 ? 'un an' : `${k} ans`;
-    return achat
-      ? { sujet: `Déjà ${duree} dans votre logement !`, titre: `${k === 1 ? 'Un an' : k + ' ans'} déjà`, corps: `<p>Bonjour ${p},</p><p>Il y a ${duree}, vous signiez l'achat de votre logement${ville}. Le temps passe vite ! J'espère que vous vous y plaisez toujours autant.</p><p>Le marché a évolué depuis votre achat.</p>${estimation}${reco}` }
-      : { sujet: `${k === 1 ? 'Un an' : k + ' ans'} déjà depuis votre vente`, titre: `${k === 1 ? 'Un an' : k + ' ans'} déjà`, corps: `<p>Bonjour ${p},</p><p>Il y a ${duree}, nous signions ensemble la vente de votre bien${ville}. Je garde un très bon souvenir de ce projet, et j'espère que tout va bien pour vous depuis.</p><p>Si un nouveau projet se dessine (achat, investissement, vente d'un autre bien), je serai ravi de vous accompagner à nouveau.</p>${reco}` };
+    if (achat) {
+      sujet = `Déjà ${duree} dans votre logement !`;
+      corps = [`Il y a ${duree}, vous signiez l'achat de votre logement${ville}. Le temps passe vite ! J'espère que vous vous y plaisez toujours autant.`,
+        'Le marché a évolué depuis votre achat. ' + estimation, reco];
+    } else {
+      sujet = `${k === 1 ? 'Un an' : k + ' ans'} déjà depuis votre vente`;
+      corps = [`Il y a ${duree}, nous signions ensemble la vente de votre bien${ville}. Je garde un très bon souvenir de ce projet, et j'espère que tout va bien pour vous depuis.`,
+        'Si un nouveau projet se dessine (achat, investissement, vente d\'un autre bien), je serai ravi de vous accompagner à nouveau.', reco];
+    }
+  } else {
+    // « nouvelles » : reprise de contact à l'initiative du conseiller
+    sujet = 'Quelques nouvelles de votre conseiller immobilier';
+    corps = [`Cela fait un moment que nous ne nous sommes pas parlé, et je voulais simplement prendre de vos nouvelles. J'espère que tout va bien pour vous${achat && ville ? ` et que vous vous plaisez toujours${ville}` : ''}.`,
+      'Le marché immobilier de l\'Est lyonnais a beaucoup bougé ces derniers temps. ' + estimation, reco,
+      `Si mon accompagnement vous a satisfait et que vous ne l'avez pas encore fait, un avis Google m'aiderait beaucoup : ${LIEN_AVIS_GOOGLE}`];
   }
-  // « nouvelles » : relance manuelle d'un ancien client
-  return { sujet: 'Quelques nouvelles de votre conseiller immobilier', titre: 'Je prends de vos nouvelles', corps: `<p>Bonjour ${p},</p><p>Cela fait un moment que nous ne nous sommes pas parlé, et je voulais simplement prendre de vos nouvelles. J'espère que tout va bien pour vous${achat && ville ? ` et que vous vous plaisez toujours${ville}` : ''}.</p><p>Le marché immobilier de l'Est lyonnais a beaucoup bougé ces derniers temps.</p>${estimation}${reco}<p>Si mon accompagnement vous a satisfait et que vous ne l'avez pas encore fait, <a href="${LIEN_AVIS_GOOGLE}" style="color:#1A2E4A;">un avis Google</a> m'aiderait beaucoup.</p>` };
-}
-async function envoyerFidelite(c, cle) {
-  const { sujet, titre, corps } = messageFidelite(c, cle);
-  const desabo = lienDesabo(c);
-  await envoyer({
-    to: c.email, sujet, desabo,
-    html: gabarit(titre, corps, `Vous recevez cet email car vous avez été accompagné(e) par Toan Immo Lyon dans un projet immobilier. <a href="${desabo}" style="color:#7A7670;">Ne plus recevoir ces messages</a>.<br/>`),
-  });
+  const texte = [`Bonjour ${c.prenom || ''}`.trim() + ',', ...corps, `Bien à vous,\nToam Nguyen\n${TEL}`,
+    'PS : si vous préférez ne plus recevoir ces petits messages, dites-le-moi simplement en réponse.'].join('\n\n');
+  return { sujet, texte };
 }
 const clientActif = c => c.accord && !c.desinscrit && emailValide(c.email) && !!c.dateSignature;
 
@@ -393,42 +375,48 @@ export async function clientDepuisLead(r, lead) {
 }
 
 // ───────────── Tâches quotidiennes (appelées par le cron de /api/relances) ─────────────
+// Le site n'écrit qu'au conseiller : chaque matin, un seul email récapitule les nouveaux messages qu'il a
+// à envoyer lui-même (rappels de visite, demandes d'avis, fidélisation). Chaque message n'est signalé qu'une fois.
 export async function tachesQuotidiennes(r) {
   const bilan = { rappels: 0, demandesAvis: 0, fidelite: 0, erreurs: 0 };
-  const maintenant = maintenantParis();
-  const auj = maintenant.slice(0, 10), demain = decalerJour(auj, 1), ilYA7Jours = decalerJour(auj, -7);
+  const maintenant = maintenantParis(), auj = maintenant.slice(0, 10);
+  const aSignaler = [];
 
   for (const v of await tous(r, 'visite', 300)) {
-    if (v.statut === 'annulee' || !emailValide(v.visiteur.email)) continue;
-    try {
-      const jour = v.quand.slice(0, 10);
-      if (v.statut === 'planifiee' && !v.rappelLe && jour === demain) {
-        await mailRappel(v);
-        v.rappelLe = new Date().toISOString();
-        await sauver(r, 'visite', v);
-        bilan.rappels++;
-      } else if (v.quand < maintenant && jour >= ilYA7Jours && !v.avisDemandeLe && !v.avis) {
-        await mailDemandeAvis(v);
-        v.avisDemandeLe = new Date().toISOString();
-        if (v.statut === 'planifiee') v.statut = 'effectuee';
-        await sauver(r, 'visite', v);
-        bilan.demandesAvis++;
-      }
-    } catch (e) { console.error('visite', v.id, e.message); bilan.erreurs++; }
+    for (const m of messagesVisite(v, null, maintenant)) {
+      if (!['rappel', 'avis'].includes(m.cle) || (v.signales || {})[m.cle]) continue;
+      aSignaler.push({
+        type: m.cle === 'rappel' ? 'rappels' : 'demandesAvis',
+        ligne: `<strong>${esc(`${v.visiteur.prenom} ${v.visiteur.nom}`.trim())}</strong> – ${esc(m.libelle)} (${esc(v.bien.titre)})`,
+        noter: () => { v.signales = { ...(v.signales || {}), [m.cle]: auj }; return sauver(r, 'visite', v); },
+      });
+    }
   }
-
   for (const c of await tous(r, 'client', 1000)) {
     if (!clientActif(c)) continue;
     const cle = echeanceFidelite(c, auj);
-    if (!cle) continue;
-    try {
-      await envoyerFidelite(c, cle);
-      c.envois = { ...(c.envois || {}), [cle]: auj };
-      await sauver(r, 'client', c);
-      await compter('fidelite_envoyee');
-      bilan.fidelite++;
-    } catch (e) { console.error('fidélité', c.id, e.message); bilan.erreurs++; }
+    if (!cle || (c.rappels || {})[cle]) continue;
+    aSignaler.push({
+      type: 'fidelite',
+      ligne: `<strong>${esc(`${c.prenom} ${c.nom}`.trim())}</strong> – ${esc(libelleEcheance(cle))}`,
+      noter: () => { c.rappels = { ...(c.rappels || {}), [cle]: auj }; return sauver(r, 'client', c); },
+    });
   }
+
+  if (!aSignaler.length) return bilan;
+  try {
+    if (!emailAgent()) throw new Error('adresse du conseiller non configurée (LEAD_EMAIL)');
+    await envoyer({
+      to: emailAgent(),
+      sujet: `✉️ ${aSignaler.length} message${aSignaler.length > 1 ? 's' : ''} à envoyer aujourd'hui`,
+      html: gabarit('Vos messages à envoyer', `
+        <p>C'est le bon moment pour écrire à :</p>
+        <ul style="margin:0 0 16px 20px;padding:0;">${aSignaler.map(x => `<li>${x.ligne}</li>`).join('')}</ul>
+        <p>Les textes sont prêts dans la page de suivi : il reste à les copier dans votre messagerie, puis à les marquer comme envoyés.</p>
+        <div style="margin:14px 0;">${bouton(SITE + '/suivi.html', 'Ouvrir les messages à envoyer')}</div>`),
+    });
+    for (const x of aSignaler) { await x.noter(); bilan[x.type]++; }
+  } catch (e) { console.error('récapitulatif du matin :', e.message); bilan.erreurs++; }
   return bilan;
 }
 
@@ -484,7 +472,7 @@ export async function suiviPublic(req, res, r) {
     };
     await sauver(r, 'visite', v);
     await compter('bon_signe');
-    await mailsBonSigne(v);
+    await mailAgentBonSigne(v).catch(e => console.error('bon de visite – email :', e.message));
     return res.status(200).json({ ok: true, signeLe: dateTexte(v.bon.signeLe) });
   }
 
@@ -518,8 +506,23 @@ export async function suiviAdmin(req, res, r) {
     return res.status(200).json({
       biens,
       // La signature dessinée et le texte figé restent en base : inutile de les renvoyer à chaque chargement
-      visites: visites.map(v => (v.bon ? { ...v, bon: { nom: v.bon.nom, signeLe: v.bon.signeLe } } : v)),
-      clients: clients.map(c => ({ ...c, prochain: prochainMessage(c, auj) })),
+      visites: visites.map(v => ({
+        ...v,
+        ...(v.bon ? { bon: { nom: v.bon.nom, signeLe: v.bon.signeLe } } : {}),
+        // Textes prêts à copier (confirmation, rappel, demande d'avis…) selon l'avancement de la visite
+        messages: messagesVisite(v, biens.find(b => b.id === v.bien.id), maintenantParis()),
+      })),
+      clients: clients.map(c => {
+        const actif = clientActif(c);
+        const cle = actif ? echeanceFidelite(c, auj) : null;
+        return {
+          ...c,
+          prochain: prochainMessage(c, auj),
+          // Textes prêts à copier : le message arrivé à échéance (s'il y en a un) et la prise de nouvelles
+          aEnvoyer: cle ? { cle, libelle: libelleEcheance(cle), ...messageFidelite(c, cle) } : null,
+          nouvelles: actif ? messageFidelite(c, 'nouvelles') : null,
+        };
+      }),
       stats: stats || {}, maintenant: maintenantParis(),
     });
   }
@@ -559,54 +562,44 @@ export async function suiviAdmin(req, res, r) {
       const visiteur = { prenom: clip(d.prenom, 80), nom: clip(d.nom, 80), tel: clip(d.tel, 40), email: clip(d.email, 120).toLowerCase() };
       if (!visiteur.prenom || !visiteur.nom) return refus(400, 'Indiquez le prénom et le nom du visiteur.');
       if (visiteur.email && !emailValide(visiteur.email)) return refus(400, 'L\'email du visiteur n\'est pas valide.');
-      const v = {
+      // Aucun email ne part : les messages (confirmation, information du vendeur) sont proposés dans la page de suivi
+      await creer(r, 'visite', {
         id: nouvelId(), jeton: nouveauJeton(), date: new Date().toISOString(), statut: 'planifiee',
         bien: { id: b.id, titre: b.titre, adresse: b.adresse, commune: b.commune, prix: b.prix, mandat: b.mandat },
         visiteur, quand, lieu: clip(d.lieu, 200) || [b.adresse, b.commune].filter(Boolean).join(', '), notes: '',
-      };
-      const emails = { visiteur: 'pas d\'email', vendeur: null };
-      if (visiteur.email) {
-        try { await mailConfirmation(v); v.confirmeLe = new Date().toISOString(); emails.visiteur = 'envoyé'; await compter('visite_confirmee'); }
-        catch (e) { console.error('confirmation de visite :', e.message); emails.visiteur = 'erreur'; }
-      }
-      if (d.informerVendeur && emailValide(b.vendeur.email)) {
-        try { await mailVendeurVisite(v, b); emails.vendeur = 'envoyé'; }
-        catch (e) { console.error('information du vendeur :', e.message); emails.vendeur = 'erreur'; }
-      }
-      await creer(r, 'visite', v, TROIS_ANS);
-      return res.status(200).json({ ok: true, emails });
+        prevenirVendeur: !!d.informerVendeur,
+      }, TROIS_ANS);
+      return res.status(200).json({ ok: true });
     }
     case 'visite_maj': {
       const v = await lire(r, 'visite', d.id);
       if (!v) return refus(404, 'Visite introuvable');
-      let email = null;
       if (typeof d.notes === 'string') v.notes = clip(d.notes, 1000);
       if (d.quand && d.quand !== v.quand) {
         const quand = String(d.quand).slice(0, 16);
         if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(quand) || !lireDate(quand.slice(0, 10))) return refus(400, 'Date invalide.');
         if (v.bon) return refus(409, 'Le bon de visite est déjà signé pour cette date : créez plutôt une nouvelle visite.');
-        v.quand = quand; v.statut = 'planifiee'; delete v.rappelLe; delete v.avisDemandeLe;
-        if (emailValide(v.visiteur.email)) {
-          try { await mailConfirmation(v, true); email = 'envoyé'; } catch (e) { console.error('report de visite :', e.message); email = 'erreur'; }
-        }
+        // Nouvel horaire : les messages (confirmation, vendeur, rappel) sont de nouveau à envoyer
+        v.reporte = !!v.confirmeLe || !!v.reporte;
+        v.quand = quand; v.statut = 'planifiee';
+        for (const champ of ['confirmeLe', 'rappelLe', 'avisDemandeLe', 'vendeurLe', 'signales']) delete v[champ];
       }
       if (d.statut && d.statut !== v.statut) {
         if (!['planifiee', 'effectuee', 'annulee'].includes(d.statut)) return refus(400, 'Statut invalide');
         v.statut = d.statut;
-        if (d.statut === 'annulee' && d.prevenir && emailValide(v.visiteur.email)) {
-          try { await mailAnnulation(v); email = 'envoyé'; } catch (e) { console.error('annulation de visite :', e.message); email = 'erreur'; }
-        }
       }
       await sauver(r, 'visite', v);
-      return res.status(200).json({ ok: true, email });
+      return res.status(200).json({ ok: true });
     }
-    case 'visite_avis_demander': {
+    // Le conseiller a envoyé lui-même le message depuis sa messagerie : on le note pour ne plus le proposer
+    case 'visite_envoye': {
       const v = await lire(r, 'visite', d.id);
       if (!v) return refus(404, 'Visite introuvable');
-      if (!emailValide(v.visiteur.email)) return refus(400, 'Ce visiteur n\'a pas d\'email : envoyez-lui le lien par SMS.');
-      await mailDemandeAvis(v);
-      v.avisDemandeLe = new Date().toISOString();
-      if (v.statut === 'planifiee') v.statut = 'effectuee';
+      const champ = CHAMPS_ENVOI[d.cle];
+      if (!champ) return refus(400, 'Message inconnu');
+      if (!v[champ] && d.cle === 'confirmation') await compter('visite_confirmee');
+      v[champ] = maintenantParis();
+      if (d.cle === 'avis' && v.statut === 'planifiee') v.statut = 'effectuee';
       await sauver(r, 'visite', v);
       return res.status(200).json({ ok: true });
     }
@@ -621,15 +614,18 @@ export async function suiviAdmin(req, res, r) {
       const visites = visitesDuCompteRendu(await tous(r, 'visite', 300), b.id);
       if (!visites.length) return refus(400, 'Aucune visite passée pour ce bien : rien à raconter pour l\'instant.');
       const { texte, ia } = await brouillonCompteRendu(b, visites);
-      return res.status(200).json({ texte, ia, visiteIds: visites.map(v => v.id), sansAvis: visites.filter(v => !v.avis).length });
+      return res.status(200).json({
+        texte: `${texte}\n\n${SIGNATURE}`, ia,
+        sujet: `Compte rendu des visites de votre bien – ${b.titre}`,
+        visiteIds: visites.map(v => v.id), sansAvis: visites.filter(v => !v.avis).length,
+      });
     }
-    case 'cr_envoyer': {
+    case 'cr_envoye': {
       const b = await lire(r, 'bien', d.bienId);
       if (!b) return refus(404, 'Bien introuvable');
       const texte = clip(d.texte, 6000);
       if (texte.length < 40) return refus(400, 'Le compte rendu est vide.');
-      if (!emailValide(b.vendeur.email)) return refus(400, 'Ce bien n\'a pas d\'email vendeur : complétez la fiche du bien.');
-      await envoyer({ to: b.vendeur.email, sujet: `Compte rendu des visites de votre bien – ${b.titre}`, html: gabarit('Compte rendu de visites', texteEnHtml(texte)) });
+      // Le compte rendu a été envoyé par le conseiller depuis sa messagerie : on en garde la trace
       const date = new Date().toISOString();
       b.crs = [{ date, texte }, ...(b.crs || [])].slice(0, 10);
       await sauver(r, 'bien', b);
@@ -670,12 +666,15 @@ export async function suiviAdmin(req, res, r) {
       }
       return res.status(200).json({ ok: true, ...bilan });
     }
-    case 'client_relancer': {
+    // Le conseiller a envoyé lui-même le message depuis sa messagerie : on le note pour ne plus le proposer
+    case 'client_envoye': {
       const c = await lire(r, 'client', d.id);
       if (!c) return refus(404, 'Client introuvable');
-      if (!clientActif(c)) return refus(400, 'Ce client ne peut pas recevoir de message (désinscrit, sans accord ou sans email).');
-      await envoyerFidelite(c, 'nouvelles');
-      c.envois = { ...(c.envois || {}), ['nouvelles' + maintenantParis().slice(0, 10)]: maintenantParis().slice(0, 10) };
+      if (!clientActif(c)) return refus(400, 'Ce client ne reçoit pas de messages (désinscrit, sans accord ou sans email).');
+      const auj = maintenantParis().slice(0, 10);
+      const cle = d.cle === 'nouvelles' ? 'nouvelles' + auj : echeanceFidelite(c, auj);
+      if (!cle || (d.cle !== 'nouvelles' && cle !== d.cle)) return refus(400, 'Ce message n\'est plus à envoyer.');
+      c.envois = { ...(c.envois || {}), [cle]: auj };
       await sauver(r, 'client', c);
       await compter('fidelite_envoyee');
       return res.status(200).json({ ok: true });
