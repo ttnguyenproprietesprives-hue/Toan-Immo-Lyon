@@ -317,7 +317,7 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300)}
       <div class="apropos-reperes">
         <span class="apropos-repere">7 ans d'expérience</span>
         <span class="apropos-repere">Secteur Est lyonnais</span>
-        <span class="apropos-repere">★ 4,8/5 · 37 avis</span>
+        <span class="apropos-repere">★ <span data-avis="immodvisor-note">4,8</span>/5 · <span data-avis="immodvisor-nb">37</span> avis</span>
       </div>
     </div>
     <div class="apropos-texte">
@@ -576,17 +576,17 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300)}
     <div style="display:flex;gap:2rem;margin-bottom:2rem;flex-wrap:wrap;align-items:center;justify-content:space-between">
       <div style="display:flex;gap:2.5rem;flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:10px">
-          <div style="font-size:2rem;font-weight:500;color:var(--navy);line-height:1">4,8/5</div>
+          <div style="font-size:2rem;font-weight:500;color:var(--navy);line-height:1"><span data-avis="immodvisor-note">4,8</span>/5</div>
           <div>
             <div style="color:#C9A84C;font-size:16px;letter-spacing:1px">★★★★★</div>
-            <div style="font-size:12px;color:var(--gray-500)">37 avis · Immodvisor</div>
+            <div style="font-size:12px;color:var(--gray-500)"><span data-avis="immodvisor-nb">37</span> avis · Immodvisor</div>
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:10px">
-          <div style="font-size:2rem;font-weight:500;color:var(--navy);line-height:1">5/5</div>
+          <div style="font-size:2rem;font-weight:500;color:var(--navy);line-height:1"><span data-avis="google-note">5</span>/5</div>
           <div>
             <div style="color:#C9A84C;font-size:16px;letter-spacing:1px">★★★★★</div>
-            <div style="font-size:12px;color:var(--gray-500)">15 avis · Google</div>
+            <div style="font-size:12px;color:var(--gray-500)"><span data-avis="google-nb">18</span> avis · Google</div>
           </div>
         </div>
       </div>
@@ -702,7 +702,7 @@ footer{text-align:center;padding:2rem;font-size:12px;color:var(--gray-300)}
       <p style="font-size:12px;color:var(--gray-500);margin-top:8px">Vous avez été accompagné par Toam ? Votre avis aide d'autres propriétaires.</p>
     </div>
     <div style="text-align:center">
-      <a href="https://www.immodvisor.com/professionnels/mandataire-immobilier/pro/proprietes-privees-trung-toam-nguyen-36743" target="_blank" rel="noopener" style="font-size:13px;color:var(--gray-500);text-decoration:none;margin:0 12px">Voir les 37 avis Immodvisor →</a>
+      <a href="https://www.immodvisor.com/professionnels/mandataire-immobilier/pro/proprietes-privees-trung-toam-nguyen-36743" target="_blank" rel="noopener" style="font-size:13px;color:var(--gray-500);text-decoration:none;margin:0 12px">Voir les <span data-avis="immodvisor-nb">37</span> avis Immodvisor →</a>
       <a href="https://maps.app.goo.gl/Bmr8cC62UCyVGJCR8" target="_blank" rel="noopener" style="font-size:13px;color:var(--gray-500);text-decoration:none;margin:0 12px">Voir les avis Google →</a>
       <div style="margin-top:1.25rem">
         <a href="https://g.page/r/CWXo7roLQ-gZEAE/review" target="_blank" rel="noopener" style="display:inline-block;font-size:14px;font-weight:500;color:var(--navy-deep);background:var(--gold);text-decoration:none;padding:11px 22px;border-radius:var(--radius-sm)">⭐ Vous êtes client ? Laissez un avis</a>
@@ -891,6 +891,17 @@ async function lancerEstimation(){
       :'Une erreur est survenue. Vérifiez votre connexion et réessayez.';
   }
 }
+// Notes et nombres d'avis à jour (Immodvisor et Google, actualisés chaque matin côté serveur).
+// En cas d'échec, les valeurs écrites dans la page restent affichées.
+fetch('/api/relances?avis=1').then(r=>r.ok?r.json():null).then(a=>{
+  if(!a)return;
+  const note=v=>Number(v).toLocaleString('fr-FR',{maximumFractionDigits:1});
+  for(const p of ['immodvisor','google']){
+    if(!a[p])continue;
+    document.querySelectorAll(`[data-avis="${p}-note"]`).forEach(e=>e.textContent=note(a[p].note));
+    document.querySelectorAll(`[data-avis="${p}-nb"]`).forEach(e=>e.textContent=a[p].nb);
+  }
+}).catch(()=>{});
 // Depuis une page commune, la commune arrive pré-sélectionnée : /?commune=Bron%20(69500)#estimation
 (function(){
   const c=new URLSearchParams(location.search).get('commune');

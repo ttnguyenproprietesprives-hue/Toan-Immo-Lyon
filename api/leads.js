@@ -3,6 +3,7 @@ import { isAdmin } from './_auth.js';
 import { parseBody, esc } from './_util.js';
 import { redis, moisCle, compter } from './_leads.js';
 import { suiviAdmin, clientDepuisLead } from './_suivi.js';
+import { lireAvis, majAvis, saisirAvis } from './_avis.js';
 
 const STATUTS = ['nouveau', 'rappelé', 'rdv', 'mandat', 'vendu', 'perdu'];
 const LIEN_AVIS_GOOGLE = 'https://g.page/r/CWXo7roLQ-gZEAE/review';
@@ -50,6 +51,23 @@ export default async function handler(req, res) {
   try {
     // Suivi des visites et fidélisation (page /suivi.html) : même route, pour ne pas multiplier les fonctions Vercel
     if (req.query.module === 'suivi') return await suiviAdmin(req, res, r);
+
+    // Notes et nombres d'avis affichés sur le site : consultation, mise à jour immédiate, saisie manuelle
+    if (req.query.module === 'avis') {
+      if (req.method === 'GET') {
+        return res.status(200).json({ ...(await lireAvis(r)), googleAutomatique: !!process.env.GOOGLE_PLACES_API_KEY });
+      }
+      const corps = parseBody(req);
+      if (corps.action === 'maj') {
+        const bilan = await majAvis(r);
+        return res.status(200).json({ bilan, ...(await lireAvis(r)) });
+      }
+      try {
+        return res.status(200).json(await saisirAvis(r, corps.plateforme, corps.note, corps.nb));
+      } catch (e) {
+        return res.status(400).json({ error: e.message });
+      }
+    }
 
     if (req.method === 'GET') {
       const ids = await r.lrange('leads:ids', 0, 299);

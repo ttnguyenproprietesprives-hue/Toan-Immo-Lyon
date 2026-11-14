@@ -11,6 +11,7 @@ import { esc } from './_util.js';
 import { redis, compter, CALENDRIER_RELANCES } from './_leads.js';
 import { PRIX, ANNEE_PRIX } from './_prix.js';
 import { suiviPublic, tachesQuotidiennes } from './_suivi.js';
+import { lireAvis, majAvis } from './_avis.js';
 
 const SITE = 'https://www.toanimmo-lyon.fr';
 const CALENDLY = 'https://calendly.com/tt-nguyen-proprietesprivees/rendez-vous-estimation-vente-achat';
@@ -136,6 +137,16 @@ export default async function handler(req, res) {
   if (!r) return res.status(500).json({ error: 'Base Upstash non configurée' });
   const { desinscription, jeton, test, etape } = req.query;
 
+  // Notes et nombres d'avis affichés sur la page d'accueil (lecture publique, mise en cache 1 heure)
+  if (req.query.avis) {
+    const a = await lireAvis(r);
+    res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
+    return res.status(200).json({
+      immodvisor: { note: a.immodvisor.note, nb: a.immodvisor.nb },
+      google: { note: a.google.note, nb: a.google.nb },
+    });
+  }
+
   // 0. Liens publics du suivi des visites (bon de visite, avis) et désinscription des messages de fidélisation
   if (req.query.visite || req.query.desabo) {
     try {
@@ -218,6 +229,13 @@ export default async function handler(req, res) {
   } catch (e) {
     console.error('suivi quotidien :', e);
     bilan.suivi = { erreur: e.message };
+  }
+  // 5. Mise à jour des notes et nombres d'avis (Immodvisor, Google) affichés sur le site
+  try {
+    bilan.avis = await majAvis(r);
+  } catch (e) {
+    console.error('avis :', e);
+    bilan.avis = { erreur: e.message };
   }
   console.log('relances :', bilan);
   res.status(200).json(bilan);

@@ -104,6 +104,19 @@ details td{padding:3px 12px 3px 0;vertical-align:top}
     <h2>Parcours de l'estimation en ligne (ce mois-ci)</h2>
     <div class="entonnoir" id="entonnoir"></div>
 
+    <h2>Avis affichés sur le site</h2>
+    <div class="entonnoir" id="avis-bloc">
+      <div id="avis-valeurs" style="font-size:14px;line-height:1.9">Chargement…</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px;font-size:13px">
+        <strong style="color:var(--navy)">Corriger Google à la main :</strong>
+        <input id="avis-g-note" type="text" inputmode="decimal" placeholder="Note (ex. 5,0)" style="width:110px;padding:7px 10px;border:1px solid var(--gray-100);border-radius:var(--radius-sm);font-family:inherit">
+        <input id="avis-g-nb" type="number" min="0" placeholder="Nb d'avis" style="width:100px;padding:7px 10px;border:1px solid var(--gray-100);border-radius:var(--radius-sm);font-family:inherit">
+        <button class="btn-sm" style="color:var(--navy);border-color:var(--gray-100)" onclick="enregistrerAvisGoogle()">Enregistrer</button>
+        <button class="btn-sm" style="color:var(--navy);border-color:var(--gray-100)" onclick="majAvisMaintenant(this)">↻ Mettre à jour maintenant</button>
+      </div>
+      <p id="avis-message" style="font-size:12px;color:var(--gray-500);margin-top:8px"></p>
+    </div>
+
     <h2>Tous les leads</h2>
     <div class="filtres">
       <input type="search" id="recherche" placeholder="Rechercher un nom, une commune, un téléphone…" oninput="afficherLeads()"/>
@@ -172,10 +185,47 @@ async function charger() {
     document.getElementById('sous-titre').textContent = `${d.leads.length} lead(s) enregistré(s) · ${nouveaux} à traiter · mis à jour à ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
     afficherStats();
     afficherLeads();
+    chargerAvis();
   } catch (e) {
     document.getElementById('sous-titre').textContent = '';
     document.getElementById('leads').innerHTML = `<div class="erreur">Impossible de charger les leads : ${esc(e.message)}</div>`;
   }
+}
+
+// Avis affichés sur le site (mis à jour automatiquement chaque matin ; Google peut être corrigé à la main)
+function afficherAvis(a) {
+  const ligne = (nom, x) => {
+    const date = new Date(x.maj).toLocaleDateString('fr-FR');
+    const note = Number(x.note).toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    return `<div><strong>${nom}</strong> : ${note}/5 · ${esc(x.nb)} avis <span style="color:var(--gray-300)">— ${esc(x.source)}, le ${date}</span></div>`;
+  };
+  document.getElementById('avis-valeurs').innerHTML = ligne('Immodvisor', a.immodvisor) + ligne('Google', a.google) +
+    (a.googleAutomatique === false ? '<div style="font-size:12px;color:var(--gray-500)">Google n\'est pas encore lu automatiquement : quand vous recevez un nouvel avis Google, corrigez le chiffre ci-dessous.</div>' : '');
+}
+async function chargerAvis() {
+  try {
+    const r = await fetch('/api/leads?module=avis');
+    if (r.ok) afficherAvis(await r.json());
+  } catch (e) { document.getElementById('avis-valeurs').textContent = 'Avis indisponibles.'; }
+}
+async function enregistrerAvisGoogle() {
+  const msg = document.getElementById('avis-message');
+  const r = await fetch('/api/leads?module=avis', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ plateforme: 'google', note: document.getElementById('avis-g-note').value, nb: document.getElementById('avis-g-nb').value }) });
+  const d = await r.json().catch(() => ({}));
+  msg.textContent = r.ok ? '✅ Enregistré : le site affichera ces chiffres d\'ici une heure au plus.' : '⚠️ ' + (d.error || 'Erreur');
+  if (r.ok) chargerAvis();
+}
+async function majAvisMaintenant(bouton) {
+  const msg = document.getElementById('avis-message');
+  bouton.disabled = true; msg.textContent = 'Mise à jour en cours…';
+  try {
+    const r = await fetch('/api/leads?module=avis', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'maj' }) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Erreur');
+    msg.textContent = `Immodvisor : ${d.bilan.immodvisor} · Google : ${d.bilan.google}`;
+    chargerAvis();
+  } catch (e) { msg.textContent = '⚠️ ' + e.message; } finally { bouton.disabled = false; }
 }
 
 function afficherStats() {
